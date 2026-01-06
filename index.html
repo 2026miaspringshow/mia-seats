@@ -14,58 +14,45 @@
             --reserve-yellow: #FFF9C4; 
             --reserve-sold-dark: #FFD54F; 
             --reserve-border: #FBC02D;
-            --reserve-selected-orange: #FF9800; /* 保留席被選取時的橘色 */
+            --reserve-selected-orange: #FF9800;
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
             --confirm-dark: #0d1b2a;
         }
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
         .header { background: var(--mia-gradient); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
         .header-title-wrapper { display: flex; align-items: center; gap: 12px; }
         .header-logo { height: 48px; width: auto; object-fit: contain; } 
         .header-title h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 1.5px; line-height: 1.2; }
         .header-title span { font-size: 13px; font-weight: 400; opacity: 0.95; }
         .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
-
         .main-content { flex: 1; overflow-y: auto; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
         .legend-area { display: flex; gap: 12px; margin: 15px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ddd; }
-
         .venue-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
         .stage-area { width: fit-content; margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0 50px; }
         .screen { background: #121212; width: 400px; margin-bottom: 8px; padding: 10px; color: #fff; border-radius: 0 0 80px 80px; text-align: center; font-size: 13px; letter-spacing: 5px; }
         .view-notice { font-size: 10px; color: #999; margin-bottom: 30px; }
-
         .venue-container { display: grid; grid-template-columns: auto auto auto; gap: 50px; width: fit-content; }
         .block { display: flex; flex-direction: column; gap: 6px; }
         #LT, #LM, #LB { align-items: flex-end; }
         #RT, #RM, #RB { align-items: flex-start; }
         #MT, #MM, #MB { align-items: center; }
         .row { display: flex; gap: 4px; height: 32px; align-items: center; }
-        
         .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: 0.2s; color: #333; }
         .sold { background-color: var(--sold-pink) !important; color: white !important; border: 1px solid transparent; }
         .selected { background-color: var(--primary-blue) !important; color: white !important; }
-        
-        /* 保留席基礎樣式 */
         .reserve-seat { background-color: var(--reserve-yellow) !important; border: 1px solid var(--reserve-border) !important; color: #333 !important; }
-        /* 保留席被點選時的樣式：橘底白字 */
         .reserve-seat.selected { background-color: var(--reserve-selected-orange) !important; border-color: var(--reserve-selected-orange) !important; color: white !important; }
-        /* 保留席已售出樣式 */
         .sold.reserve-seat { background-color: var(--reserve-sold-dark) !important; border: 1px solid var(--reserve-sold-dark) !important; color: #5d4037 !important; }
-
         .camera-seat { background: var(--camera-light-gray) !important; color: #888; cursor: default; }
-
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 50px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 500; border-top: 1px solid #eee; }
         .logged-in .bottom-bar { display: flex; }
         .price-info { text-align: left; }
         .price-row-top { font-size: 12px; color: #999; }
         .price-row-middle { font-size: 26px; font-weight: 800; color: var(--primary-blue); }
         .price-row-bottom { font-size: 12px; color: #aaa; }
-        
         .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
-
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
         .modal { background: white; width: 100%; max-width: 420px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         .modal-header { background: var(--mia-gradient); color: white; padding: 18px; text-align: center; font-size: 18px; font-weight: bold; position: relative; flex-shrink: 0; }
@@ -78,7 +65,6 @@
         .detail-label { font-size: 11px; color: #999; font-weight: bold; }
         .detail-value { font-size: 15px; color: #333; margin-top: 3px; }
         .btn-confirm-final { background: var(--confirm-dark); color: white; width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
-        
         .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s; z-index: 2000; padding-top: 60px; }
         .side-menu.active { right: 0; }
         .menu-item { padding: 15px 25px; border-bottom: 1px solid #eee; color: #333; cursor: pointer; font-weight: bold; }
@@ -114,12 +100,10 @@
             <div class="legend-item"><div class="legend-box" style="background:var(--camera-light-gray);"></div> 攝影席</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border:1px solid var(--reserve-border);"></div> 保留席</div>
         </div>
-        
         <div class="venue-wrapper">
             <div class="stage-area">
                 <div class="screen">STAGE 舞 台</div>
                 <div class="view-notice">座位圖示僅供參考，實際視野可能因場地佈置略有差異。</div>
-                
                 <div class="venue-container" id="grid">
                     <div id="LT" class="block"></div><div id="MT" class="block"></div><div id="RT" class="block"></div>
                     <div id="LM" class="block"></div><div id="MM" class="block"></div><div id="RM" class="block"></div>
@@ -143,8 +127,7 @@
             <div class="modal-header">管理員劃位購票<span class="close-x" onclick="closeModal('modal-purchase')">×</span></div>
             <div class="modal-body">
                 <div class="form-group"><label>劃位座位</label><input type="text" id="buy-seat-list" readonly style="background:#f9f9f9; color:var(--primary-blue); font-weight:bold; border:none;"></div>
-                <div class="form-group">
-                    <label>票價類型</label>
+                <div class="form-group"><label>票價類型</label>
                     <select id="p-type" onchange="calculateFinalTotal()">
                         <option value="600">早鳥票價 NT$ 600 / 張</option>
                         <option value="800">原價票價 NT$ 800 / 張</option>
@@ -154,8 +137,7 @@
                 <div class="form-group"><label>購票人姓名</label><input type="text" id="p-name"></div>
                 <div class="form-group"><label>購票人電話</label><input type="tel" id="p-phone"></div>
                 <div class="form-group"><label>付款日期</label><input type="date" id="p-date"></div>
-                <div class="form-group">
-                    <label>售票人員</label>
+                <div class="form-group"><label>售票人員</label>
                     <select id="p-staff">
                         <option value="">請選擇</option><option value="芷瑜">芷瑜</option><option value="Daifi">Daifi</option><option value="Ruby">Ruby</option><option value="孟萱">孟萱</option>
                     </select>
@@ -185,12 +167,9 @@
                     <div style="margin-top:20px;"><button class="btn-confirm-final" onclick="showRefundSection()">取消售出</button></div>
                 </div>
                 <div id="refund-section" style="display:none; border-top:2px solid #eee; padding-top:15px; margin-top:15px;">
-                    <div class="form-group">
-                        <label>請選擇取消原因</label>
+                    <div class="form-group"><label>請選擇取消原因</label>
                         <select id="refund-reason">
-                            <option value="取消退費">取消退費</option>
-                            <option value="更換位置">更換位置</option>
-                            <option value="其他原因">其他原因</option>
+                            <option value="取消退費">取消退費</option><option value="更換位置">更換位置</option><option value="其他原因">其他原因</option>
                         </select>
                     </div>
                     <div style="display:flex; gap:10px;">
@@ -206,36 +185,32 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, onValue, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
+        // 這裡已經換成您的新 Firebase 資訊
         const firebaseConfig = {
-            apiKey: "AIzaSyA8gIluzZA5k8fkIpC0RKvUypsSRZM9rlM",
-            authDomain: "seatsystem-dbfc5.firebaseapp.com",
-            databaseURL: "https://seatsystem-dbfc5-default-rtdb.firebaseio.com",
-            projectId: "seatsystem-dbfc5",
-            storageBucket: "seatsystem-dbfc5.firebasestorage.app",
-            messagingSenderId: "924114074974",
-            appId: "1:924114074974:web:3ad35d39cc6813c636a3cf"
+            apiKey: "AIzaSyBpxxZ0DJvGJdu8anqJWmGeGHf_wUufv28",
+            authDomain: "miaspringshow.firebaseapp.com",
+            databaseURL: "https://miaspringshow-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "miaspringshow",
+            storageBucket: "miaspringshow.firebasestorage.app",
+            messagingSenderId: "756405426670",
+            appId: "1:756405426670:web:cc234426bb8c3ac2ce96ff"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         let isAdmin = false, seatsData = {}, selectedIds = [], activeSeatForRefund = null;
-
         const cameraSeats = ["F15", "F16", "F17", "G15", "G16", "G17"];
-        
-        // 更新保留席範圍：A1~A27, B1~B29
         const reserveSeats = [];
         for(let i=1; i<=27; i++) reserveSeats.push("A"+i);
         for(let i=1; i<=29; i++) reserveSeats.push("B"+i);
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
-
         window.toggleMenu = () => {
             const menu = document.getElementById('side-menu');
             const overlay = document.getElementById('menu-overlay');
             menu.classList.toggle('active');
             overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
         };
-
         window.handleLogin = () => {
             const pw = prompt("管理員密碼：");
             if(pw === "mia2026") {
@@ -246,15 +221,12 @@
                 render(); toggleMenu();
             }
         };
-
         window.handleLogout = () => { isAdmin = false; selectedIds = []; document.getElementById('main-body').classList.remove('logged-in'); document.getElementById('menu-login').style.display = 'block'; document.getElementById('menu-logout').style.display = 'none'; render(); toggleMenu(); };
-
         const layout = [
             { id: 'T', rows: 5, L: [7,8,9,10,11], M: 13, R: [7,8,9,10,11], start: 'A' },
             { id: 'M', rows: 10, L: 9, M: 13, R: 9, start: 'F' },
             { id: 'B', rows: 10, L: 6, M: 13, R: 6, start: 'P' }
         ];
-
         function render() {
             layout.forEach(sec => {
                 for(let r=0; r<sec.rows; r++){
@@ -267,7 +239,6 @@
             });
             updateBottomBar();
         }
-
         function updateBlock(bid, rowName, start, end) {
             const block = document.getElementById(bid);
             if(rowName==='A' || rowName==='F' || rowName==='P') block.innerHTML = '';
@@ -290,7 +261,6 @@
             }
             block.appendChild(rowDiv);
         }
-
         function handleSeatClick(id) {
             if(!isAdmin) return;
             const current = seatsData[id] || { status: 'available' };
@@ -310,29 +280,23 @@
             if (selectedIds.includes(id)) {
                 selectedIds = selectedIds.filter(i => i !== id);
             } else { 
-                if(selectedIds.length >= 5) {
-                    alert("單次購票上限為 5 張座位。");
-                    return;
-                }
+                if(selectedIds.length >= 5) { alert("單次購票上限 5 張。"); return; }
                 selectedIds.push(id); 
             }
             render();
         }
-
         window.showRefundSection = () => { document.getElementById('refund-section').style.display = 'block'; };
         window.hideRefundSection = () => { document.getElementById('refund-section').style.display = 'none'; };
-
         document.getElementById('btn-do-refund').onclick = () => {
             const reason = document.getElementById('refund-reason').value;
             const originalData = seatsData[activeSeatForRefund];
-            if(confirm(`確定要以「${reason}」原因取消 ${activeSeatForRefund} 嗎？`)) {
+            if(confirm(`確定要取消 ${activeSeatForRefund} 嗎？`)) {
                 const refundRef = push(ref(db, 'refunds'));
                 set(refundRef, { ...originalData, seatId: activeSeatForRefund, refundReason: reason, refundTime: new Date().toLocaleString() });
                 update(ref(db, `seats/${activeSeatForRefund}`), { status: 'available', name: null, staff: null, date: null, note: null, phone: null, ticketType: null });
                 closeModal('modal-detail');
             }
         };
-
         function updateBottomBar() {
             const count = selectedIds.length;
             const price = parseInt(document.getElementById('p-type').value);
@@ -340,14 +304,11 @@
             document.getElementById('display-sub-info').innerText = `已選 ${count} 張`;
             document.getElementById('btn-open-modal').disabled = count === 0;
         }
-
         window.calculateFinalTotal = () => { 
             updateBottomBar(); 
             document.getElementById('buy-final-total').innerText = `NT$ ${selectedIds.length * parseInt(document.getElementById('p-type').value)}`; 
         };
-        
         window.closeModal = (mid) => { document.getElementById(mid).style.display = 'none'; };
-        
         document.getElementById('btn-open-modal').onclick = () => {
             document.getElementById('p-name').value = ""; document.getElementById('p-phone').value = "";
             document.getElementById('p-staff').value = ""; document.getElementById('p-note').value = "";
@@ -356,7 +317,6 @@
             document.getElementById('p-date').value = new Date().toISOString().split('T')[0];
             calculateFinalTotal();
         };
-
         document.getElementById('btn-confirm-final').onclick = () => {
             const name = document.getElementById('p-name').value;
             const staff = document.getElementById('p-staff').value;
@@ -368,7 +328,6 @@
             });
             update(ref(db), updates).then(() => { selectedIds = []; closeModal('modal-purchase'); render(); });
         };
-
         window.exportData = (type) => {
             const pw = prompt("管理員密碼：");
             if(pw !== "mia2026") return;
