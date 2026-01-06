@@ -27,15 +27,15 @@
         .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
 
         .main-content { flex: 1; overflow-y: auto; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
-        .legend-area { display: flex; gap: 12px; margin: 15px 0 5px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
+        .legend-area { display: flex; gap: 12px; margin: 15px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ddd; }
-        .view-notice { font-size: 10px; color: #999; margin-bottom: 15px; }
 
         .venue-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
         .stage-area { width: fit-content; margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0 50px; }
-        .screen { background: #121212; width: 400px; margin-bottom: 40px; padding: 10px; color: #fff; border-radius: 0 0 80px 80px; text-align: center; font-size: 13px; letter-spacing: 5px; }
-        
+        .screen { background: #121212; width: 400px; margin-bottom: 8px; padding: 10px; color: #fff; border-radius: 0 0 80px 80px; text-align: center; font-size: 13px; letter-spacing: 5px; }
+        .view-notice { font-size: 10px; color: #999; margin-bottom: 30px; }
+
         .venue-container { display: grid; grid-template-columns: auto auto auto; gap: 50px; width: fit-content; }
         .block { display: flex; flex-direction: column; gap: 6px; }
         #LT, #LM, #LB { align-items: flex-end; }
@@ -106,11 +106,12 @@
             <div class="legend-item"><div class="legend-box" style="background:var(--camera-light-gray);"></div> 攝影席</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border:1px solid var(--reserve-border);"></div> 保留席</div>
         </div>
-        <div class="view-notice">座位圖示僅供參考，實際視野可能因場地佈置略有差異。</div>
         
         <div class="venue-wrapper">
             <div class="stage-area">
                 <div class="screen">STAGE 舞 台</div>
+                <div class="view-notice">座位圖示僅供參考，實際視野可能因場地佈置略有差異。</div>
+                
                 <div class="venue-container" id="grid">
                     <div id="LT" class="block"></div><div id="MT" class="block"></div><div id="RT" class="block"></div>
                     <div id="LM" class="block"></div><div id="MM" class="block"></div><div id="RM" class="block"></div>
@@ -299,7 +300,6 @@
             if (selectedIds.includes(id)) {
                 selectedIds = selectedIds.filter(i => i !== id);
             } else { 
-                // 購票上限檢查
                 if(selectedIds.length >= 5) {
                     alert("單次購票上限為 5 張座位。");
                     return;
