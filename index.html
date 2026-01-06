@@ -12,7 +12,7 @@
             --sold-pink: rgb(216, 83, 123); 
             --camera-light-gray: #E0E0E0; 
             --reserve-yellow: #FFF9C4; 
-            --reserve-sold-dark: #FFD54F; /* 已售出保留席底色 */
+            --reserve-sold-dark: #FFD54F; 
             --reserve-border: #FBC02D;
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
             --confirm-dark: #0d1b2a;
@@ -27,9 +27,10 @@
         .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
 
         .main-content { flex: 1; overflow-y: auto; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
-        .legend-area { display: flex; gap: 12px; margin: 15px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
+        .legend-area { display: flex; gap: 12px; margin: 15px 0 5px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ddd; }
+        .view-notice { font-size: 10px; color: #999; margin-bottom: 15px; }
 
         .venue-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
         .stage-area { width: fit-content; margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0 50px; }
@@ -105,6 +106,8 @@
             <div class="legend-item"><div class="legend-box" style="background:var(--camera-light-gray);"></div> 攝影席</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border:1px solid var(--reserve-border);"></div> 保留席</div>
         </div>
+        <div class="view-notice">座位圖示僅供參考，實際視野可能因場地佈置略有差異。</div>
+        
         <div class="venue-wrapper">
             <div class="stage-area">
                 <div class="screen">STAGE 舞 台</div>
@@ -282,7 +285,7 @@
             const current = seatsData[id] || { status: 'available' };
             if(current.status === 'sold') {
                 activeSeatForRefund = id;
-                hideRefundSection(); // 確保每次點開都是初始狀態
+                hideRefundSection();
                 document.getElementById('det-seat-id').innerText = id;
                 document.getElementById('det-name').innerText = current.name || '';
                 document.getElementById('det-phone').innerText = current.phone || '';
@@ -293,8 +296,16 @@
                 document.getElementById('modal-detail').style.display = 'flex';
                 return;
             }
-            if (selectedIds.includes(id)) selectedIds = selectedIds.filter(i => i !== id);
-            else { if(selectedIds.length < 10) selectedIds.push(id); }
+            if (selectedIds.includes(id)) {
+                selectedIds = selectedIds.filter(i => i !== id);
+            } else { 
+                // 購票上限檢查
+                if(selectedIds.length >= 5) {
+                    alert("單次購票上限為 5 張座位。");
+                    return;
+                }
+                selectedIds.push(id); 
+            }
             render();
         }
 
@@ -305,15 +316,8 @@
             const reason = document.getElementById('refund-reason').value;
             const originalData = seatsData[activeSeatForRefund];
             if(confirm(`確定要以「${reason}」原因取消 ${activeSeatForRefund} 嗎？`)) {
-                // 1. 紀錄退票到 refunds
                 const refundRef = push(ref(db, 'refunds'));
-                set(refundRef, {
-                    ...originalData,
-                    seatId: activeSeatForRefund,
-                    refundReason: reason,
-                    refundTime: new Date().toLocaleString()
-                });
-                // 2. 清空座位狀態
+                set(refundRef, { ...originalData, seatId: activeSeatForRefund, refundReason: reason, refundTime: new Date().toLocaleString() });
                 update(ref(db, `seats/${activeSeatForRefund}`), { status: 'available', name: null, staff: null, date: null, note: null, phone: null, ticketType: null });
                 closeModal('modal-detail');
             }
@@ -350,12 +354,7 @@
             if(!name || !staff) return alert("請填寫姓名與售票人員");
             const updates = {};
             selectedIds.forEach(id => {
-                updates[`seats/${id}`] = {
-                    status: 'sold', name, staff, ticketType: typeText,
-                    phone: document.getElementById('p-phone').value,
-                    date: document.getElementById('p-date').value,
-                    note: document.getElementById('p-note').value
-                };
+                updates[`seats/${id}`] = { status: 'sold', name, staff, ticketType: typeText, phone: document.getElementById('p-phone').value, date: document.getElementById('p-date').value, note: document.getElementById('p-note').value };
             });
             update(ref(db), updates).then(() => { selectedIds = []; closeModal('modal-purchase'); render(); });
         };
@@ -363,7 +362,6 @@
         window.exportData = (type) => {
             const pw = prompt("管理員密碼：");
             if(pw !== "mia2026") return;
-            
             onValue(ref(db, type), (snapshot) => {
                 const data = snapshot.val() || {};
                 let csv = "";
