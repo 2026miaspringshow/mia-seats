@@ -6,91 +6,94 @@
     <title>2026 MIA SPRING SHOW | 票務管理系統</title>
     <style>
         :root { 
-            --primary-blue: rgb(94, 121, 172); /* 柔和藍 (已選擇) */
-            --accent-blue: #2196f3; /* 亮藍 (總計金額) */
+            --primary-blue: rgb(94, 121, 172); 
+            --accent-blue: #2196f3; 
             --bg-gray: #f8f9fa; 
-            --sold-pink: rgb(216, 83, 123); /* 柔和粉 (已售出) */
+            --sold-pink: rgb(216, 83, 123); 
             --camera-gray: #616161;
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
-            --confirm-dark: #0d1b2a; /* 深色底框 */
+            --confirm-dark: #0d1b2a;
         }
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* 頂部標題列 */
-        .header { background: var(--mia-gradient); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
+        /* 1. 標題區塊強化 */
+        .header { background: var(--mia-gradient); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
         .header-title-wrapper { display: flex; align-items: center; gap: 12px; }
-        .header-logo { height: 45px; width: auto; object-fit: contain; } 
-        .header-title h1 { margin: 0; font-size: 16px; letter-spacing: 1px; line-height: 1.2; }
-        .header-title span { font-size: 11px; opacity: 0.9; }
+        .header-logo { height: 48px; width: auto; object-fit: contain; } 
+        .header-title h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 1.5px; line-height: 1.2; } /* 主標加粗 */
+        .header-title span { font-size: 13px; font-weight: 400; opacity: 0.95; } /* 副標加大 */
         
-        .menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
         .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s; z-index: 2000; padding-top: 60px; }
         .side-menu.active { right: 0; }
         .menu-item { padding: 15px 25px; border-bottom: 1px solid #eee; color: #333; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; }
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
 
-        .main-content { flex: 1; overflow-y: auto; padding-bottom: 100px; display: flex; flex-direction: column; align-items: center; }
+        .main-content { flex: 1; overflow-y: auto; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
         .legend-area { display: flex; gap: 12px; margin: 15px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ddd; }
 
-        /* 座位顏色更新 */
+        /* 3. 座位區佈局對齊修正 */
         .venue-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
-        .stage-area { width: fit-content; min-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0 40px; }
-        .screen { background: #121212; width: 400px; margin-bottom: 40px; padding: 8px; color: #fff; border-radius: 0 0 80px 80px; text-align: center; font-size: 13px; }
-        .venue-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; width: 100%; }
-        .block { display: flex; flex-direction: column; gap: 6px; }
-        .row { display: flex; gap: 4px; height: 32px; align-items: center; }
-        .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: 0.2s; }
+        .stage-area { width: fit-content; margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0 50px; }
+        .screen { background: #121212; width: 400px; margin-bottom: 40px; padding: 10px; color: #fff; border-radius: 0 0 80px 80px; text-align: center; font-size: 13px; letter-spacing: 5px; }
         
+        .venue-container { display: grid; grid-template-columns: auto auto auto; gap: 50px; width: fit-content; }
+        .block { display: flex; flex-direction: column; gap: 6px; }
+        #LT, #LM, #LB { align-items: flex-end; }
+        #RT, #RM, #RB { align-items: flex-start; }
+        #MT, #MM, #MB { align-items: center; }
+        .row { display: flex; gap: 4px; height: 32px; align-items: center; }
+        
+        .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: 0.1s; }
         .sold { background-color: var(--sold-pink) !important; color: white !important; border: none; }
-        .selected { background-color: var(--primary-blue) !important; color: white !important; transform: scale(1.05); }
+        .selected { background-color: var(--primary-blue) !important; color: white !important; }
         .camera-seat { background: var(--camera-gray) !important; border: none; color: white; cursor: default; }
         .pr-seat { border: 1px solid #ffca28 !important; background-color: #fffde7; }
 
-        /* 底部資訊條按鈕優化 */
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 95px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 25px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 100; border-top: 1px solid #eee; }
+        /* 4. 底部資訊條改版 */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 100px; background: white; display: none; align-items: center; justify-content: center; gap: 60px; padding: 0 40px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 100; border-top: 1px solid #eee; }
         .logged-in .bottom-bar { display: flex; }
+
+        .price-info { text-align: left; line-height: 1.4; }
+        .price-row-top { font-size: 12px; color: #999; margin-bottom: 2px; }
+        .price-row-middle { font-size: 24px; font-weight: 800; color: var(--primary-blue); }
+        .price-row-bottom { font-size: 12px; color: #aaa; }
 
         .btn-confirm-main { 
             background: var(--confirm-dark); 
             color: white; 
-            padding: 15px 35px; 
-            border-radius: 30px; 
+            padding: 16px 45px; 
+            border-radius: 50px; 
             border: none; 
             font-size: 16px; 
             font-weight: bold; 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
-            gap: 10px; 
+            gap: 12px; 
             box-shadow: 0 4px 15px rgba(13, 27, 42, 0.3);
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
-        .btn-confirm-main:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
-        .btn-confirm-main svg { width: 20px; height: 20px; fill: white; }
+        .btn-confirm-main:disabled { background: #e0e0e0; color: #bbb; box-shadow: none; cursor: not-allowed; }
+        .btn-confirm-main svg { width: 22px; height: 22px; fill: white; }
+        .btn-confirm-main:disabled svg { fill: #bbb; }
 
         /* 彈窗樣式 */
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 15px; }
-        .modal { background: white; width: 100%; max-width: 400px; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        .modal-header { background: var(--mia-gradient); color: white; padding: 18px; text-align: center; font-size: 18px; font-weight: bold; letter-spacing: 2px; position: relative; }
-        .close-x { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 24px; opacity: 0.8; }
-        .modal-body { padding: 20px 25px; }
+        .modal { background: white; width: 100%; max-width: 400px; border-radius: 15px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .modal-header { background: var(--mia-gradient); color: white; padding: 18px; text-align: center; font-size: 18px; font-weight: bold; position: relative; }
+        .close-x { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 24px; }
+        .modal-body { padding: 25px; }
 
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #666; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
 
         .total-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; border-top: 1px dashed #ddd; padding-top: 15px; }
-        .total-label { font-weight: bold; color: #666; font-size: 14px; }
         .total-amount { font-size: 28px; font-weight: bold; color: var(--accent-blue); }
-
         .btn-confirm-final { background: var(--confirm-dark); color: white; width: 100%; padding: 16px; border-radius: 10px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
-
-        /* 訂單字卡 */
-        .info-card { background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; display: flex; border-left: 5px solid var(--primary-blue); }
-        .info-card.red-border { border-left-color: var(--sold-pink); }
-        .card-content { padding: 12px; flex: 1; }
     </style>
 </head>
 <body id="main-body">
@@ -136,8 +139,9 @@
 
     <div class="bottom-bar">
         <div class="price-info">
-            <div id="display-total" style="font-size:24px; font-weight:bold; color:var(--primary-blue);">NT$ 0</div>
-            <div id="display-count" style="font-size:12px; color:#888;">已選擇 0 張座位</div>
+            <div class="price-row-top">總計金額</div>
+            <div id="display-total" class="price-row-middle">NT$ 0</div>
+            <div id="display-sub-info" class="price-row-bottom">早鳥票價 NT$ 600 / 張 | 已選 0 張</div>
         </div>
         <button class="btn-confirm-main" id="btn-open-modal" disabled>
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -156,233 +160,4 @@
                 <div class="form-group">
                     <label>票價類型</label>
                     <select id="p-type" onchange="calculateFinalTotal()">
-                        <option value="600">早鳥票價 NT$ 600 / 張</option>
-                        <option value="800">原價票價 NT$ 800 / 張</option>
-                        <option value="0">公關票價 NT$ 0 / 張</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>購票人姓名</label><input type="text" id="p-name" placeholder="請輸入姓名"></div>
-                <div class="form-group"><label>購票人電話</label><input type="tel" id="p-phone" placeholder="請輸入電話"></div>
-                <div class="form-group"><label>付款日期</label><input type="date" id="p-date"></div>
-                <div class="form-group">
-                    <label>售票人員</label>
-                    <select id="p-staff">
-                        <option value="">請選擇</option><option value="芷瑜">芷瑜</option><option value="Daifi">Daifi</option><option value="Ruby">Ruby</option><option value="孟萱">孟萱</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>備註</label><input type="text" id="p-note"></div>
-                
-                <div class="total-row">
-                    <div class="total-label">總計金額</div>
-                    <div class="total-amount" id="buy-final-total">NT$ 0</div>
-                </div>
-                <button class="btn-confirm-final" id="btn-confirm-final">確認劃位售出</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modal-detail">
-        <div class="modal">
-            <div class="modal-header">
-                票務管理中心
-                <span class="close-x" onclick="closeModal('modal-detail')">×</span>
-            </div>
-            <div class="modal-body">
-                <div class="info-card"><div class="card-content"><p style="font-size:28px; font-weight:bold; color:var(--primary-blue); margin:0;" id="det-seat-id"></p></div></div>
-                <div class="info-card red-border">
-                    <div class="card-content">
-                        <div class="info-row"><div class="info-label">購票人：</div><span id="det-name"></span></div>
-                        <div class="info-row"><div class="info-label">付款日期：</div><span id="det-date"></span></div>
-                        <div class="info-row"><div class="info-label">售票員：</div><span id="det-staff"></span></div>
-                        <div class="info-row"><div class="info-label">備註：</div><span id="det-note"></span></div>
-                    </div>
-                </div>
-                <button class="btn-confirm-final" style="background:var(--sold-pink);" id="btn-cancel-seat">取消銷售 (退票)</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyA8gIluzZA5k8fkIpC0RKvUypsSRZM9rlM",
-            authDomain: "seatsystem-dbfc5.firebaseapp.com",
-            databaseURL: "https://seatsystem-dbfc5-default-rtdb.firebaseio.com",
-            projectId: "seatsystem-dbfc5",
-            storageBucket: "seatsystem-dbfc5.firebasestorage.app",
-            messagingSenderId: "924114074974",
-            appId: "1:924114074974:web:3ad35d39cc6813c636a3cf"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        let isAdmin = false, seatsData = {}, selectedIds = [], activeSeatForRefund = null;
-
-        const cameraSeats = ["F15", "F16", "F17", "G15", "G16", "G17"];
-        const prSeats = [];
-        for(let i=8; i<=20; i++) prSeats.push("A"+i);
-        for(let i=9; i<=21; i++) prSeats.push("B"+i);
-
-        onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
-
-        window.toggleMenu = () => {
-            const menu = document.getElementById('side-menu');
-            const overlay = document.getElementById('menu-overlay');
-            menu.classList.toggle('active');
-            overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
-        };
-
-        window.handleLogin = () => {
-            const pw = prompt("管理員密碼：");
-            if(pw === "mia2026") {
-                isAdmin = true;
-                document.getElementById('main-body').classList.add('logged-in');
-                document.getElementById('menu-login').style.display = 'none';
-                document.getElementById('menu-logout').style.display = 'flex';
-                render(); toggleMenu();
-            }
-        };
-
-        window.handleLogout = () => {
-            isAdmin = false; selectedIds = [];
-            document.getElementById('main-body').classList.remove('logged-in');
-            document.getElementById('menu-login').style.display = 'flex';
-            document.getElementById('menu-logout').style.display = 'none';
-            render(); toggleMenu();
-        };
-
-        window.exportData = () => {
-            const pw = prompt("密碼：");
-            if(pw !== "mia2026") return;
-            let csv = "座位,購票人,電話,付款日期,售票員,備註\n";
-            Object.keys(seatsData).forEach(id => {
-                const s = seatsData[id];
-                if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.date},${s.staff},${s.note}\n`;
-            });
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `MIA_Report_${new Date().toLocaleDateString()}.csv`;
-            link.click(); toggleMenu();
-        };
-
-        const layout = [
-            { id: 'T', rows: 5, L: [7,8,9,10,11], M: 13, R: [7,8,9,10,11], start: 'A' },
-            { id: 'M', rows: 10, L: 9, M: 13, R: 9, start: 'F' },
-            { id: 'B', rows: 10, L: 6, M: 13, R: 6, start: 'P' }
-        ];
-
-        function render() {
-            layout.forEach(sec => {
-                for(let r=0; r<sec.rows; r++){
-                    const rowName = String.fromCharCode(sec.start.charCodeAt(0)+r);
-                    const cL = Array.isArray(sec.L)?sec.L[r]:sec.L;
-                    const cM = sec.M;
-                    const cR = Array.isArray(sec.R)?sec.R[r]:sec.R;
-                    updateBlock(`L${sec.id}`, rowName, 1, cL);
-                    updateBlock(`M${sec.id}`, rowName, cL+1, cL+cM);
-                    updateBlock(`R${sec.id}`, rowName, cL+cM+1, cL+cM+cR);
-                }
-            });
-            updateBottomBar();
-        }
-
-        function updateBlock(bid, rowName, start, end) {
-            const block = document.getElementById(bid);
-            if(rowName==='A' || rowName==='F' || rowName==='P') block.innerHTML = '';
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'row';
-            for(let s=start; s<=end; s++){
-                const id = rowName + s;
-                const div = document.createElement('div');
-                if (cameraSeats.includes(id)) {
-                    div.className = "seat camera-seat";
-                    div.innerText = "📷";
-                } else {
-                    const status = (seatsData[id] && seatsData[id].status) ? seatsData[id].status : 'available';
-                    div.className = `seat ${status} ${prSeats.includes(id) ? 'pr-seat' : ''}`;
-                    if(selectedIds.includes(id)) div.classList.add('selected');
-                    div.innerText = id;
-                    div.onclick = () => handleSeatClick(id);
-                }
-                rowDiv.appendChild(div);
-            }
-            block.appendChild(rowDiv);
-        }
-
-        function handleSeatClick(id) {
-            if(!isAdmin) return;
-            const current = seatsData[id] || { status: 'available' };
-            if(current.status === 'sold') {
-                activeSeatForRefund = id;
-                document.getElementById('det-seat-id').innerText = id;
-                document.getElementById('det-name').innerText = current.name || '無';
-                document.getElementById('det-date').innerText = current.date || '無';
-                document.getElementById('det-staff').innerText = current.staff || '無';
-                document.getElementById('det-note').innerText = current.note || '無';
-                document.getElementById('modal-detail').style.display = 'flex';
-                return;
-            }
-            if (selectedIds.includes(id)) {
-                selectedIds = selectedIds.filter(i => i !== id);
-            } else {
-                if(selectedIds.length >= 5) return alert("上限 5 張");
-                selectedIds.push(id);
-            }
-            render();
-        }
-
-        document.getElementById('btn-cancel-seat').onclick = () => {
-            if(confirm(`退票 ${activeSeatForRefund}？`)) {
-                update(ref(db, `seats/${activeSeatForRefund}`), { status: 'available', name: null, phone: null, date: null, staff: null, note: null });
-                closeModal('modal-detail');
-            }
-        };
-
-        function updateBottomBar() {
-            const count = selectedIds.length;
-            const price = parseInt(document.getElementById('p-type').value);
-            document.getElementById('display-total').innerText = `NT$ ${count * price}`;
-            document.getElementById('display-count').innerText = `已選擇 ${count} 張座位`;
-            document.getElementById('btn-open-modal').disabled = count === 0;
-        }
-
-        window.calculateFinalTotal = () => { 
-            updateBottomBar(); 
-            document.getElementById('buy-final-total').innerText = `NT$ ${selectedIds.length * parseInt(document.getElementById('p-type').value)}`; 
-        };
-        
-        window.closeModal = (mid) => { document.getElementById(mid).style.display = 'none'; };
-        
-        document.getElementById('btn-open-modal').onclick = () => {
-            document.getElementById('modal-purchase').style.display = 'flex';
-            document.getElementById('buy-seat-list').value = selectedIds.join(', ');
-            document.getElementById('p-date').value = new Date().toISOString().split('T')[0];
-            calculateFinalTotal();
-        };
-
-        document.getElementById('btn-confirm-final').onclick = () => {
-            const name = document.getElementById('p-name').value;
-            const staff = document.getElementById('p-staff').value;
-            const date = document.getElementById('p-date').value;
-            if(!name || !staff || !date) return alert("請填寫姓名、日期與人員");
-            const updates = {};
-            selectedIds.forEach(id => {
-                updates[`seats/${id}`] = {
-                    status: 'sold', name, staff, date,
-                    phone: document.getElementById('p-phone').value,
-                    note: document.getElementById('p-type').selectedOptions[0].text + " " + document.getElementById('p-note').value
-                };
-            });
-            update(ref(db), updates).then(() => { 
-                alert("購票劃位成功！"); 
-                selectedIds = []; 
-                closeModal('modal-purchase'); 
-                render(); 
-            });
-        };
-    </script>
-</body>
-</html>
+                        <option value="600">早鳥票
