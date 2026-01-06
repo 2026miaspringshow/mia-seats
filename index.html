@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta property="og:title" content="2026 8th MIA SPRING SHOW">
+    <meta property="og:description" content="MIA 春季展演 | 票務即時管理系統">
+    <meta property="og:image" content="https://2026miaspringshow.github.io/mia-seats/logo.png">
+    <meta property="og:type" content="website">
+    <meta name="description" content="2026 MIA SPRING SHOW 即時座位票務系統">
+
     <title>2026 MIA SPRING SHOW | 票務管理系統</title>
     <style>
         :root { 
@@ -185,6 +192,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, onValue, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
+        // Firebase 設定
         const firebaseConfig = {
             apiKey: "AIzaSyBpxxZ0DJvGJdu8anqJWmGeGHf_wUufv28",
             authDomain: "miaspringshow.firebaseapp.com",
@@ -198,18 +206,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         let isAdmin = false, seatsData = {}, selectedIds = [], activeSeatForRefund = null;
+        
+        // 特殊座位定義
         const cameraSeats = ["F15", "F16", "F17", "G15", "G16", "G17"];
         const reserveSeats = [];
         for(let i=1; i<=27; i++) reserveSeats.push("A"+i);
         for(let i=1; i<=29; i++) reserveSeats.push("B"+i);
 
+        // 監聽資料庫變化
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
+
+        // 選單邏輯
         window.toggleMenu = () => {
             const menu = document.getElementById('side-menu');
             const overlay = document.getElementById('menu-overlay');
             menu.classList.toggle('active');
             overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
         };
+
         window.handleLogin = () => {
             const pw = prompt("管理員密碼：");
             if(pw === "mia2026") {
@@ -220,12 +234,23 @@
                 render(); toggleMenu();
             }
         };
-        window.handleLogout = () => { isAdmin = false; selectedIds = []; document.getElementById('main-body').classList.remove('logged-in'); document.getElementById('menu-login').style.display = 'block'; document.getElementById('menu-logout').style.display = 'none'; render(); toggleMenu(); };
+
+        window.handleLogout = () => { 
+            isAdmin = false; 
+            selectedIds = []; 
+            document.getElementById('main-body').classList.remove('logged-in'); 
+            document.getElementById('menu-login').style.display = 'block'; 
+            document.getElementById('menu-logout').style.display = 'none'; 
+            render(); toggleMenu(); 
+        };
+
+        // 座位圖渲染邏輯
         const layout = [
             { id: 'T', rows: 5, L: [7,8,9,10,11], M: 13, R: [7,8,9,10,11], start: 'A' },
             { id: 'M', rows: 10, L: 9, M: 13, R: 9, start: 'F' },
             { id: 'B', rows: 10, L: 6, M: 13, R: 6, start: 'P' }
         ];
+
         function render() {
             layout.forEach(sec => {
                 for(let r=0; r<sec.rows; r++){
@@ -238,6 +263,7 @@
             });
             updateBottomBar();
         }
+
         function updateBlock(bid, rowName, start, end) {
             const block = document.getElementById(bid);
             if(rowName==='A' || rowName==='F' || rowName==='P') block.innerHTML = '';
@@ -260,6 +286,7 @@
             }
             block.appendChild(rowDiv);
         }
+
         function handleSeatClick(id) {
             if(!isAdmin) return;
             const current = seatsData[id] || { status: 'available' };
@@ -284,8 +311,10 @@
             }
             render();
         }
+
         window.showRefundSection = () => { document.getElementById('refund-section').style.display = 'block'; };
         window.hideRefundSection = () => { document.getElementById('refund-section').style.display = 'none'; };
+
         document.getElementById('btn-do-refund').onclick = () => {
             const reason = document.getElementById('refund-reason').value;
             const originalData = seatsData[activeSeatForRefund];
@@ -296,6 +325,7 @@
                 closeModal('modal-detail');
             }
         };
+
         function updateBottomBar() {
             const count = selectedIds.length;
             const price = parseInt(document.getElementById('p-type').value);
@@ -303,18 +333,22 @@
             document.getElementById('display-sub-info').innerText = `已選 ${count} 張`;
             document.getElementById('btn-open-modal').disabled = count === 0;
         }
+
         window.calculateFinalTotal = () => { 
             updateBottomBar(); 
             document.getElementById('buy-final-total').innerText = `NT$ ${selectedIds.length * parseInt(document.getElementById('p-type').value)}`; 
         };
+
         window.closeModal = (mid) => { document.getElementById(mid).style.display = 'none'; };
+
+        // 2. 修正時區日期邏輯：確保點開購票時日期為台灣時間
         document.getElementById('btn-open-modal').onclick = () => {
             document.getElementById('p-name').value = ""; document.getElementById('p-phone').value = "";
             document.getElementById('p-staff').value = ""; document.getElementById('p-note').value = "";
             document.getElementById('modal-purchase').style.display = 'flex';
             document.getElementById('buy-seat-list').value = selectedIds.join(', ');
             
-            // 修正時區日期邏輯
+            // 修正時區
             const now = new Date();
             const offset = now.getTimezoneOffset() * 60000;
             const localISOTime = (new Date(now - offset)).toISOString().split('T')[0];
@@ -322,6 +356,7 @@
             
             calculateFinalTotal();
         };
+
         document.getElementById('btn-confirm-final').onclick = () => {
             const name = document.getElementById('p-name').value;
             const staff = document.getElementById('p-staff').value;
@@ -329,10 +364,19 @@
             if(!name || !staff) return alert("請填寫姓名與售票人員");
             const updates = {};
             selectedIds.forEach(id => {
-                updates[`seats/${id}`] = { status: 'sold', name, staff, ticketType: typeText, phone: document.getElementById('p-phone').value, date: document.getElementById('p-date').value, note: document.getElementById('p-note').value };
+                updates[`seats/${id}`] = { 
+                    status: 'sold', 
+                    name, 
+                    staff, 
+                    ticketType: typeText, 
+                    phone: document.getElementById('p-phone').value, 
+                    date: document.getElementById('p-date').value, 
+                    note: document.getElementById('p-note').value 
+                };
             });
             update(ref(db), updates).then(() => { selectedIds = []; closeModal('modal-purchase'); render(); });
         };
+
         window.exportData = (type) => {
             const pw = prompt("管理員密碼：");
             if(pw !== "mia2026") return;
