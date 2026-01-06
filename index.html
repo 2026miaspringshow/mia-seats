@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 MIA SPRING SHOW | 票務系統</title>
+    <title>2026 MIA SPRING SHOW | 票務管理系統</title>
     <style>
-        :root { --primary-blue: #1a237e; --accent-blue: #3f51b5; --bg-gray: #f8f9fa; }
+        :root { --primary-blue: #1a237e; --accent-blue: #3f51b5; --bg-gray: #f8f9fa; --sold-red: #d32f2f; }
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        .header { background: linear-gradient(135deg, #1a237e 0%, #311b92 100%); color: white; padding: 15px 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .header h1 { margin: 0; font-size: 18px; letter-spacing: 1px; }
-        .header p { margin: 5px 0 0; font-size: 14px; opacity: 0.8; }
+        /* 頂部導覽列風格 */
+        .header { background: linear-gradient(135deg, #1a237e 0%, #311b92 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .header-title { display: flex; flex-direction: column; }
+        .header-title h1 { margin: 0; font-size: 16px; letter-spacing: 1px; }
+        .header-title span { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+        
+        /* 管理員登入按鈕 (仿我的訂單風格) */
+        .admin-trigger { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 15px; border-radius: 6px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .admin-trigger:hover { background: rgba(255,255,255,0.25); }
+        .logged-in .admin-trigger { background: #4caf50; border-color: #4caf50; }
 
         .main-content { flex: 1; overflow-y: auto; padding-bottom: 100px; display: flex; flex-direction: column; align-items: center; }
         .legend-area { display: flex; gap: 12px; margin: 15px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
@@ -25,20 +32,25 @@
         .block { display: flex; flex-direction: column; gap: 6px; }
         .row { display: flex; gap: 4px; height: 32px; align-items: center; }
 
-        .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: 0.2s; }
-        .sold { background-color: #eeeeee !important; color: #bbb !important; cursor: not-allowed; border: none; }
+        /* 座位樣式調整 */
+        .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: default; transition: 0.2s; }
+        .available { cursor: pointer; }
+        .sold { background-color: var(--sold-red) !important; color: white !important; border: none; }
         .selected { background-color: var(--primary-blue) !important; color: white !important; border-color: var(--primary-blue) !important; box-shadow: 0 4px 8px rgba(26,35,126,0.3); }
-        .camera-seat { background: #424242 !important; border: none; color: white; cursor: default; }
-        .camera-seat::after { content: "📷"; font-size: 12px; }
+        .camera-seat { background: #424242 !important; border: none; color: white; }
         .pr-seat { border: 1px solid #ffca28 !important; background-color: #fffde7; }
 
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 85px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 100; }
+        /* 置底列 - 預設隱藏，登入後顯示 */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 85px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 25px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 100; }
+        .logged-in .bottom-bar { display: flex; }
+        
         .price-info { display: flex; flex-direction: column; }
         .price-total { font-size: 22px; font-weight: bold; color: var(--accent-blue); }
         .seat-count { font-size: 12px; color: #888; }
         .btn-checkout { background: var(--primary-blue); color: white; border: none; padding: 12px 35px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-checkout:disabled { background: #ccc; cursor: not-allowed; }
 
+        /* 購票彈窗 */
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 200; padding: 15px; }
         .modal { background: white; width: 100%; max-width: 420px; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
         .modal-header { background: #f8f9fa; padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; text-align: center; }
@@ -49,24 +61,24 @@
         .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: bold; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
         .selected-list { background: #e8eaf6; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; color: var(--primary-blue); font-weight: bold; text-align: center; }
-        
-        .payment-box { border: 2px solid var(--accent-blue); border-radius: 10px; padding: 12px; text-align: center; margin-bottom: 15px; background: #f0f2ff; }
-        .total-confirm { font-size: 20px; font-weight: bold; color: #d32f2f; text-align: right; margin-top: 5px; }
-        .admin-btn { position: absolute; bottom: 95px; right: 20px; font-size: 10px; color: #ddd; background: none; border: none; }
+        .total-confirm { font-size: 20px; font-weight: bold; color: var(--sold-red); text-align: right; margin-top: 5px; }
     </style>
 </head>
-<body>
+<body id="main-body">
 
     <div class="header">
-        <h1>2026 8th MIA SPRING SHOW</h1>
-        <p>即時座位票務系統</p>
+        <div class="header-title">
+            <h1>2026 8th MIA SPRING SHOW</h1>
+            <span>即時座位票務系統</span>
+        </div>
+        <button class="admin-trigger" id="admin-login-btn">🔒 管理員登入</button>
     </div>
 
     <div class="main-content">
         <div class="legend-area">
             <div class="legend-item"><div class="legend-box"></div> 可選</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--primary-blue); border:none;"></div> 已選</div>
-            <div class="legend-item"><div class="legend-box" style="background:#eee; border:none;"></div> 已售</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--sold-red); border:none;"></div> 已售</div>
             <div class="legend-item"><div class="legend-box pr-seat"></div> 預留</div>
             <div class="legend-item"><div class="legend-box camera-seat"></div> 攝影</div>
         </div>
@@ -81,7 +93,6 @@
                 </div>
             </div>
         </div>
-        <button class="admin-btn" onclick="checkAdmin()">Admin Login</button>
     </div>
 
     <div class="bottom-bar">
@@ -94,10 +105,9 @@
 
     <div class="modal-overlay" id="modal-overlay">
         <div class="modal">
-            <div class="modal-header">確認訂位資訊</div>
+            <div class="modal-header">管理員劃位確認</div>
             <div class="modal-body">
                 <div class="selected-list" id="modal-seat-list">座位：未選擇</div>
-                
                 <div class="form-group">
                     <label>票價類型</label>
                     <select id="p-type" onchange="calculateFinalTotal()">
@@ -105,35 +115,21 @@
                         <option value="800">原價票 $800/張</option>
                     </select>
                 </div>
-
-                <div class="payment-box">
-                    <div style="font-size: 11px; color: #666;">付款方式</div>
-                    <div style="font-weight: bold; color: var(--primary-blue);">現場現金繳費</div>
-                </div>
-
-                <div class="form-group">
-                    <label>購票人姓名</label><input type="text" id="p-name" placeholder="必填">
-                </div>
-                <div class="form-group">
-                    <label>購票人電話</label><input type="tel" id="p-phone" placeholder="必填">
-                </div>
-                <div class="form-group">
-                    <label>付款日期</label><input type="date" id="p-date">
-                </div>
+                <div class="form-group"><label>購票人姓名</label><input type="text" id="p-name"></div>
+                <div class="form-group"><label>購票人電話</label><input type="tel" id="p-phone"></div>
+                <div class="form-group"><label>付款日期</label><input type="date" id="p-date"></div>
                 <div class="form-group">
                     <label>售票人員</label>
                     <select id="p-staff">
-                        <option value="">請選擇人員</option><option value="芷瑜">芷瑜</option><option value="Daifi">Daifi</option><option value="Ruby">Ruby</option><option value="孟萱">孟萱</option>
+                        <option value="">請選擇</option><option value="芷瑜">芷瑜</option><option value="Daifi">Daifi</option><option value="Ruby">Ruby</option><option value="孟萱">孟萱</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>備註</label><input type="text" id="p-note">
-                </div>
+                <div class="form-group"><label>備註</label><input type="text" id="p-note"></div>
                 <div class="total-confirm" id="modal-final-total">總計 NT$ 0</div>
             </div>
             <div class="modal-footer">
-                <button class="btn-checkout" style="flex:1; background:#999;" onclick="closeModal()">取消</button>
-                <button class="btn-checkout" style="flex:2;" id="btn-confirm-final">最後確認購票</button>
+                <button class="btn-checkout" style="background:#999;" onclick="closeModal()">取消</button>
+                <button class="btn-checkout" style="flex:1;" id="btn-confirm-final">確認劃位售出</button>
             </div>
         </div>
     </div>
@@ -174,6 +170,27 @@
             render();
         });
 
+        // 管理員登入邏輯
+        document.getElementById('admin-login-btn').onclick = () => {
+            if(isAdmin) {
+                if(confirm("確定要登出管理員模式嗎？")) {
+                    isAdmin = false;
+                    selectedIds = [];
+                    document.getElementById('main-body').classList.remove('logged-in');
+                    document.getElementById('admin-login-btn').innerHTML = "🔒 管理員登入";
+                    render();
+                }
+                return;
+            }
+            const pw = prompt("請輸入管理員密碼：");
+            if(pw === "mia2026") {
+                isAdmin = true;
+                document.getElementById('main-body').classList.add('logged-in');
+                document.getElementById('admin-login-btn').innerHTML = "✅ 管理中 (登出)";
+                render();
+            } else if(pw !== null) alert("密碼錯誤");
+        };
+
         function render() {
             layout.forEach(sec => {
                 for(let r=0; r<sec.rows; r++){
@@ -213,19 +230,19 @@
         }
 
         function handleSeatClick(id) {
+            if(!isAdmin) return; // 未登入不能點擊
+
             const current = seatsData[id] || { status: 'available' };
             if(current.status === 'sold') {
-                if(isAdmin) {
-                    if(confirm(`座位 ${id}\n購票人：${current.name}\n售票員：${current.staff}\n確定要退票嗎？`)) {
-                        update(ref(db, `seats/${id}`), { status: 'available', name: null, phone: null, date: null, staff: null, note: null });
-                    }
-                } else alert("此座位已售出");
+                if(confirm(`座位 ${id}\n購票人：${current.name}\n售票員：${current.staff}\n確定要退票嗎？`)) {
+                    update(ref(db, `seats/${id}`), { status: 'available', name: null, phone: null, date: null, staff: null, note: null });
+                }
                 return;
             }
             if (selectedIds.includes(id)) {
                 selectedIds = selectedIds.filter(i => i !== id);
             } else {
-                if(selectedIds.length >= 5) return alert("一次最多只能選購 5 張座位喔！");
+                if(selectedIds.length >= 5) return alert("上限 5 張座位");
                 selectedIds.push(id);
             }
             render();
@@ -235,7 +252,7 @@
             const count = selectedIds.length;
             const price = parseInt(document.getElementById('p-type').value);
             document.getElementById('display-total').innerText = `NT$ ${count * price}`;
-            document.getElementById('display-count').innerText = `已選 ${count} 張座位 (上限 5 張)`;
+            document.getElementById('display-count').innerText = `已選 ${count} 張座位`;
             document.getElementById('btn-open-modal').disabled = count === 0;
         }
 
@@ -250,40 +267,34 @@
         
         document.getElementById('btn-open-modal').onclick = () => {
             document.getElementById('modal-overlay').style.display = 'flex';
-            document.getElementById('modal-seat-list').innerText = `選取座位：${selectedIds.join(', ')}`;
+            document.getElementById('modal-seat-list').innerText = `劃位座位：${selectedIds.join(', ')}`;
             document.getElementById('p-date').valueAsDate = new Date();
             calculateFinalTotal();
         };
 
         document.getElementById('btn-confirm-final').onclick = () => {
             const name = document.getElementById('p-name').value;
-            const phone = document.getElementById('p-phone').value;
             const staff = document.getElementById('p-staff').value;
-            if(!name || !phone || !staff) return alert("請填寫姓名、電話與售票人員");
+            if(!name || !staff) return alert("請填寫姓名與售票人員");
 
             const updates = {};
             selectedIds.forEach(id => {
                 updates[`seats/${id}`] = {
-                    status: 'sold', name, phone, staff,
+                    status: 'sold', name, staff,
+                    phone: document.getElementById('p-phone').value,
                     date: document.getElementById('p-date').value,
                     note: document.getElementById('p-note').value + ` (${document.getElementById('p-type').selectedOptions[0].text.split(' ')[0]})`
                 };
             });
             update(ref(db), updates).then(() => {
-                alert("購票完成！");
+                alert("劃位完成！");
                 selectedIds = [];
                 closeModal();
-                // 清空輸入框
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-phone').value = '';
                 document.getElementById('p-note').value = '';
                 render();
             });
-        };
-
-        window.checkAdmin = () => {
-            const pw = prompt("Admin Password:");
-            if(pw === "mia2026") { isAdmin = true; alert("管理員模式啟動：可點擊已售座位退票"); }
         };
     </script>
 </body>
