@@ -11,6 +11,8 @@
             --bg-gray: #f8f9fa; 
             --sold-pink: rgb(216, 83, 123); 
             --camera-gray: #616161;
+            --reserve-yellow: #FFF9C4; /* 鵝黃色 */
+            --reserve-border: #FBC02D;
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
             --confirm-dark: #0d1b2a;
         }
@@ -46,9 +48,10 @@
         .sold { background-color: var(--sold-pink) !important; color: white !important; border: none; }
         .selected { background-color: var(--primary-blue) !important; color: white !important; }
         .camera-seat { background: var(--camera-gray) !important; border: none; color: white; cursor: default; }
+        .reserve-seat { background-color: var(--reserve-yellow) !important; border: 1px solid var(--reserve-border) !important; }
 
-        /* 底部橫排資訊 */
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 40px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 500; border-top: 1px solid #eee; }
+        /* 底部橫排 */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 50px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 500; border-top: 1px solid #eee; }
         .logged-in .bottom-bar { display: flex; }
 
         .price-info { text-align: left; }
@@ -56,22 +59,12 @@
         .price-row-middle { font-size: 26px; font-weight: 800; color: var(--primary-blue); }
         .price-row-bottom { font-size: 12px; color: #aaa; }
 
-        .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 50px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 50px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-confirm-main:disabled { background: #e0e0e0; cursor: not-allowed; }
 
-        /* 彈出視窗樣式：固定大小、圓角 */
+        /* 彈窗樣式 */
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
-        .modal { 
-            background: white; 
-            width: 100%; 
-            max-width: 420px; 
-            max-height: 85vh; 
-            border-radius: 20px; 
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; 
-            box-shadow: 0 25px 60px rgba(0,0,0,0.4); 
-        }
+        .modal { background: white; width: 100%; max-width: 420px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         .modal-header { background: var(--mia-gradient); color: white; padding: 18px; text-align: center; font-size: 18px; font-weight: bold; position: relative; flex-shrink: 0; }
         .close-x { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 24px; z-index: 10; }
         .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
@@ -89,7 +82,7 @@
         
         .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s; z-index: 2000; padding-top: 60px; }
         .side-menu.active { right: 0; }
-        .menu-item { padding: 15px 25px; border-bottom: 1px solid #eee; color: #333; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .menu-item { padding: 15px 25px; border-bottom: 1px solid #eee; color: #333; cursor: pointer; display: flex; align-items: center; font-weight: bold; }
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
     </style>
 </head>
@@ -108,9 +101,9 @@
 
     <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
     <div class="side-menu" id="side-menu">
-        <div class="menu-item" id="menu-login" onclick="handleLogin()">🔒 管理員登入</div>
-        <div class="menu-item" id="menu-logout" onclick="handleLogout()" style="display:none;">🔓 管理員登出</div>
-        <div class="menu-item" onclick="exportData()">📥 匯出購票名冊</div>
+        <div class="menu-item" id="menu-login" onclick="handleLogin()">管理員登入</div>
+        <div class="menu-item" id="menu-logout" onclick="handleLogout()" style="display:none;">管理員登出</div>
+        <div class="menu-item" onclick="exportData()">匯出購票名冊</div>
     </div>
 
     <div class="main-content">
@@ -119,6 +112,7 @@
             <div class="legend-item"><div class="legend-box" style="background:var(--primary-blue);"></div> 已選擇</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--sold-pink);"></div> 已售出</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--camera-gray);"></div> 攝影席</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border-color:var(--reserve-border);"></div> 保留席</div>
         </div>
         <div class="venue-wrapper">
             <div class="stage-area">
@@ -184,10 +178,7 @@
                 <div class="detail-row"><div class="detail-label">付款日期：</div><div class="detail-value" id="det-date"></div></div>
                 <div class="detail-row"><div class="detail-label">售票人員：</div><div class="detail-value" id="det-staff"></div></div>
                 <div class="detail-row"><div class="detail-label">備註：</div><div class="detail-value" id="det-note"></div></div>
-                
-                <div style="margin-top:20px;">
-                    <button class="btn-confirm-final" id="btn-cancel-seat">取消售出</button>
-                </div>
+                <div style="margin-top:20px;"><button class="btn-confirm-final" id="btn-cancel-seat">取消售出</button></div>
             </div>
         </div>
     </div>
@@ -211,6 +202,9 @@
         let isAdmin = false, seatsData = {}, selectedIds = [], activeSeatForRefund = null;
 
         const cameraSeats = ["F15", "F16", "F17", "G15", "G16", "G17"];
+        const reserveSeats = [];
+        for(let i=8; i<=20; i++) reserveSeats.push("A"+i);
+        for(let i=9; i<=21; i++) reserveSeats.push("B"+i);
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
 
@@ -227,12 +221,27 @@
                 isAdmin = true;
                 document.getElementById('main-body').classList.add('logged-in');
                 document.getElementById('menu-login').style.display = 'none';
-                document.getElementById('menu-logout').style.display = 'flex';
+                document.getElementById('menu-logout').style.display = 'block';
                 render(); toggleMenu();
             }
         };
 
-        window.handleLogout = () => { isAdmin = false; selectedIds = []; document.getElementById('main-body').classList.remove('logged-in'); render(); toggleMenu(); };
+        window.handleLogout = () => { isAdmin = false; selectedIds = []; document.getElementById('main-body').classList.remove('logged-in'); document.getElementById('menu-login').style.display = 'block'; document.getElementById('menu-logout').style.display = 'none'; render(); toggleMenu(); };
+
+        window.exportData = () => {
+            const pw = prompt("密碼：");
+            if(pw !== "mia2026") return;
+            let csv = "座位,購票人,電話,票價類型,付款日期,售票員,備註\n";
+            Object.keys(seatsData).forEach(id => {
+                const s = seatsData[id];
+                if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.date},${s.staff},${s.note}\n`;
+            });
+            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `MIA_Report_${new Date().toLocaleDateString()}.csv`;
+            link.click(); toggleMenu();
+        };
 
         const layout = [
             { id: 'T', rows: 5, L: [7,8,9,10,11], M: 13, R: [7,8,9,10,11], start: 'A' },
@@ -265,7 +274,7 @@
                     div.className = "seat camera-seat";
                 } else {
                     const status = (seatsData[id] && seatsData[id].status) ? seatsData[id].status : 'available';
-                    div.className = `seat ${status}`;
+                    div.className = `seat ${status} ${reserveSeats.includes(id) ? 'reserve-seat' : ''}`;
                     if(selectedIds.includes(id)) div.classList.add('selected');
                     div.innerText = id;
                     div.onclick = () => handleSeatClick(id);
@@ -281,12 +290,12 @@
             if(current.status === 'sold') {
                 activeSeatForRefund = id;
                 document.getElementById('det-seat-id').innerText = id;
-                document.getElementById('det-name').innerText = current.name || '無';
-                document.getElementById('det-phone').innerText = current.phone || '無';
-                document.getElementById('det-type').innerText = current.ticketType || '無';
-                document.getElementById('det-staff').innerText = current.staff || '無';
-                document.getElementById('det-date').innerText = current.date || '無';
-                document.getElementById('det-note').innerText = current.note || '無';
+                document.getElementById('det-name').innerText = current.name || '';
+                document.getElementById('det-phone').innerText = current.phone || '';
+                document.getElementById('det-type').innerText = current.ticketType || '';
+                document.getElementById('det-staff').innerText = current.staff || '';
+                document.getElementById('det-date').innerText = current.date || '';
+                document.getElementById('det-note').innerText = current.note || '';
                 document.getElementById('modal-detail').style.display = 'flex';
                 return;
             }
@@ -327,12 +336,13 @@
         document.getElementById('btn-confirm-final').onclick = () => {
             const name = document.getElementById('p-name').value;
             const staff = document.getElementById('p-staff').value;
-            const ticketType = document.getElementById('p-type').options[document.getElementById('p-type').selectedIndex].text;
+            const typeText = document.getElementById('p-type').options[document.getElementById('p-type').selectedIndex].text.split(' NT$')[0];
             if(!name || !staff) return alert("請填寫姓名與售票人員");
             const updates = {};
             selectedIds.forEach(id => {
                 updates[`seats/${id}`] = {
-                    status: 'sold', name, staff, ticketType,
+                    status: 'sold', name, staff, 
+                    ticketType: typeText,
                     phone: document.getElementById('p-phone').value,
                     date: document.getElementById('p-date').value,
                     note: document.getElementById('p-note').value
