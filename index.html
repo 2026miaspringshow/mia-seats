@@ -10,21 +10,19 @@
             --accent-blue: #2196f3; 
             --bg-gray: #f8f9fa; 
             --sold-pink: rgb(216, 83, 123); 
-            --camera-gray: #616161;
-            --reserve-yellow: #FFF9C4; /* 鵝黃色 */
+            --camera-light-gray: #E0E0E0; /* 淺灰色攝影席 */
+            --reserve-yellow: #FFF9C4; 
             --reserve-border: #FBC02D;
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
             --confirm-dark: #0d1b2a;
         }
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* 標題區塊 */
         .header { background: var(--mia-gradient); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
         .header-title-wrapper { display: flex; align-items: center; gap: 12px; }
         .header-logo { height: 48px; width: auto; object-fit: contain; } 
         .header-title h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 1.5px; line-height: 1.2; }
         .header-title span { font-size: 13px; font-weight: 400; opacity: 0.95; }
-        
         .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
 
         .main-content { flex: 1; overflow-y: auto; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
@@ -44,21 +42,25 @@
         #MT, #MM, #MB { align-items: center; }
         .row { display: flex; gap: 4px; height: 32px; align-items: center; }
         
-        .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; }
-        .sold { background-color: var(--sold-pink) !important; color: white !important; border: none; }
-        .selected { background-color: var(--primary-blue) !important; color: white !important; }
-        .camera-seat { background: var(--camera-gray) !important; border: none; color: white; cursor: default; }
+        /* 座位基礎樣式 */
+        .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: 0.2s; color: #333; }
+        
+        /* 各種狀態顏色 */
+        .sold { background-color: var(--sold-pink) !important; color: white !important; border: 1px solid transparent; }
+        .selected { background-color: var(--primary-blue) !important; color: white !important; border-color: var(--primary-blue) !important; }
+        .camera-seat { background: var(--camera-light-gray) !important; border-color: #ccc; color: #888; cursor: default; }
         .reserve-seat { background-color: var(--reserve-yellow) !important; border: 1px solid var(--reserve-border) !important; }
+        
+        /* 已售出的保留席 (區別一般已售出席) */
+        .sold.reserve-seat { border: 2px solid var(--reserve-border) !important; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3); }
 
         /* 底部橫排 */
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 50px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 500; border-top: 1px solid #eee; }
         .logged-in .bottom-bar { display: flex; }
-
         .price-info { text-align: left; }
         .price-row-top { font-size: 12px; color: #999; }
         .price-row-middle { font-size: 26px; font-weight: 800; color: var(--primary-blue); }
         .price-row-bottom { font-size: 12px; color: #aaa; }
-
         .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 50px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-confirm-main:disabled { background: #e0e0e0; cursor: not-allowed; }
 
@@ -68,14 +70,12 @@
         .modal-header { background: var(--mia-gradient); color: white; padding: 18px; text-align: center; font-size: 18px; font-weight: bold; position: relative; flex-shrink: 0; }
         .close-x { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 24px; z-index: 10; }
         .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
-
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #666; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         .detail-row { margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
-        .detail-label { font-size: 12px; color: #888; font-weight: bold; }
-        .detail-value { font-size: 15px; color: #333; margin-top: 2px; }
-
+        .detail-label { font-size: 11px; color: #999; font-weight: bold; text-transform: uppercase; }
+        .detail-value { font-size: 15px; color: #333; margin-top: 3px; font-weight: 500; }
         .total-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; border-top: 1px dashed #ddd; padding-top: 15px; }
         .total-amount { font-size: 28px; font-weight: bold; color: var(--accent-blue); }
         .btn-confirm-final { background: var(--confirm-dark); color: white; width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
@@ -111,8 +111,8 @@
             <div class="legend-item"><div class="legend-box" style="background:white;"></div> 可選位</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--primary-blue);"></div> 已選擇</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--sold-pink);"></div> 已售出</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--camera-gray);"></div> 攝影席</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border-color:var(--reserve-border);"></div> 保留席</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--camera-light-gray);"></div> 攝影席</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border:1px solid var(--reserve-border);"></div> 保留席</div>
         </div>
         <div class="venue-wrapper">
             <div class="stage-area">
@@ -143,9 +143,9 @@
                 <div class="form-group">
                     <label>票價類型</label>
                     <select id="p-type" onchange="calculateFinalTotal()">
-                        <option value="600">早鳥票價 NT$ 600 / 張</option>
-                        <option value="800">原價票價 NT$ 800 / 張</option>
-                        <option value="0">公關票價 NT$ 0 / 張</option>
+                        <option value="600">早鳥票價</option>
+                        <option value="800">原價票價</option>
+                        <option value="0">公關票價</option>
                     </select>
                 </div>
                 <div class="form-group"><label>購票人姓名</label><input type="text" id="p-name"></div>
@@ -171,13 +171,13 @@
         <div class="modal">
             <div class="modal-header">票務詳細資訊<span class="close-x" onclick="closeModal('modal-detail')">×</span></div>
             <div class="modal-body">
-                <div class="detail-row"><div class="detail-label">座位：</div><div class="detail-value" id="det-seat-id" style="font-size:18px; color:var(--primary-blue); font-weight:bold;"></div></div>
-                <div class="detail-row"><div class="detail-label">購票人姓名：</div><div class="detail-value" id="det-name"></div></div>
-                <div class="detail-row"><div class="detail-label">購票人電話：</div><div class="detail-value" id="det-phone"></div></div>
-                <div class="detail-row"><div class="detail-label">票價類型：</div><div class="detail-value" id="det-type"></div></div>
-                <div class="detail-row"><div class="detail-label">付款日期：</div><div class="detail-value" id="det-date"></div></div>
-                <div class="detail-row"><div class="detail-label">售票人員：</div><div class="detail-value" id="det-staff"></div></div>
-                <div class="detail-row"><div class="detail-label">備註：</div><div class="detail-value" id="det-note"></div></div>
+                <div class="detail-row"><div class="detail-label">座位</div><div class="detail-value" id="det-seat-id" style="font-size:18px; color:var(--primary-blue); font-weight:bold;"></div></div>
+                <div class="detail-row"><div class="detail-label">購票人姓名</div><div class="detail-value" id="det-name"></div></div>
+                <div class="detail-row"><div class="detail-label">購票人電話</div><div class="detail-value" id="det-phone"></div></div>
+                <div class="detail-row"><div class="detail-label">票價類型</div><div class="detail-value" id="det-type"></div></div>
+                <div class="detail-row"><div class="detail-label">付款日期</div><div class="detail-value" id="det-date"></div></div>
+                <div class="detail-row"><div class="detail-label">售票人員</div><div class="detail-value" id="det-staff"></div></div>
+                <div class="detail-row"><div class="detail-label">備註</div><div class="detail-value" id="det-note"></div></div>
                 <div style="margin-top:20px;"><button class="btn-confirm-final" id="btn-cancel-seat">取消售出</button></div>
             </div>
         </div>
@@ -228,21 +228,6 @@
 
         window.handleLogout = () => { isAdmin = false; selectedIds = []; document.getElementById('main-body').classList.remove('logged-in'); document.getElementById('menu-login').style.display = 'block'; document.getElementById('menu-logout').style.display = 'none'; render(); toggleMenu(); };
 
-        window.exportData = () => {
-            const pw = prompt("密碼：");
-            if(pw !== "mia2026") return;
-            let csv = "座位,購票人,電話,票價類型,付款日期,售票員,備註\n";
-            Object.keys(seatsData).forEach(id => {
-                const s = seatsData[id];
-                if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.date},${s.staff},${s.note}\n`;
-            });
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `MIA_Report_${new Date().toLocaleDateString()}.csv`;
-            link.click(); toggleMenu();
-        };
-
         const layout = [
             { id: 'T', rows: 5, L: [7,8,9,10,11], M: 13, R: [7,8,9,10,11], start: 'A' },
             { id: 'M', rows: 10, L: 9, M: 13, R: 9, start: 'F' },
@@ -270,13 +255,16 @@
             for(let s=start; s<=end; s++){
                 const id = rowName + s;
                 const div = document.createElement('div');
+                div.innerText = id;
+                
                 if (cameraSeats.includes(id)) {
                     div.className = "seat camera-seat";
                 } else {
                     const status = (seatsData[id] && seatsData[id].status) ? seatsData[id].status : 'available';
-                    div.className = `seat ${status} ${reserveSeats.includes(id) ? 'reserve-seat' : ''}`;
+                    const isReserve = reserveSeats.includes(id);
+                    div.className = `seat ${status} ${isReserve ? 'reserve-seat' : ''}`;
+                    
                     if(selectedIds.includes(id)) div.classList.add('selected');
-                    div.innerText = id;
                     div.onclick = () => handleSeatClick(id);
                 }
                 rowDiv.appendChild(div);
@@ -336,16 +324,18 @@
         document.getElementById('btn-confirm-final').onclick = () => {
             const name = document.getElementById('p-name').value;
             const staff = document.getElementById('p-staff').value;
-            const typeText = document.getElementById('p-type').options[document.getElementById('p-type').selectedIndex].text.split(' NT$')[0];
+            const typeText = document.getElementById('p-type').options[document.getElementById('p-type').selectedIndex].text;
             if(!name || !staff) return alert("請填寫姓名與售票人員");
             const updates = {};
             selectedIds.forEach(id => {
                 updates[`seats/${id}`] = {
-                    status: 'sold', name, staff, 
-                    ticketType: typeText,
+                    status: 'sold', 
+                    name: name, 
+                    staff: staff, 
+                    ticketType: typeText, // 單獨存入票價
                     phone: document.getElementById('p-phone').value,
                     date: document.getElementById('p-date').value,
-                    note: document.getElementById('p-note').value
+                    note: document.getElementById('p-note').value // 單獨存入備註
                 };
             });
             update(ref(db), updates).then(() => { 
@@ -353,6 +343,21 @@
                 closeModal('modal-purchase'); 
                 render(); 
             });
+        };
+
+        window.exportData = () => {
+            const pw = prompt("密碼：");
+            if(pw !== "mia2026") return;
+            let csv = "座位,購票人,電話,票價類型,付款日期,售票員,備註\n";
+            Object.keys(seatsData).forEach(id => {
+                const s = seatsData[id];
+                if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.date},${s.staff},${s.note}\n`;
+            });
+            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `MIA_Report_${new Date().toLocaleDateString()}.csv`;
+            link.click(); toggleMenu();
         };
     </script>
 </body>
