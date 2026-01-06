@@ -14,6 +14,7 @@
             --reserve-yellow: #FFF9C4; 
             --reserve-sold-dark: #FFD54F; 
             --reserve-border: #FBC02D;
+            --reserve-selected-orange: #FF9800; /* 保留席被選取時的橘色 */
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
             --confirm-dark: #0d1b2a;
         }
@@ -46,9 +47,15 @@
         .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: 0.2s; color: #333; }
         .sold { background-color: var(--sold-pink) !important; color: white !important; border: 1px solid transparent; }
         .selected { background-color: var(--primary-blue) !important; color: white !important; }
-        .camera-seat { background: var(--camera-light-gray) !important; color: #888; cursor: default; }
-        .reserve-seat { background-color: var(--reserve-yellow) !important; border: 1px solid var(--reserve-border) !important; }
+        
+        /* 保留席基礎樣式 */
+        .reserve-seat { background-color: var(--reserve-yellow) !important; border: 1px solid var(--reserve-border) !important; color: #333 !important; }
+        /* 保留席被點選時的樣式：橘底白字 */
+        .reserve-seat.selected { background-color: var(--reserve-selected-orange) !important; border-color: var(--reserve-selected-orange) !important; color: white !important; }
+        /* 保留席已售出樣式 */
         .sold.reserve-seat { background-color: var(--reserve-sold-dark) !important; border: 1px solid var(--reserve-sold-dark) !important; color: #5d4037 !important; }
+
+        .camera-seat { background: var(--camera-light-gray) !important; color: #888; cursor: default; }
 
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 50px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 500; border-top: 1px solid #eee; }
         .logged-in .bottom-bar { display: flex; }
@@ -57,7 +64,6 @@
         .price-row-middle { font-size: 26px; font-weight: 800; color: var(--primary-blue); }
         .price-row-bottom { font-size: 12px; color: #aaa; }
         
-        /* 統一按鈕樣式：圓角 12px */
         .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
 
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
@@ -155,7 +161,7 @@
                     </select>
                 </div>
                 <div class="form-group"><label>備註</label><input type="text" id="p-note"></div>
-                <div class="total-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top:1px dashed #ddd; padding:15px 0 20px 0;">
+                <div class="total-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top:1px dashed #ddd; padding:20px 0 25px 0;">
                     <div style="font-weight:bold; color:#666;">總計金額</div>
                     <div id="buy-final-total" style="font-size:28px; font-weight:bold; color:var(--accent-blue);">NT$ 0</div>
                 </div>
@@ -216,12 +222,10 @@
 
         const cameraSeats = ["F15", "F16", "F17", "G15", "G16", "G17"];
         
-        // 更新保留席範圍：整排 A 與 整排 B
+        // 更新保留席範圍：A1~A27, B1~B29
         const reserveSeats = [];
-        for(let i=1; i<=21; i++) {
-            reserveSeats.push("A"+i);
-            reserveSeats.push("B"+i);
-        }
+        for(let i=1; i<=27; i++) reserveSeats.push("A"+i);
+        for(let i=1; i<=29; i++) reserveSeats.push("B"+i);
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
 
