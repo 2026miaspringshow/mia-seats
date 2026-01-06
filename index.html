@@ -11,8 +11,8 @@
             --bg-gray: #f8f9fa; 
             --sold-pink: rgb(216, 83, 123); 
             --camera-light-gray: #E0E0E0; 
-            --reserve-yellow: #FFF9C4; /* 未售出：鵝黃色 */
-            --reserve-sold-dark: #FFD54F; /* 已售出：較深黃色 */
+            --reserve-yellow: #FFF9C4; 
+            --reserve-sold-dark: #FFD54F; /* 已售出保留席底色 */
             --reserve-border: #FBC02D;
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
             --confirm-dark: #0d1b2a;
@@ -43,14 +43,11 @@
         .row { display: flex; gap: 4px; height: 32px; align-items: center; }
         
         .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: 0.2s; color: #333; }
-        
         .sold { background-color: var(--sold-pink) !important; color: white !important; border: 1px solid transparent; }
-        .selected { background-color: var(--primary-blue) !important; color: white !important; border-color: var(--primary-blue) !important; }
-        .camera-seat { background: var(--camera-light-gray) !important; border-color: #ccc; color: #888; cursor: default; }
+        .selected { background-color: var(--primary-blue) !important; color: white !important; }
+        .camera-seat { background: var(--camera-light-gray) !important; color: #888; cursor: default; }
         .reserve-seat { background-color: var(--reserve-yellow) !important; border: 1px solid var(--reserve-border) !important; }
-        
-        /* 公關席已售出：深黃底 + 粗金邊 */
-        .sold.reserve-seat { background-color: var(--reserve-sold-dark) !important; border: 2.5px solid var(--reserve-border) !important; color: #5d4037 !important; font-weight: bold; }
+        .sold.reserve-seat { background-color: var(--reserve-sold-dark) !important; border: 1px solid var(--reserve-sold-dark) !important; color: #5d4037 !important; }
 
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 50px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 500; border-top: 1px solid #eee; }
         .logged-in .bottom-bar { display: flex; }
@@ -68,11 +65,9 @@
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #666; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .detail-row { margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
+        .detail-row { margin-bottom: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
         .detail-label { font-size: 11px; color: #999; font-weight: bold; }
-        .detail-value { font-size: 15px; color: #333; margin-top: 3px; font-weight: 500; }
-        .total-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; border-top: 1px dashed #ddd; padding-top: 15px; }
-        .total-amount { font-size: 28px; font-weight: bold; color: var(--accent-blue); }
+        .detail-value { font-size: 15px; color: #333; margin-top: 3px; }
         .btn-confirm-final { background: var(--confirm-dark); color: white; width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
         
         .side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s; z-index: 2000; padding-top: 60px; }
@@ -98,7 +93,8 @@
     <div class="side-menu" id="side-menu">
         <div class="menu-item" id="menu-login" onclick="handleLogin()">管理員登入</div>
         <div class="menu-item" id="menu-logout" onclick="handleLogout()" style="display:none;">管理員登出</div>
-        <div class="menu-item" onclick="exportData()">匯出購票名冊</div>
+        <div class="menu-item" onclick="exportData('seats')">匯出購票名冊</div>
+        <div class="menu-item" onclick="exportData('refunds')">匯出退票名冊</div>
     </div>
 
     <div class="main-content">
@@ -108,7 +104,6 @@
             <div class="legend-item"><div class="legend-box" style="background:var(--sold-pink);"></div> 已售出</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--camera-light-gray);"></div> 攝影席</div>
             <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border:1px solid var(--reserve-border);"></div> 保留席</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--reserve-sold-dark); border:2.5px solid var(--reserve-border);"></div> 已售出保留席</div>
         </div>
         <div class="venue-wrapper">
             <div class="stage-area">
@@ -154,9 +149,9 @@
                     </select>
                 </div>
                 <div class="form-group"><label>備註</label><input type="text" id="p-note"></div>
-                <div class="total-row">
+                <div class="total-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top:1px dashed #ddd; padding-top:15px;">
                     <div style="font-weight:bold; color:#666;">總計金額</div>
-                    <div class="total-amount" id="buy-final-total">NT$ 0</div>
+                    <div id="buy-final-total" style="font-size:28px; font-weight:bold; color:var(--accent-blue);">NT$ 0</div>
                 </div>
                 <button class="btn-confirm-final" id="btn-confirm-final">確認劃位售出</button>
             </div>
@@ -167,21 +162,37 @@
         <div class="modal">
             <div class="modal-header">票務詳細資訊<span class="close-x" onclick="closeModal('modal-detail')">×</span></div>
             <div class="modal-body">
-                <div class="detail-row"><div class="detail-label">座位</div><div class="detail-value" id="det-seat-id" style="font-size:18px; color:var(--primary-blue); font-weight:bold;"></div></div>
-                <div class="detail-row"><div class="detail-label">購票人姓名</div><div class="detail-value" id="det-name"></div></div>
-                <div class="detail-row"><div class="detail-label">購票人電話</div><div class="detail-value" id="det-phone"></div></div>
-                <div class="detail-row"><div class="detail-label">票價類型</div><div class="detail-value" id="det-type"></div></div>
-                <div class="detail-row"><div class="detail-label">付款日期</div><div class="detail-value" id="det-date"></div></div>
-                <div class="detail-row"><div class="detail-label">售票人員</div><div class="detail-value" id="det-staff"></div></div>
-                <div class="detail-row"><div class="detail-label">備註</div><div class="detail-value" id="det-note"></div></div>
-                <div style="margin-top:20px;"><button class="btn-confirm-final" id="btn-cancel-seat">取消售出</button></div>
+                <div id="detail-info-area">
+                    <div class="detail-row"><div class="detail-label">座位</div><div class="detail-value" id="det-seat-id" style="font-size:18px; color:var(--primary-blue); font-weight:bold;"></div></div>
+                    <div class="detail-row"><div class="detail-label">購票人姓名</div><div class="detail-value" id="det-name"></div></div>
+                    <div class="detail-row"><div class="detail-label">購票人電話</div><div class="detail-value" id="det-phone"></div></div>
+                    <div class="detail-row"><div class="detail-label">票價類型</div><div class="detail-value" id="det-type"></div></div>
+                    <div class="detail-row"><div class="detail-label">付款日期</div><div class="detail-value" id="det-date"></div></div>
+                    <div class="detail-row"><div class="detail-label">售票人員</div><div class="detail-value" id="det-staff"></div></div>
+                    <div class="detail-row"><div class="detail-label">備註</div><div class="detail-value" id="det-note"></div></div>
+                    <div style="margin-top:20px;"><button class="btn-confirm-final" onclick="showRefundSection()">取消售出</button></div>
+                </div>
+                <div id="refund-section" style="display:none; border-top:2px solid #eee; padding-top:15px; margin-top:15px;">
+                    <div class="form-group">
+                        <label>請選擇取消原因</label>
+                        <select id="refund-reason">
+                            <option value="取消退費">取消退費</option>
+                            <option value="更換位置">更換位置</option>
+                            <option value="其他原因">其他原因</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-confirm-final" style="background:#666;" onclick="hideRefundSection()">返回</button>
+                        <button class="btn-confirm-final" style="background:var(--sold-pink);" id="btn-do-refund">確認取消並紀錄</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA8gIluzZA5k8fkIpC0RKvUypsSRZM9rlM",
@@ -271,6 +282,7 @@
             const current = seatsData[id] || { status: 'available' };
             if(current.status === 'sold') {
                 activeSeatForRefund = id;
+                hideRefundSection(); // 確保每次點開都是初始狀態
                 document.getElementById('det-seat-id').innerText = id;
                 document.getElementById('det-name').innerText = current.name || '';
                 document.getElementById('det-phone').innerText = current.phone || '';
@@ -286,8 +298,22 @@
             render();
         }
 
-        document.getElementById('btn-cancel-seat').onclick = () => {
-            if(confirm(`確定取消售出並退還座位 ${activeSeatForRefund}？`)) {
+        window.showRefundSection = () => { document.getElementById('refund-section').style.display = 'block'; };
+        window.hideRefundSection = () => { document.getElementById('refund-section').style.display = 'none'; };
+
+        document.getElementById('btn-do-refund').onclick = () => {
+            const reason = document.getElementById('refund-reason').value;
+            const originalData = seatsData[activeSeatForRefund];
+            if(confirm(`確定要以「${reason}」原因取消 ${activeSeatForRefund} 嗎？`)) {
+                // 1. 紀錄退票到 refunds
+                const refundRef = push(ref(db, 'refunds'));
+                set(refundRef, {
+                    ...originalData,
+                    seatId: activeSeatForRefund,
+                    refundReason: reason,
+                    refundTime: new Date().toLocaleString()
+                });
+                // 2. 清空座位狀態
                 update(ref(db, `seats/${activeSeatForRefund}`), { status: 'available', name: null, staff: null, date: null, note: null, phone: null, ticketType: null });
                 closeModal('modal-detail');
             }
@@ -309,12 +335,8 @@
         window.closeModal = (mid) => { document.getElementById(mid).style.display = 'none'; };
         
         document.getElementById('btn-open-modal').onclick = () => {
-            // 開啟時清空輸入欄位
-            document.getElementById('p-name').value = "";
-            document.getElementById('p-phone').value = "";
-            document.getElementById('p-staff').value = "";
-            document.getElementById('p-note').value = "";
-            
+            document.getElementById('p-name').value = ""; document.getElementById('p-phone').value = "";
+            document.getElementById('p-staff').value = ""; document.getElementById('p-note').value = "";
             document.getElementById('modal-purchase').style.display = 'flex';
             document.getElementById('buy-seat-list').value = selectedIds.join(', ');
             document.getElementById('p-date').value = new Date().toISOString().split('T')[0];
@@ -329,33 +351,42 @@
             const updates = {};
             selectedIds.forEach(id => {
                 updates[`seats/${id}`] = {
-                    status: 'sold', name, staff, 
-                    ticketType: typeText,
+                    status: 'sold', name, staff, ticketType: typeText,
                     phone: document.getElementById('p-phone').value,
                     date: document.getElementById('p-date').value,
                     note: document.getElementById('p-note').value
                 };
             });
-            update(ref(db), updates).then(() => { 
-                selectedIds = []; 
-                closeModal('modal-purchase'); 
-                render(); 
-            });
+            update(ref(db), updates).then(() => { selectedIds = []; closeModal('modal-purchase'); render(); });
         };
 
-        window.exportData = () => {
-            const pw = prompt("密碼：");
+        window.exportData = (type) => {
+            const pw = prompt("管理員密碼：");
             if(pw !== "mia2026") return;
-            let csv = "座位,購票人,電話,票價類型,付款日期,售票員,備註\n";
-            Object.keys(seatsData).forEach(id => {
-                const s = seatsData[id];
-                if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.date},${s.staff},${s.note}\n`;
-            });
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `MIA_Report_${new Date().toLocaleDateString()}.csv`;
-            link.click(); toggleMenu();
+            
+            onValue(ref(db, type), (snapshot) => {
+                const data = snapshot.val() || {};
+                let csv = "";
+                if(type === 'seats') {
+                    csv = "座位,購票人,電話,票價類型,付款日期,售票員,備註\n";
+                    Object.keys(data).forEach(id => {
+                        const s = data[id];
+                        if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.date},${s.staff},${s.note}\n`;
+                    });
+                } else {
+                    csv = "退票座位,原購票人,票價類型,售票員,取消原因,退票紀錄時間\n";
+                    Object.keys(data).forEach(key => {
+                        const r = data[key];
+                        csv += `${r.seatId},${r.name},${r.ticketType},${r.staff},${r.refundReason},${r.refundTime}\n`;
+                    });
+                }
+                const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `MIA_${type === 'seats' ? 'Purchase' : 'Refund'}_${new Date().toLocaleDateString()}.csv`;
+                link.click();
+            }, { onlyOnce: true });
+            toggleMenu();
         };
     </script>
 </body>
