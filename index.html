@@ -56,7 +56,9 @@
         .price-row-top { font-size: 12px; color: #999; }
         .price-row-middle { font-size: 26px; font-weight: 800; color: var(--primary-blue); }
         .price-row-bottom { font-size: 12px; color: #aaa; }
-        .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 50px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
+        
+        /* 統一按鈕樣式：圓角 12px */
+        .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
 
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
         .modal { background: white; width: 100%; max-width: 420px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
@@ -153,7 +155,7 @@
                     </select>
                 </div>
                 <div class="form-group"><label>備註</label><input type="text" id="p-note"></div>
-                <div class="total-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top:1px dashed #ddd; padding-top:15px;">
+                <div class="total-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top:1px dashed #ddd; padding:15px 0 20px 0;">
                     <div style="font-weight:bold; color:#666;">總計金額</div>
                     <div id="buy-final-total" style="font-size:28px; font-weight:bold; color:var(--accent-blue);">NT$ 0</div>
                 </div>
@@ -213,9 +215,13 @@
         let isAdmin = false, seatsData = {}, selectedIds = [], activeSeatForRefund = null;
 
         const cameraSeats = ["F15", "F16", "F17", "G15", "G16", "G17"];
+        
+        // 更新保留席範圍：整排 A 與 整排 B
         const reserveSeats = [];
-        for(let i=8; i<=20; i++) reserveSeats.push("A"+i);
-        for(let i=9; i<=21; i++) reserveSeats.push("B"+i);
+        for(let i=1; i<=21; i++) {
+            reserveSeats.push("A"+i);
+            reserveSeats.push("B"+i);
+        }
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
 
