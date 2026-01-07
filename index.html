@@ -90,32 +90,19 @@
         .menu-item { padding: 15px 25px; border-bottom: 1px solid #eee; color: #333; cursor: pointer; font-weight: bold; }
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
         
-        /* 購票須知內容通用樣式 */
         .notice-text { line-height: 1.8; color: #444; }
         .notice-important-line { font-size: 18px; font-weight: bold; color: #e91e63; display: block; margin-bottom: 15px; }
         .notice-title { font-size: 17px; font-weight: bold; color: #000; display: block; margin-top: 12px; margin-bottom: 4px; }
         .notice-footer { font-size: 12.5px; color: #777; border-top: 1px solid #eee; margin-top: 20px; padding-top: 10px; }
 
-        /* --- 手機版 RWD 專屬優化 --- */
         @media screen and (max-width: 480px) {
             .modal { max-width: 88%; }
-            /* 標題分兩行 */
-            .modal-header .title-line-1 { display: block; font-size: 13px; font-weight: 400; margin-bottom: 2px; opacity: 0.9; }
-            .modal-header .title-line-2 { display: block; font-size: 19px; font-weight: 800; }
-            
+            .modal-header { font-size: 20px; padding: 16px; }
             .modal-body.notice-text { padding: 18px 22px; }
-            
-            /* 內文間距稍加大，但控制在範圍內 */
             .notice-important-line { font-size: 15px; margin-bottom: 12px; line-height: 1.4; }
             .notice-title { font-size: 15px; margin-top: 14px; margin-bottom: 6px; }
-            .notice-text { font-size: 13.5px; line-height: 1.7; } /* 加大行高 */
-            
-            .notice-footer { 
-                font-size: 11px; 
-                white-space: normal; 
-                line-height: 1.5;
-                margin-top: 15px;
-            }
+            .notice-text { font-size: 13.5px; line-height: 1.7; }
+            .notice-footer { font-size: 11px; white-space: normal; line-height: 1.5; margin-top: 15px; }
             .btn-confirm-final { padding: 12px; font-size: 15px; margin-top: 15px !important; }
             .bottom-bar { padding: 0 20px; }
         }
@@ -125,10 +112,7 @@
 
     <div class="modal-overlay" id="modal-notice" style="display: flex;">
         <div class="modal">
-            <div class="modal-header">
-                <span class="title-line-1">2026 8th MIA SPRING SHOW</span>
-                <span class="title-line-2">購票須知</span>
-            </div>
+            <div class="modal-header">購票須知</div>
             <div class="modal-body notice-text">
                 <span class="notice-important-line">3/1 (日) 18:00 開放MIA光復館排隊購票</span>
                 <span class="notice-title">【售票資訊】</span>
@@ -138,7 +122,7 @@
                 1. 3/1 ~ 3/8：僅限MIA光復館櫃檯現場劃位購票。<br>
                 2. 3/9 起：開放櫃檯現場及官方LINE同步劃位購票。
                 <div class="notice-footer">
-                    ※本系統座位圖僅供即時查閱參考，如需購買請向MIA櫃檯人員諮詢。
+                    ※座位圖僅供即時查閱參考，如需購買請向MIA櫃檯人員諮詢。
                 </div>
                 <button class="btn-confirm-final" style="margin-top:20px;" onclick="closeModal('modal-notice')">我已了解</button>
             </div>
