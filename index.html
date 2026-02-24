@@ -13,6 +13,8 @@
     <meta name="description" content="2026 MIA SPRING SHOW 即時座位票務系統">
 
     <title>2026 MIA SPRING SHOW | 票務管理系統</title>
+    <!-- 引入 ExcelJS 引擎，產生真正的 xlsx 檔案 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <style>
         :root { 
             --primary-blue: #6366f1; 
@@ -208,8 +210,6 @@
             align-items: center; 
             justify-content: center; 
             cursor: pointer; 
-            font-size: 20px; 
-            line-height: 1;
             z-index: 10; 
             transition: background 0.2s; 
         }
@@ -449,7 +449,12 @@
     <!-- 管理員登入 -->
     <div class="modal-overlay" id="modal-login">
         <div class="modal" style="max-width: 400px;">
-            <div class="modal-header login-header">管理員登入<span class="close-x" onclick="window.closeModal('modal-login')">&times;</span></div>
+            <div class="modal-header login-header">
+                <span>管理員登入</span>
+                <span class="close-x" onclick="window.closeModal('modal-login')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
             <div class="modal-body">
                 <div class="form-group" style="margin-bottom: 25px;">
                     <input type="password" id="admin-pw-input" placeholder="請輸入管理員密碼" style="padding:16px; border:1.5px solid #ddd; border-radius:12px; width:100%; box-sizing:border-box; font-size: 16px;">
@@ -466,7 +471,12 @@
     <!-- 登出確認 -->
     <div class="modal-overlay" id="modal-logout-confirm">
         <div class="modal" style="max-width: 400px;">
-            <div class="modal-header login-header">系統登出<span class="close-x" onclick="window.closeModal('modal-logout-confirm')">&times;</span></div>
+            <div class="modal-header login-header">
+                <span>系統登出</span>
+                <span class="close-x" onclick="window.closeModal('modal-logout-confirm')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
             <div class="modal-body">
                 <div style="text-align: center; font-size: 16px; color: #475569; margin-bottom: 30px; font-weight: bold;">您確定要登出管理員模式嗎？</div>
                 <div style="display:flex; gap:10px;">
@@ -538,7 +548,14 @@
             <div class="order-page-header">
                 <h2 class="order-page-title">訂單管理</h2>
                 <div class="header-actions-group">
-                    <button class="btn-action-outline" onclick="window.exportData('orders')" title="匯出 CSV">匯出訂單名冊</button>
+                    <button class="btn-action-outline" onclick="window.exportToExcel()" title="匯出完整 Excel (含座位圖與訂單)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        匯出總表 (Excel)
+                    </button>
+                    <button class="btn-action-outline" onclick="window.exportDailyReceipts()" title="依據所選的收款日期匯出名冊">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        匯出當日收款
+                    </button>
                 </div>
             </div>
 
@@ -581,11 +598,11 @@
                 <div class="filter-row-top">
                     <div class="filter-group">
                         <span class="filter-label">訂單日期</span>
-                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()" title="按訂單建立日篩選">
+                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">收款日期</span>
-                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()" title="按核銷收款日篩選">
+                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">付款方式</span>
@@ -603,7 +620,7 @@
                             <option value="paid">已完成</option>
                         </select>
                     </div>
-                    <button class="btn-clear-filters" onclick="window.clearAllFilters()" title="清除所有篩選條件預設">清除篩選</button>
+                    <button class="btn-clear-filters" onclick="window.clearAllFilters()">清除篩選</button>
                     <div class="search-group">
                         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -657,7 +674,12 @@
     <!-- 購票步驟 -->
     <div class="modal-overlay" id="modal-purchase">
         <div class="modal">
-            <div class="modal-header">購票資訊<span class="close-x" onclick="window.closeModal('modal-purchase')">&times;</span></div>
+            <div class="modal-header">
+                <span>購票資訊</span>
+                <span class="close-x" onclick="window.closeModal('modal-purchase')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>劃位座位</label>
@@ -689,7 +711,12 @@
 
     <div class="modal-overlay" id="modal-payment">
         <div class="modal">
-            <div class="modal-header">購票資訊<span class="close-x" onclick="window.closeModal('modal-payment')">&times;</span></div>
+            <div class="modal-header">
+                <span>購票資訊</span>
+                <span class="close-x" onclick="window.closeModal('modal-payment')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>購票姓名</label>
@@ -716,7 +743,12 @@
 
     <div class="modal-overlay" id="modal-success">
         <div class="modal">
-            <div class="modal-header success-header">劃位完成<span class="close-x" onclick="window.closeModal('modal-success')">&times;</span></div>
+            <div class="modal-header success-header">
+                <span>劃位完成</span>
+                <span class="close-x" onclick="window.closeModal('modal-success')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
             <div class="modal-body" style="text-align: center; padding: 30px;">
                 <div class="success-checkmark">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -735,7 +767,12 @@
     <!-- 管理員核銷確認 -->
     <div class="modal-overlay" id="modal-verify">
         <div class="modal" style="max-width: 460px;">
-            <div class="modal-header" id="verify-modal-title">核銷確認</div>
+            <div class="modal-header">
+                <span id="verify-modal-title-text">核銷確認</span>
+                <span class="close-x" onclick="window.closeModal('modal-verify')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
             <div class="modal-body">
                 <input type="hidden" id="verify-order-id">
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 0 5px;">
@@ -760,13 +797,18 @@
         </div>
     </div>
 
-    <!-- 編輯訂單 (整合防呆視窗，實現同頁切換) -->
+    <!-- 編輯訂單 (整合防呆視窗) -->
     <div class="modal-overlay" id="modal-edit-order">
         <div class="modal" style="max-width: 420px;">
             
             <!-- 第一視圖：編輯表單 -->
             <div id="edit-step-1" style="display: flex; flex-direction: column; height: 100%;">
-                <div class="modal-header">編輯訂單<span class="close-x" onclick="window.closeModal('modal-edit-order')">&times;</span></div>
+                <div class="modal-header">
+                    <span>編輯訂單</span>
+                    <span class="close-x" onclick="window.closeModal('modal-edit-order')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </span>
+                </div>
                 <div class="modal-body">
                     <input type="hidden" id="edit-order-id">
                     <div class="form-group">
@@ -794,7 +836,12 @@
 
             <!-- 第二視圖：防呆確認 -->
             <div id="edit-step-2" style="display: none; flex-direction: column; height: 100%;">
-                <div class="modal-header danger-header">變更確認<span class="close-x" onclick="window.cancelWarning()">&times;</span></div>
+                <div class="modal-header danger-header">
+                    <span>變更確認</span>
+                    <span class="close-x" onclick="window.cancelWarning()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </span>
+                </div>
                 <div class="modal-body" style="padding: 32px 24px; text-align: center;">
                     <div class="warning-exclamation">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -803,12 +850,8 @@
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
                         </svg>
                     </div>
-                    <div style="margin-bottom: 30px; text-align: left; padding: 0 10px;">
-                        <p style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px; font-weight: bold; line-height: 1.6; text-align: center;">此筆訂單已完成核銷，變更付款方式將會：</p>
-                        <ul style="margin: 0 auto; padding-left: 0; color: #475569; font-size: 15px; line-height: 1.8; width: fit-content; text-align: left; list-style-position: inside;">
-                            <li>將狀態 <span style="color: #ef4444; font-weight: 800;">退回未核銷</span></li>
-                            <li>自動 <span style="color: #ef4444; font-weight: 800;">清除收款日期</span></li>
-                        </ul>
+                    <div style="margin-bottom: 30px; text-align: center; padding: 0 10px;">
+                        <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: bold; line-height: 1.6;">此筆訂單已完成核銷，變更付款方式將會：<br><span style="color: #ef4444; font-weight: 800;">退回未核銷狀態</span> 並且 <span style="color: #ef4444; font-weight: 800;">清除收款日期</span></p>
                     </div>
                     <div style="display:flex; gap:12px;">
                         <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.cancelWarning()">取消</button>
@@ -996,7 +1039,6 @@
             const m = document.getElementById(mid);
             if(m) {
                 m.style.display = 'none'; 
-                // 如果關閉的是編輯視窗，將視圖重置回表單頁面
                 if (mid === 'modal-edit-order') {
                     document.getElementById('edit-step-1').style.display = 'flex';
                     document.getElementById('edit-step-2').style.display = 'none';
@@ -1270,7 +1312,7 @@
             document.getElementById('verify-name').innerText = o.name;
             document.getElementById('verify-total').innerText = `NT$ ${o.total.toLocaleString()}`;
             const isCash = o.paymentMethod === 'cash';
-            document.getElementById('verify-modal-title').innerText = isCash ? '現金收款確認' : '匯款入帳確認';
+            document.getElementById('verify-modal-title-text').innerText = isCash ? '現金收款確認' : '匯款入帳確認';
             document.getElementById('verify-transfer-info').style.display = isCash ? 'none' : 'flex';
             if (!isCash) {
                 document.getElementById('verify-bank-code').innerText = o.bankCode || "未提供";
@@ -1323,7 +1365,6 @@
                 statusSelect.value = o.paymentMethod === 'cash' ? 'pending-cash' : 'pending-transfer';
             }
             
-            // 確保打開時顯示表單頁面
             document.getElementById('edit-step-1').style.display = 'flex';
             document.getElementById('edit-step-2').style.display = 'none';
             document.getElementById('modal-edit-order').style.display = 'flex';
@@ -1332,7 +1373,6 @@
         window.saveOrderEdit = () => {
             const statusVal = document.getElementById('edit-order-status').value;
             if (originalOrderState && originalOrderState.status === 'paid' && statusVal !== 'paid') {
-                // 如果是從已完成退回，則切換到確認畫面 (同一彈窗)
                 document.getElementById('edit-step-1').style.display = 'none';
                 document.getElementById('edit-step-2').style.display = 'flex';
                 return;
@@ -1382,6 +1422,7 @@
 
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-edit-order'); 
+                window.closeModal('modal-confirm-revert');
                 window.showToast("已儲存變更", "success"); 
             }).catch((err) => {
                 console.error(err);
@@ -1398,31 +1439,254 @@
             update(ref(db), updates).then(() => window.showToast("已刪除", "success"));
         };
 
-        window.exportData = (type) => {
+        window.exportToExcel = async () => {
             if(!isAdmin) return;
-            onValue(ref(db, type), (snapshot) => {
-                const data = snapshot.val() || {};
-                let csv = "\ufeff";
-                if(type === 'seats') {
-                    csv += "座位,購票姓名,電話,票價類型,收款日期,付款方式,備註\n";
-                    Object.keys(data).forEach(id => {
-                        const s = data[id];
-                        if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.receiptDate || ''},${s.paymentMethod==='cash'?'現金':'匯款'},${s.note || ''}\n`;
-                    });
-                } else {
-                    csv += "訂單編號,訂單時間,購票姓名,電話,座位,金額,付款方式,末五碼,收款日期,狀態,備註\n";
-                    Object.values(data).forEach(o => {
-                        const t = new Date(o.createdAt).toLocaleString('zh-TW');
-                        const st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
-                        csv += `${o.orderId},${t},${o.name},${o.phone},"${(o.seats || []).join('; ')}",${o.total},${o.paymentMethod==='cash'?'現金':'匯款'},${o.bankCode || ''},${o.receiptDate || ''},${st},${o.note || ''}\n`;
-                    });
+            window.showToast("正在產生 Excel 檔案，請稍候...", "success");
+
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'MIA Ticketing System';
+
+            // ==========================================
+            // 工作表 1：現場座位圖
+            // ==========================================
+            const wsMap = workbook.addWorksheet('現場座位圖', {views: [{showGridLines: false}]});
+            
+            for (let i = 1; i <= 41; i++) wsMap.getColumn(i).width = 8;
+
+            wsMap.mergeCells('A1:AO1');
+            wsMap.getCell('A1').value = '2026 8th MIA SPRING SHOW - 現場座位表';
+            wsMap.getCell('A1').font = { size: 20, bold: true };
+            wsMap.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+            wsMap.getRow(1).height = 40;
+
+            wsMap.mergeCells('A2:AO2');
+            wsMap.getCell('A2').value = '舞 台';
+            wsMap.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
+            wsMap.getCell('A2').font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
+            wsMap.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
+            wsMap.getRow(2).height = 30;
+
+            wsMap.getRow(3).height = 20;
+
+            const L_MAX = 11, M_MAX = 15, R_MAX = 11, GAP = 2;
+            let currentRow = 4;
+
+            layout.forEach(sec => {
+                for(let r = 0; r < sec.rows; r++) {
+                    const rowName = String.fromCharCode(sec.start.charCodeAt(0) + r);
+                    const cL = Array.isArray(sec.L) ? sec.L[r] : sec.L;
+                    const cM = Array.isArray(sec.M) ? sec.M[r] : sec.M;
+                    const cR = Array.isArray(sec.R) ? sec.R[r] : sec.R;
+
+                    let currentCol = 1;
+
+                    const renderCell = (s, block) => {
+                        const id = rowName + s;
+                        const cell = wsMap.getCell(currentRow, currentCol);
+                        const isBlocked = ((rowName === 'A' || rowName === 'B') && (block === 'L' || block === 'R'));
+                        
+                        cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
+                        cell.border = { 
+                            top: {style:'thin', color:{argb:'FFCBD5E1'}}, 
+                            left: {style:'thin', color:{argb:'FFCBD5E1'}}, 
+                            bottom: {style:'thin', color:{argb:'FFCBD5E1'}}, 
+                            right: {style:'thin', color:{argb:'FFCBD5E1'}} 
+                        };
+
+                        if (isBlocked) {
+                            cell.value = "X";
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+                            cell.font = { color: { argb: 'FF94A3B8' }, bold: true };
+                        } else if (cameraSeats.includes(id)) {
+                            cell.value = `${id}\n攝影席`;
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+                            cell.font = { color: { argb: 'FFFFFFFF' }, bold: true, size: 9 };
+                        } else {
+                            const seatInfo = seatsData[id] || {};
+                            const isSold = seatInfo.status === 'sold';
+                            const isReserve = reserveSeats.includes(id);
+
+                            if (isSold) {
+                                cell.value = `${id}\n${seatInfo.name || ''}`;
+                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+                                cell.font = { color: { argb: 'FFB91C1C' }, bold: true, size: 9 };
+                            } else if (isReserve) {
+                                cell.value = `${id}\n保留席`;
+                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+                                cell.font = { color: { argb: 'FFD97706' }, bold: true, size: 9 };
+                            } else {
+                                cell.value = id; 
+                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+                                cell.font = { color: { argb: 'FF1E293B' }, bold: true };
+                            }
+                        }
+                    };
+
+                    currentCol += (L_MAX - cL); 
+                    for(let s = 1; s <= cL; s++) { renderCell(s, 'L'); currentCol++; }
+                    currentCol += GAP;
+                    const padMidLeft = Math.floor((M_MAX - cM) / 2);
+                    currentCol += padMidLeft;
+                    for(let s = cL + 1; s <= cL + cM; s++) { renderCell(s, 'M'); currentCol++; }
+                    currentCol += (M_MAX - cM - padMidLeft);
+                    currentCol += GAP;
+                    for(let s = cL + cM + 1; s <= cL + cM + cR; s++) { renderCell(s, 'R'); currentCol++; }
+
+                    wsMap.getRow(currentRow).height = 40;
+                    currentRow++;
                 }
+                currentRow++; 
+            });
+
+            // ==========================================
+            // 工作表 2：訂單名冊
+            // ==========================================
+            const wsOrders = workbook.addWorksheet('訂單名冊');
+            wsOrders.columns = [
+                { header: '訂單編號', key: 'orderId', width: 22 },
+                { header: '訂單時間', key: 'time', width: 20 },
+                { header: '購票姓名', key: 'name', width: 15 },
+                { header: '電話', key: 'phone', width: 15 },
+                { header: '座位', key: 'seats', width: 35 },
+                { header: '金額', key: 'total', width: 12 },
+                { header: '付款方式', key: 'method', width: 12 },
+                { header: '末五碼', key: 'bankCode', width: 12 },
+                { header: '收款日期', key: 'receiptDate', width: 15 },
+                { header: '狀態', key: 'status', width: 15 },
+                { header: '備註', key: 'note', width: 25 }
+            ];
+
+            wsOrders.getRow(1).font = { bold: true, color: { argb: 'FF475569' } };
+            wsOrders.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+            wsOrders.getRow(1).border = { bottom: { style: 'medium', color: { argb: 'FFCBD5E1' } } };
+
+            const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            allOrders.forEach(o => {
+                const t = new Date(o.createdAt).toLocaleString('zh-TW', { hour12: false });
+                const st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                wsOrders.addRow({
+                    orderId: o.orderId,
+                    time: t,
+                    name: o.name,
+                    phone: o.phone,
+                    seats: (o.seats || []).join(', '),
+                    total: o.total,
+                    method: o.paymentMethod === 'cash' ? '現金' : '匯款',
+                    bankCode: o.bankCode || '',
+                    receiptDate: o.receiptDate || o.reportDate || '',
+                    status: st,
+                    note: o.note || ''
+                });
+            });
+
+            // ==========================================
+            // 觸發下載
+            // ==========================================
+            try {
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const link = document.createElement("a");
-                link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-                link.download = `MIA_${type}_${new Date().toLocaleDateString()}.csv`;
+                link.href = URL.createObjectURL(blob);
+                link.download = `MIA_票務總表_${new Date().toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'}).replace(/\//g, '')}.xlsx`;
                 link.click();
-            }, { onlyOnce: true });
+                window.showToast("Excel 匯出成功！", "success");
+            } catch (err) {
+                console.error(err);
+                window.showToast("匯出失敗，請重試", "error");
+            }
         };
+
+        window.exportDailyReceipts = async () => {
+            if(!isAdmin) return;
+            const targetDate = document.getElementById('receipt-date-input').value;
+            
+            if(!targetDate) {
+                window.showToast("請先在上方選擇「收款日期」", "error");
+                return;
+            }
+
+            window.showToast("正在產生當日收款名冊...", "success");
+            
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'MIA Ticketing System';
+            const ws = workbook.addWorksheet('當日收款名冊');
+
+            ws.columns = [
+                { header: '訂單編號', key: 'orderId', width: 22 },
+                { header: '訂單時間', key: 'time', width: 20 },
+                { header: '購票姓名', key: 'name', width: 15 },
+                { header: '電話', key: 'phone', width: 15 },
+                { header: '座位', key: 'seats', width: 35 },
+                { header: '金額', key: 'total', width: 12 },
+                { header: '付款方式', key: 'method', width: 12 },
+                { header: '末五碼', key: 'bankCode', width: 12 },
+                { header: '收款日期', key: 'receiptDate', width: 15 },
+                { header: '狀態', key: 'status', width: 15 },
+                { header: '備註', key: 'note', width: 25 }
+            ];
+
+            ws.getRow(1).font = { bold: true, color: { argb: 'FF475569' } };
+            ws.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+            ws.getRow(1).border = { bottom: { style: 'medium', color: { argb: 'FFCBD5E1' } } };
+
+            const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            let dailyTotal = 0;
+            let count = 0;
+
+            allOrders.forEach(o => {
+                let match = false;
+                if (o.status === 'paid' && o.receiptDate === targetDate) {
+                    match = true;
+                } else if (o.paymentMethod === 'transfer' && o.reportDate === targetDate) {
+                    match = true;
+                }
+
+                if(match) {
+                    const t = new Date(o.createdAt).toLocaleString('zh-TW', { hour12: false });
+                    const st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                    
+                    ws.addRow({
+                        orderId: o.orderId,
+                        time: t,
+                        name: o.name,
+                        phone: o.phone,
+                        seats: (o.seats || []).join(', '),
+                        total: o.total,
+                        method: o.paymentMethod === 'cash' ? '現金' : '匯款',
+                        bankCode: o.bankCode || '',
+                        receiptDate: o.receiptDate || o.reportDate || '',
+                        status: st,
+                        note: o.note || ''
+                    });
+                    dailyTotal += (o.total || 0);
+                    count++;
+                }
+            });
+
+            ws.addRow({});
+            const summaryRow = ws.addRow({
+                seats: `共計 ${count} 筆`,
+                total: `總計: $${dailyTotal.toLocaleString()}`
+            });
+            summaryRow.font = { bold: true, color: { argb: 'FF1E293B' } };
+
+            try {
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `MIA_當日收款名冊_${targetDate.replace(/-/g, '')}.xlsx`;
+                link.click();
+                window.showToast("Excel 匯出成功！", "success");
+            } catch (err) {
+                console.error(err);
+                window.showToast("匯出失敗，請重試", "error");
+            }
+        };
+
+        // 為避免錯誤，保留舊的 exportData 函式，但按鈕已經全面改用 Excel 匯出
+        window.exportData = window.exportToExcel;
     </script>
 </body>
 </html>
