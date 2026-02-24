@@ -40,6 +40,10 @@
             --seat-bg-camera: #f3e8ff;
             --seat-text-camera: #a855f7;
             --seat-shadow-camera: #d8b4fe;
+
+            --seat-bg-blocked: #e2e8f0;
+            --seat-text-blocked: #94a3b8;
+            --seat-shadow-blocked: #cbd5e1;
         }
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: var(--mia-gradient); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
@@ -49,7 +53,7 @@
         .header-title span { font-size: 13px; font-weight: 400; opacity: 0.95; }
         
         .header-actions { display: flex; align-items: center; gap: 10px; }
-        .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; transition: 0.2s; padding: 0 5px; display: flex; align-items: center; justify-content: center; }
+        .menu-btn { background: none; border: none; color: white; cursor: pointer; transition: 0.2s; padding: 0 5px; display: flex; align-items: center; justify-content: center; }
         .menu-btn:hover { opacity: 0.7; transform: scale(1.1); }
         .menu-btn svg { width: 24px; height: 24px; }
 
@@ -73,15 +77,27 @@
         .row { display: flex; gap: 4px; height: 38px; align-items: center; }
         
         .seat { 
-            width: 28px; height: 28px; flex-shrink: 0; font-size: 9px; font-weight: bold;
-            border-radius: 12px 12px 6px 6px; display: flex; align-items: center; justify-content: center; 
-            transition: all 0.15s ease; user-select: none;
-            background-color: var(--seat-bg-avail); color: var(--seat-text-avail);
-            border: 1px solid var(--seat-border-avail); box-shadow: 0 3px 0 0 var(--seat-shadow-avail);
+            width: 28px !important; 
+            height: 28px !important; 
+            box-sizing: border-box !important;
+            flex-shrink: 0; 
+            font-size: 9px; 
+            font-weight: bold;
+            border-radius: 12px 12px 6px 6px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.15s ease; 
+            user-select: none;
+            background-color: var(--seat-bg-avail); 
+            color: var(--seat-text-avail);
+            border: 1px solid var(--seat-border-avail); 
+            box-shadow: 0 3px 0 0 var(--seat-shadow-avail);
             cursor: pointer;
         }
-        .seat:hover:not(.camera-seat):not(.sold) { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--seat-shadow-avail); z-index: 5; }
-        .seat:active:not(.camera-seat):not(.sold) { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--seat-shadow-avail); }
+        
+        .seat:hover:not(.camera-seat):not(.sold):not(.blocked-seat) { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--seat-shadow-avail); z-index: 5; }
+        .seat:active:not(.camera-seat):not(.sold):not(.blocked-seat) { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--seat-shadow-avail); }
 
         .sold { background-color: var(--seat-bg-sold) !important; color: var(--seat-text-sold) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-sold) !important; border: none !important; cursor: not-allowed; transform: none !important; }
         .selected { background-color: var(--seat-bg-selected) !important; color: var(--seat-text-selected) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-selected) !important; border: none !important; transform: translateY(1px) !important; }
@@ -90,6 +106,15 @@
         .sold.reserve-seat { background-color: var(--seat-bg-sold) !important; color: var(--seat-text-sold) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-sold) !important; border: none !important; }
         .camera-seat { background-color: var(--seat-bg-camera) !important; color: var(--seat-text-camera) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-camera) !important; border: none !important; cursor: default; }
         
+        .blocked-seat { 
+            background-color: var(--seat-bg-blocked) !important; 
+            color: var(--seat-text-blocked) !important; 
+            box-shadow: 0 3px 0 0 var(--seat-shadow-blocked) !important; 
+            border: 1px solid #cbd5e1 !important; 
+            cursor: default !important; 
+            pointer-events: none; 
+        }
+
         .floating-bar {
             position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px;
             background: #0f172a; border-radius: 20px; padding: 12px 16px; display: flex; align-items: center;
@@ -154,11 +179,14 @@
         /* --- 完整頁面：訂單管理樣式 --- */
         .order-page { flex: 1; overflow-y: auto; padding: 30px 20px; width: 100%; display: none; flex-direction: column; align-items: center; background-color: var(--bg-gray); }
         .order-page-inner { width: 100%; max-width: 1000px; }
-        .order-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .order-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
         .order-page-title { font-size: 24px; font-weight: 800; color: #1e293b; margin: 0; }
-        .btn-back-seat { background: white; border: 2px solid #e2e8f0; padding: 10px 20px; border-radius: 12px; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 15px; }
-        .btn-back-seat:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
-        
+        .header-actions-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-action-outline { background: white; border: 2px solid #e2e8f0; padding: 10px 16px; border-radius: 12px; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn-action-outline:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
+        .btn-action-primary { background: var(--primary-blue); border: 2px solid var(--primary-blue); color: white; padding: 10px 16px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn-action-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
         /* --- 數據概覽卡片 --- */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
@@ -189,6 +217,7 @@
 
         @media screen and (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .order-page-header { flex-direction: column; align-items: flex-start; }
         }
         @media screen and (max-width: 480px) {
             .modal { max-width: 88%; }
@@ -262,15 +291,19 @@
                     <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
             </button>
-            <button class="menu-btn" id="header-action-btn" onclick="window.handleHeaderAction()">🔒</button>
+            <!-- 右上角操作按鈕 (鎖頭/選單) -->
+            <button class="menu-btn" id="header-action-btn" onclick="window.handleHeaderAction()">
+                <svg id="header-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </button>
         </div>
     </div>
 
     <div class="menu-overlay" id="menu-overlay" onclick="window.toggleMenu()"></div>
     <div class="side-menu" id="side-menu">
         <div class="menu-item" id="menu-logout" onclick="window.handleLogout()">管理員登出</div>
-        <div class="menu-item" onclick="window.exportData('seats')">匯出購票名冊</div>
-        <div class="menu-item" onclick="window.exportData('orders')">匯出訂單名冊</div>
     </div>
 
     <div class="main-content" id="main-content-area">
@@ -299,10 +332,16 @@
         <div class="order-page-inner">
             <div class="order-page-header">
                 <h2 class="order-page-title">總訂單管理</h2>
-                <button class="btn-back-seat" onclick="window.closeOrderManager()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    返回座位圖
-                </button>
+                <div class="header-actions-group">
+                    <!-- 移除圖示與座位匯出按鈕 -->
+                    <button class="btn-action-outline" onclick="window.exportData('orders')" title="匯出 CSV">
+                        匯出訂單名冊
+                    </button>
+                    <button class="btn-action-primary" onclick="window.closeOrderManager()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        返回座位圖
+                    </button>
+                </div>
             </div>
 
             <!-- 數據概覽 Dashboard -->
@@ -465,10 +504,18 @@
         let ordersData = {};
         let selectedIds = [];
         
-        const cameraSeats = ["F17", "F18", "F19", "G17", "G18", "G19"];
+        const iconLock = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+        const iconMenu = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+
+        const cameraSeats = ["G15", "G16", "G17", "H15", "H16", "H17"];
+        
         const reserveSeats = [];
-        for(let i=1; i<=27; i++) reserveSeats.push("A"+i);
-        for(let i=1; i<=29; i++) reserveSeats.push("B"+i);
+        for(let i=1; i<=27; i++) reserveSeats.push("A"+i); 
+        for(let i=1; i<=27; i++) reserveSeats.push("B"+i); 
+        for(let i=10; i<=14; i++) reserveSeats.push("G"+i);
+        for(let i=18; i<=22; i++) reserveSeats.push("G"+i);
+        for(let i=10; i<=14; i++) reserveSeats.push("H"+i);
+        for(let i=18; i<=22; i++) reserveSeats.push("H"+i);
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
         
@@ -503,7 +550,7 @@
             if(pw === "mia2026") {
                 isAdmin = true;
                 document.getElementById('main-body').classList.add('logged-in');
-                document.getElementById('header-action-btn').innerText = '☰'; 
+                document.getElementById('header-action-btn').innerHTML = iconMenu;
                 document.getElementById('header-order-btn').style.display = 'flex';
                 window.closeModal('modal-login');
                 render(); 
@@ -522,7 +569,7 @@
             isAdmin = false; 
             selectedIds = []; 
             document.getElementById('main-body').classList.remove('logged-in'); 
-            document.getElementById('header-action-btn').innerText = '🔒';
+            document.getElementById('header-action-btn').innerHTML = iconLock;
             document.getElementById('header-order-btn').style.display = 'none';
             window.closeOrderManager();
             render(); 
@@ -540,9 +587,9 @@
         };
 
         const layout = [
-            { id: 'T', rows: 5, L: [7,8,9,10,11], M: 13, R: [7,8,9,10,11], start: 'A' },
-            { id: 'M', rows: 10, L: 11, M: 13, R: 11, start: 'F' },
-            { id: 'B', rows: 10, L: 11, M: 13, R: 11, start: 'P' }
+            { id: 'T', rows: 6, L: [7, 7, 8, 9, 9, 9], M: 13, R: [7, 7, 8, 9, 9, 9], start: 'A' }, 
+            { id: 'M', rows: 10, L: 9, M: 13, R: 9, start: 'G' }, 
+            { id: 'B', rows: 9, L: 9, M: 13, R: 9, start: 'Q' }   
         ];
 
         function render() {
@@ -561,14 +608,21 @@
         function updateBlock(bid, rowName, start, end) {
             const block = document.getElementById(bid);
             if(!block) return;
-            if(rowName==='A' || rowName==='F' || rowName==='P') block.innerHTML = '';
+            if(rowName==='A' || rowName==='G' || rowName==='Q') block.innerHTML = '';
+            
             const rowDiv = document.createElement('div');
             rowDiv.className = 'row';
             for(let s=start; s<=end; s++){
                 const id = rowName + s;
                 const div = document.createElement('div');
                 div.innerText = id;
-                if (cameraSeats.includes(id)) {
+                
+                const isBlocked = (rowName === 'A' && (s <= 7 || s >= 21));
+
+                if (isBlocked) {
+                    div.innerText = "x";
+                    div.className = "seat blocked-seat";
+                } else if (cameraSeats.includes(id)) {
                     div.className = "seat camera-seat";
                 } else {
                     const status = (seatsData[id] && seatsData[id].status) ? seatsData[id].status : 'available';
@@ -708,7 +762,6 @@
             
             const ordersArray = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
-            // 計算數據指標
             let totalRevenue = 0;
             let ticketsSold = 0;
             let pendingCount = 0;
@@ -719,7 +772,6 @@
                 if(o.status === 'pending') pendingCount++;
             });
 
-            // 更新儀表板數據
             document.getElementById('stat-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
             document.getElementById('stat-tickets').innerHTML = `${ticketsSold} <span>張</span>`;
             document.getElementById('stat-orders').innerHTML = `${ordersArray.length} <span>筆</span>`;
@@ -811,7 +863,8 @@
 
         window.exportData = (type) => {
             if(!isAdmin) return;
-            onValue(ref(db, type), (snapshot) => {
+            const dataRef = ref(db, type);
+            onValue(dataRef, (snapshot) => {
                 const data = snapshot.val() || {};
                 let csv = "\ufeff";
                 if(type === 'seats') {
@@ -827,7 +880,7 @@
                         const dateObj = new Date(o.createdAt);
                         const timeString = dateObj.toLocaleString('zh-TW');
                         const seatsStr = (o.seats || []).join('; ');
-                        csv += `${o.orderId},${timeString},${o.name},${o.phone},${seatsStr},${o.total},${o.paymentMethod==='cash'?'現金':'匯款'},${o.status==='paid'?'已完成':'待入帳'}\n`;
+                        csv += `${o.orderId},${timeString},${o.name},${o.phone},"${seatsStr}",${o.total},${o.paymentMethod==='cash'?'現金':'匯款'},${o.status==='paid'?'已完成':'待入帳'}\n`;
                     });
                 }
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -836,7 +889,6 @@
                 link.download = `MIA_${type === 'seats' ? 'Seats' : 'Orders'}_${new Date().toLocaleDateString()}.csv`;
                 link.click();
             }, { onlyOnce: true });
-            window.toggleMenu();
         };
     </script>
 </body>
