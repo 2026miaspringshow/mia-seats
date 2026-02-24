@@ -848,10 +848,8 @@
                 const updates = {};
                 if(o && o.seats) {
                     o.seats.forEach(seatId => {
-                        updates[`seats/${seatId}`] = { 
-                            status: 'available', name: null, phone: null, ticketType: null, 
-                            date: null, paymentMethod: null, orderId: null
-                        };
+                        // 重點：設為 null 才會徹底從 Firebase 資料庫移除該座位的節點
+                        updates[`seats/${seatId}`] = null;
                     });
                 }
                 updates[`orders/${orderId}`] = null;
