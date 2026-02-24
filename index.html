@@ -13,18 +13,33 @@
     <title>2026 MIA SPRING SHOW | 票務管理系統</title>
     <style>
         :root { 
-            --primary-blue: rgb(94, 121, 172); 
-            --accent-blue: #2196f3; 
+            --primary-blue: #6366f1; 
+            --accent-blue: #6366f1; 
             --bg-gray: #f8f9fa; 
-            --sold-pink: rgb(216, 83, 123); 
-            --camera-light-gray: #E0E0E0; 
-            --reserve-yellow: #FFF9C4; 
-            --reserve-sold-dark: #FFD54F; 
-            --reserve-border: #FBC02D;
-            --reserve-selected-orange: #FF9800;
             --mia-gradient: linear-gradient(135deg, #e91e63 0%, #673ab7 100%);
             --confirm-dark: #0d1b2a;
             --confirm-hover: #1b2a3a;
+
+            --seat-bg-avail: #ffffff;
+            --seat-text-avail: #64748b;
+            --seat-border-avail: #f1f5f9;
+            --seat-shadow-avail: #cbd5e1;
+            
+            --seat-bg-selected: #6366f1;
+            --seat-text-selected: #ffffff;
+            --seat-shadow-selected: #3730a3;
+            
+            --seat-bg-sold: #fce7f3;
+            --seat-text-sold: #f472b6;
+            --seat-shadow-sold: #f472b6;
+            
+            --seat-bg-reserve: #fef3c7;
+            --seat-text-reserve: #f59e0b;
+            --seat-shadow-reserve: #fcd34d;
+            
+            --seat-bg-camera: #f3e8ff;
+            --seat-text-camera: #a855f7;
+            --seat-shadow-camera: #d8b4fe;
         }
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: var(--mia-gradient); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
@@ -32,62 +47,86 @@
         .header-logo { height: 48px; width: auto; object-fit: contain; } 
         .header-title h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 1.5px; line-height: 1.2; }
         .header-title span { font-size: 13px; font-weight: 400; opacity: 0.95; }
-        .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; transition: 0.2s; }
+        
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .menu-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; transition: 0.2s; padding: 0 5px; display: flex; align-items: center; justify-content: center; }
         .menu-btn:hover { opacity: 0.7; transform: scale(1.1); }
+        .menu-btn svg { width: 24px; height: 24px; }
 
-        .main-content { flex: 1; overflow-y: auto; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
+        .main-content { flex: 1; overflow-y: auto; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
         .legend-area { display: flex; gap: 12px; margin: 15px 0; font-size: 11px; color: #666; justify-content: center; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ddd; }
+        .legend-box { width: 14px; height: 14px; border-radius: 4px 4px 2px 2px; }
         .venue-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
         .stage-area { width: fit-content; margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0 50px; }
-        .screen { background: #121212; width: 400px; margin-bottom: 8px; padding: 10px; color: #fff; border-radius: 0 0 80px 80px; text-align: center; font-size: 13px; letter-spacing: 5px; }
+        
+        .screen { background: #0f172a; width: 888px; margin-bottom: 8px; padding: 15px; color: #fff; border-radius: 0 0 80px 80px; text-align: center; font-size: 16px; font-weight: bold; letter-spacing: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        
         .view-notice { font-size: 10px; color: #999; margin-bottom: 30px; }
         .venue-container { display: grid; grid-template-columns: auto auto auto; gap: 50px; width: fit-content; }
         .block { display: flex; flex-direction: column; gap: 6px; }
         #LT, #LM, #LB { align-items: flex-end; }
         #RT, #RM, #RB { align-items: flex-start; }
         #MT, #MM, #MB { align-items: center; }
-        .row { display: flex; gap: 4px; height: 32px; align-items: center; }
         
-        .seat { width: 34px; height: 34px; font-size: 10px; border-radius: 5px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0; background: white; cursor: pointer; transition: all 0.2s ease; color: #333; }
-        .seat:hover:not(.camera-seat):not(.sold) { border-color: var(--accent-blue); transform: scale(1.12); z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .row { display: flex; gap: 4px; height: 38px; align-items: center; }
+        
+        .seat { 
+            width: 28px; height: 28px; flex-shrink: 0; font-size: 9px; font-weight: bold;
+            border-radius: 12px 12px 6px 6px; display: flex; align-items: center; justify-content: center; 
+            transition: all 0.15s ease; user-select: none;
+            background-color: var(--seat-bg-avail); color: var(--seat-text-avail);
+            border: 1px solid var(--seat-border-avail); box-shadow: 0 3px 0 0 var(--seat-shadow-avail);
+            cursor: pointer;
+        }
+        .seat:hover:not(.camera-seat):not(.sold) { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--seat-shadow-avail); z-index: 5; }
+        .seat:active:not(.camera-seat):not(.sold) { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--seat-shadow-avail); }
 
-        .sold { background-color: var(--sold-pink) !important; color: white !important; border: 1px solid transparent; }
-        .selected { background-color: var(--primary-blue) !important; color: white !important; }
-        .reserve-seat { background-color: var(--reserve-yellow) !important; border: 1px solid var(--reserve-border) !important; color: #333 !important; }
-        .reserve-seat.selected { background-color: var(--reserve-selected-orange) !important; border-color: var(--reserve-selected-orange) !important; color: white !important; }
-        .sold.reserve-seat { background-color: var(--reserve-sold-dark) !important; border: 1px solid var(--reserve-sold-dark) !important; color: #5d4037 !important; }
-        .camera-seat { background: var(--camera-light-gray) !important; color: #888; cursor: default; }
+        .sold { background-color: var(--seat-bg-sold) !important; color: var(--seat-text-sold) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-sold) !important; border: none !important; cursor: not-allowed; transform: none !important; }
+        .selected { background-color: var(--seat-bg-selected) !important; color: var(--seat-text-selected) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-selected) !important; border: none !important; transform: translateY(1px) !important; }
+        .reserve-seat { background-color: var(--seat-bg-reserve) !important; color: var(--seat-text-reserve) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-reserve) !important; border: none !important; }
+        .reserve-seat.selected { background-color: var(--seat-bg-selected) !important; color: var(--seat-text-selected) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-selected) !important; border: none !important; transform: translateY(1px) !important; }
+        .sold.reserve-seat { background-color: var(--seat-bg-sold) !important; color: var(--seat-text-sold) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-sold) !important; border: none !important; }
+        .camera-seat { background-color: var(--seat-bg-camera) !important; color: var(--seat-text-camera) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-camera) !important; border: none !important; cursor: default; }
         
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 110px; background: white; display: none; align-items: center; justify-content: space-between; padding: 0 50px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 500; border-top: 1px solid #eee; }
-        .logged-in .bottom-bar { display: flex; }
-        .price-info { text-align: left; }
-        .price-row-top { font-size: 12px; color: #999; }
-        .price-row-middle { font-size: 26px; font-weight: 800; color: var(--accent-blue); }
-        .price-row-bottom { font-size: 12px; color: #aaa; }
-        
-        .btn-confirm-main { background: var(--confirm-dark); color: white; padding: 16px 45px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
-        .btn-confirm-main:hover:not(:disabled) { background: var(--confirm-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .btn-confirm-main:disabled { opacity: 0.5; cursor: not-allowed; }
+        .floating-bar {
+            position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px;
+            background: #0f172a; border-radius: 20px; padding: 12px 16px; display: flex; align-items: center;
+            justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 500;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+        .floating-bar.show { bottom: 30px; }
+        .floating-bar-left { display: flex; align-items: center; gap: 15px; }
+        .floating-cart-icon { width: 46px; height: 46px; background: var(--primary-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; }
+        .floating-info { display: flex; flex-direction: column; justify-content: center; }
+        .floating-info-top { font-size: 16px; font-weight: bold; color: white; }
+        .btn-floating-confirm { background: white; color: #0f172a; padding: 14px 24px; border-radius: 14px; border: none; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn-floating-confirm:hover { background: #f1f5f9; transform: scale(1.03); }
+        .btn-floating-confirm:active { transform: scale(0.97); }
+
+        .custom-toast {
+            position: fixed; top: -60px; left: 50%; transform: translateX(-50%); background-color: #ef4444; color: white;
+            padding: 12px 28px; border-radius: 9999px; display: flex; align-items: center; gap: 10px; font-size: 16px;
+            font-weight: bold; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); z-index: 5000;
+            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2), opacity 0.3s; opacity: 0; pointer-events: none;
+        }
+        .custom-toast.show { top: 40px; opacity: 1; }
+        .custom-toast.success { background-color: #10b981; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
+        .custom-toast svg { width: 22px; height: 22px; }
 
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
-        .modal { background: white; width: 100%; max-width: 420px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
-        .modal-header { background: var(--mia-gradient); color: white; padding: 18px; text-align: center; font-size: 18px; font-weight: bold; position: relative; flex-shrink: 0; }
+        .modal { background: white; width: 100%; max-width: 480px; max-height: 95vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
+        .modal-header { background: var(--mia-gradient); color: white; padding: 20px; text-align: center; font-size: 20px; font-weight: bold; position: relative; flex-shrink: 0; }
         .close-x { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 24px; z-index: 10; transition: 0.2s; }
         .close-x:hover { color: #ffeb3b; transform: translateY(-50%) rotate(90deg); }
         
-        .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
-        /* 統一調整購票視窗內的輸入框與下拉選單寬度 */
-        .modal-body input, .modal-body select { 
-            width: 100% !important; 
-            box-sizing: border-box !important; 
-            display: block !important;
-        }
+        .modal-body { padding: 30px; overflow-y: auto; flex: 1; }
+        .modal-body input, .modal-body select { width: 100% !important; box-sizing: border-box !important; display: block !important; }
 
-        .detail-row { margin-bottom: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
-        .detail-label { font-size: 11px; color: #999; font-weight: bold; }
-        .detail-value { font-size: 15px; color: #333; margin-top: 3px; }
+        .detail-row { margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        .detail-label { font-size: 13px; color: #999; font-weight: bold; }
+        .detail-value { font-size: 17px; color: #333; margin-top: 4px; }
         
         .btn-confirm-final { background: var(--confirm-dark); color: white; width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
         .btn-confirm-final:hover { background: var(--confirm-hover); }
@@ -102,21 +141,74 @@
         .notice-title { font-size: 17px; font-weight: bold; color: #000; display: block; margin-top: 12px; margin-bottom: 4px; }
         .notice-footer { font-size: 12.5px; color: #777; border-top: 1px solid #eee; margin-top: 20px; padding-top: 10px; }
 
+        .pay-method-btn { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: #64748b; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; font-size: 15px; }
+        .pay-method-btn.active-cash { border-color: #10b981; background: #ecfdf5; color: #059669; }
+        .pay-method-btn.active-transfer { border-color: #f59e0b; background: #fffbeb; color: #d97706; }
+        
+        .btn-prev-step { background: white; color: #64748b; border: 1px solid #cbd5e1; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; flex: 1; font-size: 15px; }
+        .btn-prev-step:hover { background: #f8fafc; }
+        .btn-complete { background: #10b981; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; flex: 2; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-complete:hover { background: #059669; transform: scale(1.02); }
+        .btn-complete:active { transform: scale(0.98); }
+
+        /* --- 完整頁面：訂單管理樣式 --- */
+        .order-page { flex: 1; overflow-y: auto; padding: 30px 20px; width: 100%; display: none; flex-direction: column; align-items: center; background-color: var(--bg-gray); }
+        .order-page-inner { width: 100%; max-width: 1000px; }
+        .order-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .order-page-title { font-size: 24px; font-weight: 800; color: #1e293b; margin: 0; }
+        .btn-back-seat { background: white; border: 2px solid #e2e8f0; padding: 10px 20px; border-radius: 12px; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 15px; }
+        .btn-back-seat:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
+        
+        /* --- 數據概覽卡片 --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .stat-label { font-size: 12px; font-weight: bold; color: #94a3b8; margin-bottom: 10px; }
+        .stat-value { font-size: 24px; font-weight: 900; color: #1e293b; }
+        .stat-value span { font-size: 14px; font-weight: 500; color: #64748b; margin-left: 4px; }
+        .stat-value.pending { color: #ef4444; } /* 待核銷用紅色強調 */
+        .stat-icon-wrapper { position: absolute; right: 15px; top: 15px; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .icon-revenue { background: #eef2ff; color: #6366f1; }
+        .icon-tickets { background: #eff6ff; color: #3b82f6; }
+        .icon-orders { background: #f0fdf4; color: #22c55e; }
+        .icon-pending { background: #fff7ed; color: #f97316; }
+
+        .order-table-container { width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .order-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 700px; font-size: 14px; }
+        .order-table th { background: #f8fafc; padding: 16px 20px; font-weight: bold; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+        .order-table td { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
+        .order-table tr:hover { background: #f1f5f9; }
+        
+        .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold; white-space: nowrap; }
+        .status-paid { background: #dcfce7; color: #059669; border: 1px solid #a7f3d0; }
+        .status-pending { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+        
+        .action-icon-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; color: #64748b; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;}
+        .action-icon-btn:hover.edit { background: #e0e7ff; color: #4338ca; }
+        .action-icon-btn:hover.delete { background: #fee2e2; color: #b91c1c; }
+        .action-icon-btn svg { width: 18px; height: 18px; }
+
+        @media screen and (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media screen and (max-width: 480px) {
             .modal { max-width: 88%; }
-            .modal-header { font-size: 20px; padding: 16px; }
-            .modal-body.notice-text { padding: 18px 22px; }
-            .notice-important-line { font-size: 15px; margin-bottom: 12px; line-height: 1.4; }
-            .notice-title { font-size: 15px; margin-top: 14px; margin-bottom: 6px; }
-            .notice-text { font-size: 13.5px; line-height: 1.7; }
-            .notice-footer { font-size: 11px; white-space: normal; line-height: 1.5; margin-top: 15px; }
-            .btn-confirm-final { padding: 12px; font-size: 15px; margin-top: 15px !important; }
-            .bottom-bar { padding: 0 20px; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body id="main-body">
 
+    <!-- 頂部提示框 -->
+    <div id="custom-toast" class="custom-toast">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="toast-msg">上限為 5 張</span>
+    </div>
+
+    <!-- 購票須知 -->
     <div class="modal-overlay" id="modal-notice" style="display: flex;">
         <div class="modal">
             <div class="modal-header">購票須知</div>
@@ -131,7 +223,22 @@
                 <div class="notice-footer">
                     ※座位圖僅供即時查閱參考，如需購買請向MIA櫃檯人員諮詢。
                 </div>
-                <button class="btn-confirm-final" style="margin-top:20px;" onclick="closeModal('modal-notice')">我已了解</button>
+                <button class="btn-confirm-final" style="margin-top:20px;" onclick="window.closeModal('modal-notice')">我已了解</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理員登入 -->
+    <div class="modal-overlay" id="modal-login">
+        <div class="modal" style="max-width: 320px;">
+            <div class="modal-header">管理員登入<span class="close-x" onclick="window.closeModal('modal-login')">×</span></div>
+            <div class="modal-body">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:8px; color:#666;">請輸入管理員密碼</label>
+                    <input type="password" id="admin-pw-input" placeholder="輸入密碼" style="padding:12px; border:1px solid #ddd; border-radius:8px; width:100%; box-sizing:border-box; font-size: 16px;">
+                    <div id="login-error-msg" style="color: #e91e63; font-size: 12px; margin-top: 8px; font-weight: bold; display: none;">密碼錯誤，請重新輸入！</div>
+                </div>
+                <button class="btn-confirm-final" onclick="window.submitLogin()">確認登入</button>
             </div>
         </div>
     </div>
@@ -144,28 +251,39 @@
                 <span>即時座位票務系統</span>
             </div>
         </div>
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="header-actions">
+            <!-- 訂單管理按鈕 -->
+            <button class="menu-btn" id="header-order-btn" onclick="window.openOrderManager()" style="display:none;" title="訂單管理">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            </button>
+            <button class="menu-btn" id="header-action-btn" onclick="window.handleHeaderAction()">🔒</button>
+        </div>
     </div>
 
-    <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+    <div class="menu-overlay" id="menu-overlay" onclick="window.toggleMenu()"></div>
     <div class="side-menu" id="side-menu">
-        <div class="menu-item" id="menu-login" onclick="handleLogin()">管理員登入</div>
-        <div class="menu-item" id="menu-logout" onclick="handleLogout()" style="display:none;">管理員登出</div>
-        <div class="menu-item" onclick="exportData('seats')">匯出購票名冊</div>
-        <div class="menu-item" onclick="exportData('refunds')">匯出退票名冊</div>
+        <div class="menu-item" id="menu-logout" onclick="window.handleLogout()">管理員登出</div>
+        <div class="menu-item" onclick="window.exportData('seats')">匯出購票名冊</div>
+        <div class="menu-item" onclick="window.exportData('orders')">匯出訂單名冊</div>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="main-content-area">
         <div class="legend-area">
-            <div class="legend-item"><div class="legend-box" style="background:white;"></div> 可選位</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--primary-blue);"></div> 已選擇</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--sold-pink);"></div> 已售出</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--camera-light-gray);"></div> 攝影席</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--reserve-yellow); border:1px solid var(--reserve-border);"></div> 保留席</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--seat-bg-avail); border: 1px solid var(--seat-border-avail); box-shadow: 0 2px 0 0 var(--seat-shadow-avail);"></div> 可選位</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--seat-bg-selected); box-shadow: 0 2px 0 0 var(--seat-shadow-selected);"></div> 已選擇</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--seat-bg-sold); box-shadow: 0 2px 0 0 var(--seat-shadow-sold);"></div> 已售出</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--seat-bg-camera); box-shadow: 0 2px 0 0 var(--seat-shadow-camera);"></div> 攝影席</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--seat-bg-reserve); box-shadow: 0 2px 0 0 var(--seat-shadow-reserve);"></div> 保留席</div>
         </div>
         <div class="venue-wrapper">
             <div class="stage-area">
-                <div class="screen">STAGE 舞 台</div>
+                <div class="screen">舞 台</div>
                 <div class="view-notice">座位圖示僅供參考，實際視野可能因場地佈置略有差異。</div>
                 <div class="venue-container" id="grid">
                     <div id="LT" class="block"></div><div id="MT" class="block"></div><div id="RT" class="block"></div>
@@ -176,77 +294,158 @@
         </div>
     </div>
 
-    <div class="bottom-bar">
-        <div class="price-info">
-            <div class="price-row-top">總計金額</div>
-            <div id="display-total" class="price-row-middle">NT$ 0</div>
-            <div id="display-sub-info" class="price-row-bottom">已選 0 張</div>
+    <!-- 完整的訂單管理頁面 -->
+    <div class="order-page" id="order-page">
+        <div class="order-page-inner">
+            <div class="order-page-header">
+                <h2 class="order-page-title">總訂單管理</h2>
+                <button class="btn-back-seat" onclick="window.closeOrderManager()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    返回座位圖
+                </button>
+            </div>
+
+            <!-- 數據概覽 Dashboard -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">總營收</div>
+                    <div class="stat-value" id="stat-revenue">$0</div>
+                    <div class="stat-icon-wrapper icon-revenue">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">已售票數</div>
+                    <div class="stat-value" id="stat-tickets">0 <span>張</span></div>
+                    <div class="stat-icon-wrapper icon-tickets">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">訂單總數</div>
+                    <div class="stat-value" id="stat-orders">0 <span>筆</span></div>
+                    <div class="stat-icon-wrapper icon-orders">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">待核銷筆數</div>
+                    <div class="stat-value pending" id="stat-pending">0 <span>筆</span></div>
+                    <div class="stat-icon-wrapper icon-pending">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-table-container">
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>訂單時間</th>
+                            <th>購票者</th>
+                            <th>座位</th>
+                            <th>訂單金額</th>
+                            <th>狀態</th>
+                            <th style="text-align:center;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-table-body"></tbody>
+                </table>
+            </div>
         </div>
-        <button class="btn-confirm-main" id="btn-open-modal" disabled>確認購票</button>
     </div>
 
+    <!-- 懸浮列 -->
+    <div class="floating-bar" id="floating-bar">
+        <div class="floating-bar-left">
+            <div class="floating-cart-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="8" cy="21" r="1"></circle>
+                    <circle cx="19" cy="21" r="1"></circle>
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+                </svg>
+            </div>
+            <div class="floating-info">
+                <div class="floating-info-top" id="display-sub-info">已選 0 座位</div>
+            </div>
+        </div>
+        <button class="btn-floating-confirm" id="btn-open-modal">確認購票</button>
+    </div>
+
+    <!-- 購票步驟視窗 -->
     <div class="modal-overlay" id="modal-purchase">
         <div class="modal">
-            <div class="modal-header">管理員劃位購票<span class="close-x" onclick="closeModal('modal-purchase')">×</span></div>
+            <div class="modal-header">購票資訊<span class="close-x" onclick="window.closeModal('modal-purchase')">×</span></div>
             <div class="modal-body">
-                <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">劃位座位</label><input type="text" id="buy-seat-list" readonly style="padding:10px; border:none; background:#f9f9f9; color:var(--primary-blue); font-weight:bold;"></div>
-                <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">票價類型</label>
-                    <select id="p-type" onchange="calculateFinalTotal()" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
+                <div class="form-group" style="margin-bottom:20px;"><label style="display:block; font-size:14px; font-weight:bold; margin-bottom:8px; color:#666;">劃位座位</label><input type="text" id="buy-seat-list" readonly style="padding:14px; border:none; background:#f9f9f9; color:var(--primary-blue); font-weight:bold; border-radius:8px; font-size:16px;"></div>
+                <div class="form-group" style="margin-bottom:20px;"><label style="display:block; font-size:14px; font-weight:bold; margin-bottom:8px; color:#666;">票價類型</label>
+                    <select id="p-type" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                         <option value="600">早鳥票價 NT$ 600 / 張</option>
                         <option value="800">原價票價 NT$ 800 / 張</option>
                         <option value="0">公關票價 NT$ 0 / 張</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">購票人姓名</label><input type="text" id="p-name" style="padding:10px; border:1px solid #ddd; border-radius:8px;"></div>
-                <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">購票人電話</label><input type="tel" id="p-phone" style="padding:10px; border:1px solid #ddd; border-radius:8px;"></div>
-                <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">付款日期</label><input type="date" id="p-date" style="padding:10px; border:1px solid #ddd; border-radius:8px;"></div>
-                <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">售票人員</label>
-                    <select id="p-staff" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
-                        <option value="">請選擇</option><option value="芷瑜">芷瑜</option><option value="Daifi">Daifi</option><option value="Ruby">Ruby</option><option value="孟萱">孟萱</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">備註</label><input type="text" id="p-note" style="padding:10px; border:1px solid #ddd; border-radius:8px;"></div>
-                <div class="total-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top:1px dashed #ddd; padding:20px 0 25px 0;">
-                    <div style="font-weight:bold; color:#666;">總計金額</div>
-                    <div id="buy-final-total" style="font-size:28px; font-weight:bold; color:var(--accent-blue);">NT$ 0</div>
-                </div>
-                <button class="btn-confirm-final" id="btn-confirm-final">確認劃位售出</button>
+                <div class="form-group" style="margin-bottom:20px;"><label style="display:block; font-size:14px; font-weight:bold; margin-bottom:8px; color:#666;">購票人姓名</label><input type="text" id="p-name" placeholder="請輸入姓名" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;"></div>
+                <div class="form-group" style="margin-bottom:30px;"><label style="display:block; font-size:14px; font-weight:bold; margin-bottom:8px; color:#666;">購票人電話</label><input type="tel" id="p-phone" placeholder="請輸入電話" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;"></div>
+                <button class="btn-confirm-final" onclick="window.goToStep2()">下一步：付款資訊</button>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-detail">
+    <!-- 步驟二 -->
+    <div class="modal-overlay" id="modal-payment">
         <div class="modal">
-            <div class="modal-header">票務詳細資訊<span class="close-x" onclick="closeModal('modal-detail')">×</span></div>
+            <div class="modal-header">付款資訊<span class="close-x" onclick="window.closeModal('modal-payment')">×</span></div>
             <div class="modal-body">
-                <div id="detail-info-area">
-                    <div class="detail-row"><div class="detail-label">座位</div><div class="detail-value" id="det-seat-id" style="font-size:18px; color:var(--primary-blue); font-weight:bold;"></div></div>
-                    <div class="detail-row"><div class="detail-label">購票人姓名</div><div class="detail-value" id="det-name"></div></div>
-                    <div class="detail-row"><div class="detail-label">購票人電話</div><div class="detail-value" id="det-phone"></div></div>
-                    <div class="detail-row"><div class="detail-label">票價類型</div><div class="detail-value" id="det-type"></div></div>
-                    <div class="detail-row"><div class="detail-label">付款日期</div><div class="detail-value" id="det-date"></div></div>
-                    <div class="detail-row"><div class="detail-label">售票人員</div><div class="detail-value" id="det-staff"></div></div>
-                    <div class="detail-row"><div class="detail-label">備註</div><div class="detail-value" id="det-note"></div></div>
-                    <div style="margin-top:20px;"><button class="btn-confirm-final" onclick="showRefundSection()">取消售出</button></div>
+                <div class="form-group" style="margin-bottom:20px; padding-bottom: 20px; border-bottom: 1px dashed #eee;">
+                    <label style="display:block; font-size:14px; font-weight:bold; margin-bottom:8px; color:#666;">總計金額</label>
+                    <div id="buy-final-total" style="font-size:36px; font-weight:900; color:var(--primary-blue);">NT$ 0</div>
                 </div>
-                <div id="refund-section" style="display:none; border-top:2px solid #eee; padding-top:15px; margin-top:15px;">
-                    <div class="form-group" style="margin-bottom:12px;"><label style="display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#666;">請選擇取消原因</label>
-                        <select id="refund-reason" style="padding:10px; border:1px solid #ddd; border-radius:8px;">
-                            <option value="取消退費">取消退費</option><option value="更換位置">更換位置</option><option value="其他原因">其他原因</option>
-                        </select>
-                    </div>
+                <div class="form-group" style="margin-bottom:25px;">
+                    <label style="display:block; font-size:14px; font-weight:bold; margin-bottom:10px; color:#666;">付款方式</label>
                     <div style="display:flex; gap:10px;">
-                        <button class="btn-confirm-final" style="background:#666;" onclick="hideRefundSection()">返回</button>
-                        <button class="btn-confirm-final" style="background:var(--sold-pink);" id="btn-do-refund">確認取消並紀錄</button>
+                        <button id="btn-pay-cash" class="pay-method-btn active-cash" onclick="window.setPaymentMethod('cash')">現金</button>
+                        <button id="btn-pay-transfer" class="pay-method-btn" onclick="window.setPaymentMethod('transfer')">匯款</button>
                     </div>
                 </div>
+                <div class="form-group" style="margin-bottom:35px;">
+                    <label style="display:block; font-size:14px; font-weight:bold; margin-bottom:10px; color:#666;">付款日期</label>
+                    <input type="date" id="p-date" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-prev-step" onclick="window.goToStep1()">上一步</button>
+                    <button class="btn-complete" onclick="window.submitFinalOrder()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        完成購票
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯訂單 -->
+    <div class="modal-overlay" id="modal-edit-order">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">編輯訂單<span class="close-x" onclick="window.closeModal('modal-edit-order')">×</span></div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-order-id">
+                <div class="form-group" style="margin-bottom:15px;"><label style="display:block; font-size:13px; font-weight:bold; margin-bottom:4px; color:#666;">購票人姓名</label><input type="text" id="edit-order-name" style="padding:12px; border:1px solid #ddd; border-radius:8px;"></div>
+                <div class="form-group" style="margin-bottom:15px;"><label style="display:block; font-size:13px; font-weight:bold; margin-bottom:4px; color:#666;">購票人電話</label><input type="tel" id="edit-order-phone" style="padding:12px; border:1px solid #ddd; border-radius:8px;"></div>
+                <div class="form-group" style="margin-bottom:25px;">
+                    <label style="display:block; font-size:13px; font-weight:bold; margin-bottom:4px; color:#666;">訂單狀態</label>
+                    <select id="edit-order-status" style="padding:12px; border:1px solid #ddd; border-radius:8px;">
+                        <option value="paid">已完成 (已付款)</option>
+                        <option value="pending">待入帳 (匯款確認中)</option>
+                    </select>
+                </div>
+                <button class="btn-confirm-final" onclick="window.saveOrderEdit()">儲存變更</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBpxxZ0DJvGJdu8anqJWmGeGHf_wUufv28",
@@ -260,14 +459,26 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let isAdmin = false, seatsData = {}, selectedIds = [], activeSeatForRefund = null;
         
-        const cameraSeats = ["F15", "F16", "F17", "G15", "G16", "G17"];
+        let isAdmin = false;
+        let seatsData = {};
+        let ordersData = {};
+        let selectedIds = [];
+        
+        const cameraSeats = ["F17", "F18", "F19", "G17", "G18", "G19"];
         const reserveSeats = [];
         for(let i=1; i<=27; i++) reserveSeats.push("A"+i);
         for(let i=1; i<=29; i++) reserveSeats.push("B"+i);
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
+        
+        onValue(ref(db, 'orders'), (snapshot) => { 
+            ordersData = snapshot.val() || {}; 
+            const orderPage = document.getElementById('order-page');
+            if(orderPage && orderPage.style.display === 'flex') {
+                window.renderOrders();
+            }
+        });
 
         window.toggleMenu = () => {
             const menu = document.getElementById('side-menu');
@@ -276,29 +487,62 @@
             overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
         };
 
-        window.handleLogin = () => {
-            const pw = prompt("管理員密碼：");
-            if(pw === "mia2026") {
-                isAdmin = true;
-                document.getElementById('main-body').classList.add('logged-in');
-                document.getElementById('menu-login').style.display = 'none';
-                document.getElementById('menu-logout').style.display = 'block';
-                render(); toggleMenu();
+        window.handleHeaderAction = () => {
+            if (!isAdmin) {
+                document.getElementById('modal-login').style.display = 'flex';
+                document.getElementById('admin-pw-input').value = '';
+                document.getElementById('login-error-msg').style.display = 'none';
+                setTimeout(() => document.getElementById('admin-pw-input').focus(), 100);
+            } else {
+                window.toggleMenu();
             }
         };
 
+        window.submitLogin = () => {
+            const pw = document.getElementById('admin-pw-input').value;
+            if(pw === "mia2026") {
+                isAdmin = true;
+                document.getElementById('main-body').classList.add('logged-in');
+                document.getElementById('header-action-btn').innerText = '☰'; 
+                document.getElementById('header-order-btn').style.display = 'flex';
+                window.closeModal('modal-login');
+                render(); 
+            } else {
+                document.getElementById('login-error-msg').style.display = 'block';
+                document.getElementById('admin-pw-input').value = '';
+                document.getElementById('admin-pw-input').focus();
+            }
+        };
+
+        document.getElementById('admin-pw-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.submitLogin();
+        });
+
         window.handleLogout = () => { 
-            isAdmin = false; selectedIds = []; 
+            isAdmin = false; 
+            selectedIds = []; 
             document.getElementById('main-body').classList.remove('logged-in'); 
-            document.getElementById('menu-login').style.display = 'block'; 
-            document.getElementById('menu-logout').style.display = 'none'; 
-            render(); toggleMenu(); 
+            document.getElementById('header-action-btn').innerText = '🔒';
+            document.getElementById('header-order-btn').style.display = 'none';
+            window.closeOrderManager();
+            render(); 
+            window.toggleMenu(); 
+        };
+
+        let toastTimeout;
+        window.showToast = (msg, type = 'error') => {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.className = 'custom-toast show';
+            if(type === 'success') toast.classList.add('success');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
         };
 
         const layout = [
             { id: 'T', rows: 5, L: [7,8,9,10,11], M: 13, R: [7,8,9,10,11], start: 'A' },
-            { id: 'M', rows: 10, L: 9, M: 13, R: 9, start: 'F' },
-            { id: 'B', rows: 10, L: 6, M: 13, R: 6, start: 'P' }
+            { id: 'M', rows: 10, L: 11, M: 13, R: 11, start: 'F' },
+            { id: 'B', rows: 10, L: 11, M: 13, R: 11, start: 'P' }
         ];
 
         function render() {
@@ -316,6 +560,7 @@
 
         function updateBlock(bid, rowName, start, end) {
             const block = document.getElementById(bid);
+            if(!block) return;
             if(rowName==='A' || rowName==='F' || rowName==='P') block.innerHTML = '';
             const rowDiv = document.createElement('div');
             rowDiv.className = 'row';
@@ -330,124 +575,268 @@
                     const isReserve = reserveSeats.includes(id);
                     div.className = `seat ${status} ${isReserve ? 'reserve-seat' : ''}`;
                     if(selectedIds.includes(id)) div.classList.add('selected');
-                    div.onclick = () => handleSeatClick(id);
+                    div.onclick = () => window.handleSeatClick(id);
                 }
                 rowDiv.appendChild(div);
             }
             block.appendChild(rowDiv);
         }
 
-        function handleSeatClick(id) {
+        window.handleSeatClick = (id) => {
             if(!isAdmin) return;
             const current = seatsData[id] || { status: 'available' };
             if(current.status === 'sold') {
-                activeSeatForRefund = id;
-                hideRefundSection();
-                document.getElementById('det-seat-id').innerText = id;
-                document.getElementById('det-name').innerText = current.name || '';
-                document.getElementById('det-phone').innerText = current.phone || '';
-                document.getElementById('det-type').innerText = current.ticketType || '';
-                document.getElementById('det-staff').innerText = current.staff || '';
-                document.getElementById('det-date').innerText = current.date || '';
-                document.getElementById('det-note').innerText = current.note || '';
-                document.getElementById('modal-detail').style.display = 'flex';
+                window.showToast("此座位已售出，請至「訂單管理」進行編輯或刪除", "error");
                 return;
             }
             if (selectedIds.includes(id)) {
                 selectedIds = selectedIds.filter(i => i !== id);
             } else { 
-                if(selectedIds.length >= 5) { alert("單次購票上限 5 張。"); return; }
+                if(selectedIds.length >= 5) { 
+                    window.showToast("上限為 5 張"); 
+                    return; 
+                }
                 selectedIds.push(id); 
             }
             render();
-        }
-
-        window.showRefundSection = () => { document.getElementById('refund-section').style.display = 'block'; };
-        window.hideRefundSection = () => { document.getElementById('refund-section').style.display = 'none'; };
-
-        document.getElementById('btn-do-refund').onclick = () => {
-            const reason = document.getElementById('refund-reason').value;
-            const originalData = seatsData[activeSeatForRefund];
-            if(confirm(`確定要取消 ${activeSeatForRefund} 嗎？`)) {
-                const refundRef = push(ref(db, 'refunds'));
-                set(refundRef, { ...originalData, seatId: activeSeatForRefund, refundReason: reason, refundTime: new Date().toLocaleString() });
-                update(ref(db, `seats/${activeSeatForRefund}`), { status: 'available', name: null, staff: null, date: null, note: null, phone: null, ticketType: null });
-                closeModal('modal-detail');
-            }
         };
 
         function updateBottomBar() {
             const count = selectedIds.length;
-            const price = parseInt(document.getElementById('p-type').value);
-            const total = count * price;
-            document.getElementById('display-total').innerText = `NT$ ${total.toLocaleString()}`;
-            document.getElementById('display-sub-info').innerText = `已選 ${count} 張`;
-            document.getElementById('btn-open-modal').disabled = count === 0;
+            const displaySub = document.getElementById('display-sub-info');
+            if(displaySub) displaySub.innerText = `已選 ${count} 座位`;
+            const floatingBar = document.getElementById('floating-bar');
+            if (floatingBar) {
+                if (count > 0 && isAdmin && document.getElementById('order-page').style.display !== 'flex') floatingBar.classList.add('show');
+                else floatingBar.classList.remove('show');
+            }
         }
 
-        window.calculateFinalTotal = () => { 
-            updateBottomBar(); 
-            const finalTotal = selectedIds.length * parseInt(document.getElementById('p-type').value);
-            document.getElementById('buy-final-total').innerText = `NT$ ${finalTotal.toLocaleString()}`; 
+        window.closeModal = (mid) => { 
+            const m = document.getElementById(mid);
+            if(m) m.style.display = 'none'; 
         };
 
-        window.closeModal = (mid) => { document.getElementById(mid).style.display = 'none'; };
+        let currentPaymentMethod = 'cash';
+        window.setPaymentMethod = (method) => {
+            currentPaymentMethod = method;
+            document.getElementById('btn-pay-cash').classList.toggle('active-cash', method === 'cash');
+            document.getElementById('btn-pay-transfer').classList.toggle('active-transfer', method === 'transfer');
+        };
 
         document.getElementById('btn-open-modal').onclick = () => {
-            document.getElementById('p-name').value = ""; document.getElementById('p-phone').value = "";
-            document.getElementById('p-staff').value = ""; document.getElementById('p-note').value = "";
+            document.getElementById('p-name').value = ""; 
+            document.getElementById('p-phone').value = "";
+            document.getElementById('modal-payment').style.display = 'none';
             document.getElementById('modal-purchase').style.display = 'flex';
             document.getElementById('buy-seat-list').value = selectedIds.join(', ');
-            const now = new Date();
-            const offset = now.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(now - offset)).toISOString().split('T')[0];
-            document.getElementById('p-date').value = localISOTime;
-            calculateFinalTotal();
+            window.setPaymentMethod('cash'); 
         };
 
-        document.getElementById('btn-confirm-final').onclick = () => {
+        window.goToStep2 = () => {
+            const name = document.getElementById('p-name').value.trim();
+            const phone = document.getElementById('p-phone').value.trim();
+            if(!name || !phone) {
+                window.showToast("請填寫姓名與電話！"); return;
+            }
+            const price = parseInt(document.getElementById('p-type').value) || 0;
+            const total = selectedIds.length * price;
+            document.getElementById('buy-final-total').innerText = `NT$ ${total.toLocaleString()}`;
+            if (!document.getElementById('p-date').value) {
+                const now = new Date();
+                const offset = now.getTimezoneOffset() * 60000;
+                document.getElementById('p-date').value = (new Date(now - offset)).toISOString().split('T')[0];
+            }
+            document.getElementById('modal-purchase').style.display = 'none';
+            document.getElementById('modal-payment').style.display = 'flex';
+        };
+
+        window.goToStep1 = () => {
+            document.getElementById('modal-payment').style.display = 'none';
+            document.getElementById('modal-purchase').style.display = 'flex';
+        };
+
+        window.submitFinalOrder = () => {
             const name = document.getElementById('p-name').value;
-            const staff = document.getElementById('p-staff').value;
+            const phone = document.getElementById('p-phone').value;
             const typeText = document.getElementById('p-type').options[document.getElementById('p-type').selectedIndex].text;
-            if(!name || !staff) return alert("請填寫姓名與售票人員");
+            const date = document.getElementById('p-date').value;
+            const price = parseInt(document.getElementById('p-type').value) || 0;
+            
+            const orderId = 'ORD-' + Date.now();
+            const status = currentPaymentMethod === 'cash' ? 'paid' : 'pending';
+            const total = selectedIds.length * price;
+            const createdAt = new Date().toISOString();
+
             const updates = {};
+            updates[`orders/${orderId}`] = {
+                orderId, name, phone, ticketType: typeText, seats: selectedIds, 
+                total, paymentMethod: currentPaymentMethod, date, status, createdAt
+            };
             selectedIds.forEach(id => {
                 updates[`seats/${id}`] = { 
-                    status: 'sold', name, staff, ticketType: typeText, 
-                    phone: document.getElementById('p-phone').value, 
-                    date: document.getElementById('p-date').value, 
-                    note: document.getElementById('p-note').value 
+                    status: 'sold', name, phone, ticketType: typeText, date, 
+                    paymentMethod: currentPaymentMethod, orderId
                 };
             });
-            update(ref(db), updates).then(() => { selectedIds = []; closeModal('modal-purchase'); render(); });
+
+            update(ref(db), updates).then(() => { 
+                selectedIds = []; 
+                window.closeModal('modal-payment'); 
+                render(); 
+                window.showToast("購票成功！", "success"); 
+            });
+        };
+
+        window.openOrderManager = () => {
+            document.getElementById('main-content-area').style.display = 'none';
+            document.getElementById('floating-bar').classList.remove('show');
+            document.getElementById('order-page').style.display = 'flex';
+            window.renderOrders();
+        };
+
+        window.closeOrderManager = () => {
+            document.getElementById('order-page').style.display = 'none';
+            document.getElementById('main-content-area').style.display = 'flex';
+            updateBottomBar();
+        };
+
+        window.renderOrders = () => {
+            const tbody = document.getElementById('order-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            const ordersArray = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            // 計算數據指標
+            let totalRevenue = 0;
+            let ticketsSold = 0;
+            let pendingCount = 0;
+            
+            ordersArray.forEach(o => {
+                totalRevenue += o.total || 0;
+                ticketsSold += (o.seats || []).length;
+                if(o.status === 'pending') pendingCount++;
+            });
+
+            // 更新儀表板數據
+            document.getElementById('stat-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
+            document.getElementById('stat-tickets').innerHTML = `${ticketsSold} <span>張</span>`;
+            document.getElementById('stat-orders').innerHTML = `${ordersArray.length} <span>筆</span>`;
+            document.getElementById('stat-pending').innerHTML = `${pendingCount} <span>筆</span>`;
+
+            if(ordersArray.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:40px;">目前尚無訂單</td></tr>';
+                return;
+            }
+
+            ordersArray.forEach(o => {
+                const dateObj = new Date(o.createdAt);
+                const timeString = dateObj.toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
+                const statusHtml = o.status === 'paid' 
+                    ? `<span class="status-badge status-paid">已完成</span>` 
+                    : `<span class="status-badge status-pending">待入帳</span>`;
+                const seatsStr = (o.seats || []).join(', ');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><div style="font-weight:bold;">${timeString}</div><div style="font-size:11px; color:#94a3b8;">${o.paymentMethod === 'cash' ? '現金' : '匯款'}</div></td>
+                    <td><div style="font-weight:bold;">${o.name}</div><div style="font-size:11px; color:#94a3b8;">${o.phone}</div></td>
+                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${seatsStr}">${seatsStr}</td>
+                    <td style="font-weight:bold; color:var(--primary-blue);">NT$ ${o.total.toLocaleString()}</td>
+                    <td>${statusHtml}</td>
+                    <td style="text-align:center;">
+                        <button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')" title="編輯訂單">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="action-icon-btn delete" onclick="window.deleteOrder('${o.orderId}')" title="刪除訂單">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.openEditOrder = (orderId) => {
+            const o = ordersData[orderId];
+            if(!o) return;
+            document.getElementById('edit-order-id').value = orderId;
+            document.getElementById('edit-order-name').value = o.name;
+            document.getElementById('edit-order-phone').value = o.phone;
+            document.getElementById('edit-order-status').value = o.status;
+            document.getElementById('modal-edit-order').style.display = 'flex';
+        };
+
+        window.saveOrderEdit = () => {
+            const orderId = document.getElementById('edit-order-id').value;
+            const newName = document.getElementById('edit-order-name').value.trim();
+            const newPhone = document.getElementById('edit-order-phone').value.trim();
+            const newStatus = document.getElementById('edit-order-status').value;
+            const o = ordersData[orderId];
+            if(!o || !newName || !newPhone) return window.showToast("資料不可為空！");
+            const updates = {};
+            updates[`orders/${orderId}/name`] = newName;
+            updates[`orders/${orderId}/phone`] = newPhone;
+            updates[`orders/${orderId}/status`] = newStatus;
+            if(o.seats) {
+                o.seats.forEach(seatId => {
+                    updates[`seats/${seatId}/name`] = newName;
+                    updates[`seats/${seatId}/phone`] = newPhone;
+                });
+            }
+            update(ref(db), updates).then(() => {
+                window.closeModal('modal-edit-order');
+                window.showToast("訂單已更新！", "success");
+            });
+        };
+
+        window.deleteOrder = (orderId) => {
+            if(confirm("⚠️ 警告：確定要刪除這筆訂單嗎？\n\n這將會使該訂單綁定的所有座位恢復為「可選位」。")) {
+                const o = ordersData[orderId];
+                const updates = {};
+                if(o && o.seats) {
+                    o.seats.forEach(seatId => {
+                        updates[`seats/${seatId}`] = { 
+                            status: 'available', name: null, phone: null, ticketType: null, 
+                            date: null, paymentMethod: null, orderId: null
+                        };
+                    });
+                }
+                updates[`orders/${orderId}`] = null;
+                update(ref(db), updates).then(() => {
+                    window.showToast("訂單已刪除，座位已釋放！", "success");
+                });
+            }
         };
 
         window.exportData = (type) => {
-            const pw = prompt("管理員密碼：");
-            if(pw !== "mia2026") return;
+            if(!isAdmin) return;
             onValue(ref(db, type), (snapshot) => {
                 const data = snapshot.val() || {};
-                let csv = "";
+                let csv = "\ufeff";
                 if(type === 'seats') {
-                    csv = "座位,購票人,電話,票價類型,付款日期,售票員,備註\n";
+                    csv += "座位,購票人,電話,票價類型,付款日期,付款方式\n";
                     Object.keys(data).forEach(id => {
                         const s = data[id];
-                        if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.date},${s.staff},${s.note}\n`;
+                        if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.date},${s.paymentMethod==='cash'?'現金':'匯款'}\n`;
                     });
-                } else {
-                    csv = "退票座位,原購票人,票價類型,售票員,取消原因,退票紀錄時間\n";
-                    Object.keys(data).forEach(key => {
-                        const r = data[key];
-                        csv += `${r.seatId},${r.name},${r.ticketType},${r.staff},${r.refundReason},${r.refundTime}\n`;
+                } else if(type === 'orders') {
+                    csv += "訂單編號,訂單時間,購票人,電話,座位,金額,付款方式,狀態\n";
+                    Object.keys(data).forEach(id => {
+                        const o = data[id];
+                        const dateObj = new Date(o.createdAt);
+                        const timeString = dateObj.toLocaleString('zh-TW');
+                        const seatsStr = (o.seats || []).join('; ');
+                        csv += `${o.orderId},${timeString},${o.name},${o.phone},${seatsStr},${o.total},${o.paymentMethod==='cash'?'現金':'匯款'},${o.status==='paid'?'已完成':'待入帳'}\n`;
                     });
                 }
-                const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = `MIA_${type === 'seats' ? 'Purchase' : 'Refund'}_${new Date().toLocaleDateString()}.csv`;
+                link.download = `MIA_${type === 'seats' ? 'Seats' : 'Orders'}_${new Date().toLocaleDateString()}.csv`;
                 link.click();
             }, { onlyOnce: true });
-            toggleMenu();
+            window.toggleMenu();
         };
     </script>
 </body>
