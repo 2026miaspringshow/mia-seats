@@ -333,7 +333,6 @@
             <div class="order-page-header">
                 <h2 class="order-page-title">總訂單管理</h2>
                 <div class="header-actions-group">
-                    <!-- 移除圖示與座位匯出按鈕 -->
                     <button class="btn-action-outline" onclick="window.exportData('orders')" title="匯出 CSV">
                         匯出訂單名冊
                     </button>
@@ -843,18 +842,31 @@
         };
 
         window.deleteOrder = (orderId) => {
-            if(confirm("⚠️ 警告：確定要刪除這筆訂單嗎？\n\n這將會使該訂單綁定的所有座位恢復為「可選位」。")) {
-                const o = ordersData[orderId];
+            const o = ordersData[orderId];
+            if(!o) {
+                window.showToast("找不到訂單資料！");
+                return;
+            }
+
+            if(confirm(`⚠️ 警告：確定要刪除【${o.name}】的訂單嗎？\n\n這將會使該訂單綁定的所有座位恢復為「可選位」。`)) {
                 const updates = {};
-                if(o && o.seats) {
+                
+                // 重點：必須確保刪除該訂單關聯的所有座位路徑
+                if(o.seats && Array.isArray(o.seats)) {
                     o.seats.forEach(seatId => {
-                        // 重點：設為 null 才會徹底從 Firebase 資料庫移除該座位的節點
+                        // 設為 null 會徹底從 Firebase 資料庫移除該座位的節點
                         updates[`seats/${seatId}`] = null;
                     });
                 }
+                
+                // 同時移除訂單節點
                 updates[`orders/${orderId}`] = null;
+                
                 update(ref(db), updates).then(() => {
-                    window.showToast("訂單已刪除，座位已釋放！", "success");
+                    window.showToast("訂單已刪除，座位已完全釋放！", "success");
+                }).catch(err => {
+                    console.error("Delete Error:", err);
+                    window.showToast("刪除失敗，請檢查權限");
                 });
             }
         };
