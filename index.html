@@ -186,6 +186,14 @@
             background-size: 110px, cover;
         }
 
+        .modal-header.danger-header { 
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='12'/%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'/%3E%3C/svg%3E"),
+                linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); 
+            background-size: 110px, cover;
+            background-position: right -15px center, center;
+        }
+
         .close-x { 
             position: absolute; 
             right: 15px; 
@@ -343,7 +351,7 @@
         .icon-orders { background: #f0fdf4; color: #22c55e; }
         .icon-pending { background: #fff7ed; color: #f97316; }
 
-        .order-table-container { width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .order-table-container { width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; background: white; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
         .order-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 700px; font-size: 14px; }
         .order-table th { background: #f8fafc; padding: 16px 20px; font-weight: bold; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
         .order-table td { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
@@ -369,6 +377,15 @@
             color: #10b981;
         }
         .success-checkmark svg { width: 45px; height: 45px; }
+
+        .warning-exclamation {
+            width: 80px; height: 80px; 
+            margin: 0 auto 20px; 
+            background: #fee2e2; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #ef4444;
+        }
+        .warning-exclamation svg { width: 45px; height: 45px; }
 
         .copy-info-box {
             background: #f1f5f9;
@@ -516,7 +533,6 @@
         </div>
     </div>
 
-    <!-- 訂單管理 -->
     <div class="order-page" id="order-page">
         <div class="order-page-inner">
             <div class="order-page-header">
@@ -565,11 +581,11 @@
                 <div class="filter-row-top">
                     <div class="filter-group">
                         <span class="filter-label">訂單日期</span>
-                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()">
+                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()" title="按訂單建立日篩選">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">收款日期</span>
-                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()">
+                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()" title="按核銷收款日篩選">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">付款方式</span>
@@ -587,7 +603,7 @@
                             <option value="paid">已完成</option>
                         </select>
                     </div>
-                    <button class="btn-clear-filters" onclick="window.clearAllFilters()">清除篩選</button>
+                    <button class="btn-clear-filters" onclick="window.clearAllFilters()" title="清除所有篩選條件預設">清除篩選</button>
                     <div class="search-group">
                         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -744,48 +760,63 @@
         </div>
     </div>
 
-    <!-- 編輯訂單 -->
+    <!-- 編輯訂單 (整合防呆視窗，實現同頁切換) -->
     <div class="modal-overlay" id="modal-edit-order">
         <div class="modal" style="max-width: 420px;">
-            <div class="modal-header">編輯訂單<span class="close-x" onclick="window.closeModal('modal-edit-order')">&times;</span></div>
-            <div class="modal-body">
-                <input type="hidden" id="edit-order-id">
-                <div class="form-group">
-                    <label>匯款末五碼</label>
-                    <input type="text" id="edit-order-bank" placeholder="若非匯款請留空" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
-                </div>
-                <div class="form-group">
-                    <label>備註資訊</label>
-                    <input type="text" id="edit-order-note" placeholder="例如：寄票" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
-                </div>
-                <div class="form-group">
-                    <label>付款方式 / 狀態</label>
-                    <select id="edit-order-status" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
-                        <option value="paid" id="edit-option-paid" style="display:none;">已完成（不變動狀態）</option>
-                        <option value="pending-cash">現金（待付款）</option>
-                        <option value="pending-transfer">匯款（待入帳）</option>
-                    </select>
-                </div>
-                <div style="display:flex; gap:10px; margin-top: 10px;">
-                    <button class="btn-prev-step" onclick="window.closeModal('modal-edit-order')">取消</button>
-                    <button class="btn-complete" onclick="window.saveOrderEdit()">儲存更改</button>
+            
+            <!-- 第一視圖：編輯表單 -->
+            <div id="edit-step-1" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="modal-header">編輯訂單<span class="close-x" onclick="window.closeModal('modal-edit-order')">&times;</span></div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-order-id">
+                    <div class="form-group">
+                        <label>匯款末五碼</label>
+                        <input type="text" id="edit-order-bank" placeholder="若非匯款請留空" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                    </div>
+                    <div class="form-group">
+                        <label>備註資訊</label>
+                        <input type="text" id="edit-order-note" placeholder="例如：寄票" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                    </div>
+                    <div class="form-group">
+                        <label>付款方式 / 狀態</label>
+                        <select id="edit-order-status" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                            <option value="paid" id="edit-option-paid" style="display:none;">已完成</option>
+                            <option value="pending-cash">現金（待付款）</option>
+                            <option value="pending-transfer">匯款（待入帳）</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top: 10px;">
+                        <button class="btn-prev-step" onclick="window.closeModal('modal-edit-order')">取消</button>
+                        <button class="btn-complete" onclick="window.saveOrderEdit()">儲存更改</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 防呆確認視窗 -->
-    <div class="modal-overlay" id="modal-confirm-revert" style="z-index: 4000;">
-        <div class="modal" style="max-width: 380px;">
-            <div class="modal-header login-header">變更確認<span class="close-x" onclick="window.closeModal('modal-confirm-revert')">&times;</span></div>
-            <div class="modal-body" style="text-align: center;">
-                <div style="font-size: 16px; font-weight: bold; color: #1e293b; margin-bottom: 15px;">此筆訂單已完成核銷</div>
-                <div style="font-size: 14px; color: #ef4444; margin-bottom: 25px; line-height: 1.6;">變更付款方式將會<br><b>「退回未核銷狀態」</b><br>並清除收款日期，是否確定要變更？</div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-prev-step" onclick="window.closeModal('modal-confirm-revert')">取消</button>
-                    <button class="btn-complete" style="background: #ef4444;" onclick="window.executeOrderEdit()">確定變更</button>
+            <!-- 第二視圖：防呆確認 -->
+            <div id="edit-step-2" style="display: none; flex-direction: column; height: 100%;">
+                <div class="modal-header danger-header">變更確認<span class="close-x" onclick="window.cancelWarning()">&times;</span></div>
+                <div class="modal-body" style="padding: 32px 24px; text-align: center;">
+                    <div class="warning-exclamation">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <div style="margin-bottom: 30px; text-align: left; padding: 0 10px;">
+                        <p style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px; font-weight: bold; line-height: 1.6; text-align: center;">此筆訂單已完成核銷，變更付款方式將會：</p>
+                        <ul style="margin: 0 auto; padding-left: 0; color: #475569; font-size: 15px; line-height: 1.8; width: fit-content; text-align: left; list-style-position: inside;">
+                            <li>將狀態 <span style="color: #ef4444; font-weight: 800;">退回未核銷</span></li>
+                            <li>自動 <span style="color: #ef4444; font-weight: 800;">清除收款日期</span></li>
+                        </ul>
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.cancelWarning()">取消</button>
+                        <button class="btn-complete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeOrderEdit()">確定變更</button>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -963,7 +994,19 @@
 
         window.closeModal = (mid) => { 
             const m = document.getElementById(mid);
-            if(m) m.style.display = 'none'; 
+            if(m) {
+                m.style.display = 'none'; 
+                // 如果關閉的是編輯視窗，將視圖重置回表單頁面
+                if (mid === 'modal-edit-order') {
+                    document.getElementById('edit-step-1').style.display = 'flex';
+                    document.getElementById('edit-step-2').style.display = 'none';
+                }
+            }
+        };
+
+        window.cancelWarning = () => {
+            document.getElementById('edit-step-2').style.display = 'none';
+            document.getElementById('edit-step-1').style.display = 'flex';
         };
 
         window.updateTotalDisplay = () => {
@@ -1186,9 +1229,8 @@
 
             filteredArray.forEach(o => {
                 const dateObj = new Date(o.createdAt);
-                const timeString = dateObj.toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const timeString = dateObj.toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
                 
-                // 狀態顯示修正：現金單 pending 顯示待付款，匯款單 pending 顯示待入帳
                 let statusLabel = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
                 let statusClass = (o.status === 'paid') ? 'status-paid' : (o.paymentMethod === 'cash' ? 'status-unpaid-red' : 'status-pending-orange');
 
@@ -1280,13 +1322,19 @@
                 paidOption.style.display = 'none';
                 statusSelect.value = o.paymentMethod === 'cash' ? 'pending-cash' : 'pending-transfer';
             }
+            
+            // 確保打開時顯示表單頁面
+            document.getElementById('edit-step-1').style.display = 'flex';
+            document.getElementById('edit-step-2').style.display = 'none';
             document.getElementById('modal-edit-order').style.display = 'flex';
         };
 
         window.saveOrderEdit = () => {
             const statusVal = document.getElementById('edit-order-status').value;
             if (originalOrderState && originalOrderState.status === 'paid' && statusVal !== 'paid') {
-                document.getElementById('modal-confirm-revert').style.display = 'flex';
+                // 如果是從已完成退回，則切換到確認畫面 (同一彈窗)
+                document.getElementById('edit-step-1').style.display = 'none';
+                document.getElementById('edit-step-2').style.display = 'flex';
                 return;
             }
             window.executeOrderEdit();
@@ -1314,10 +1362,13 @@
                 updates[`orders/${orderId}/receiptDate`] = null;
             }
 
+            let currentReportDate = o.reportDate || null;
             if (newBank !== "" && (!o.bankCode || o.bankCode === "")) {
                 const today = new Date();
-                updates[`orders/${orderId}/reportDate`] = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                currentReportDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                updates[`orders/${orderId}/reportDate`] = currentReportDate;
             } else if (newBank === "") {
+                currentReportDate = null;
                 updates[`orders/${orderId}/reportDate`] = null;
             }
 
@@ -1326,13 +1377,15 @@
                 updates[`seats/${s}/note`] = newNote;
                 updates[`seats/${s}/paymentMethod`] = finalMethod;
                 updates[`seats/${s}/receiptDate`] = (finalStatus === 'pending') ? null : (o.receiptDate || null);
-                updates[`seats/${s}/reportDate`] = updates[`orders/${orderId}/reportDate`];
+                updates[`seats/${s}/reportDate`] = currentReportDate;
             });
 
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-edit-order'); 
-                window.closeModal('modal-confirm-revert');
                 window.showToast("已儲存變更", "success"); 
+            }).catch((err) => {
+                console.error(err);
+                window.showToast("儲存失敗，請重試");
             });
         };
 
