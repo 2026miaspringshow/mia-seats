@@ -161,28 +161,37 @@
                 var(--mia-gradient); 
             background-repeat: no-repeat;
             background-position: right -15px center, center;
-            background-size: 80px, cover;
+            background-size: 110px, cover; 
             color: white; 
-            padding: 20px; 
+            padding: 32px 20px; 
             text-align: center; 
             font-size: 20px; 
             font-weight: bold; 
             position: relative; 
             flex-shrink: 0; 
         }
+
+        /* 活動資訊專用標題裝飾：改為資訊 (i) icon */
+        .modal-header.info-header {
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='16' x2='12' y2='12'/%3E%3Cline x1='12' y1='8' x2='12.01' y2='8'/%3E%3C/svg%3E"),
+                var(--mia-gradient); 
+            background-position: right -15px center, center;
+        }
         
-        /* 管理員登入專用標題裝飾：鎖頭 icon 改去左邊 */
         .modal-header.login-header { 
             background-image: 
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E"),
                 var(--mia-gradient); 
-            background-position: left -15px center, center;
+            background-position: right -15px center, center;
+            background-size: 110px, cover;
         }
 
         .modal-header.success-header { 
             background-image: 
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z'/%3E%3Cpath d='M13 5v2'/%3E%3Cpath d='M13 17v2'/%3E%3Cpath d='M13 11v2'/%3E%3C/svg%3E"),
                 var(--success-gradient); 
+            background-size: 110px, cover;
         }
 
         .close-x { 
@@ -239,6 +248,12 @@
         .btn-complete:hover { background: #059669; transform: scale(1.02); }
         .btn-complete:active { transform: scale(0.98); }
         .btn-complete:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; transform: none !important; }
+
+        /* 注意事項列表凸排處理樣式 */
+        .note-list-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+        .note-item { display: flex; font-size: 13px; line-height: 1.6; color: #475569; align-items: flex-start; }
+        .note-num { flex-shrink: 0; font-weight: bold; margin-right: 2px; }
+        .note-content { flex: 1; }
 
         /* --- 訂單管理樣式 --- */
         .order-page { flex: 1; overflow-y: auto; padding: 30px 20px; width: 100%; display: none; flex-direction: column; align-items: center; background-color: var(--bg-gray); }
@@ -309,7 +324,7 @@
             position: relative;
         }
         .copy-info-text {
-            font-size: 12px; 
+            font-size: 11px; 
             line-height: 1.65;
             color: #475569;
             white-space: pre-wrap;
@@ -352,28 +367,79 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            <line x1="12" y1="16" x2="12.01" cy="16"></line>
         </svg>
         <span id="toast-msg">上限為 5 張</span>
     </div>
 
-    <!-- 管理員登入視窗：增加寬度 400px -->
+    <!-- 活動資訊視窗：初始顯示 -->
+    <div class="modal-overlay" id="modal-event-info" style="display: flex;">
+        <div class="modal" style="max-width: 500px;">
+            <!-- 標題圖示更換為資訊 (i) 圖示 -->
+            <div class="modal-header info-header">活動資訊與注意事項<span class="close-x" onclick="window.closeModal('modal-event-info')">&times;</span></div>
+            <div class="modal-body">
+                <div style="background: #f8fafc; padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                    <!-- 標籤加粗、變大、變藍色 -->
+                    <div style="font-size: 14px; margin-bottom: 8px;"><b style="color: #1e3a8a; font-size: 14px;">活動日期：</b>3/21（六）</div>
+                    <div style="font-size: 14px; margin-bottom: 8px;"><b style="color: #1e3a8a; font-size: 14px;">活動時間：</b>17:00－19:20</div>
+                    <div style="font-size: 14px; margin-bottom: 8px;"><b style="color: #1e3a8a; font-size: 14px;">入場時間：</b>16:20－17:00</div>
+                    <div style="display: flex; font-size: 14px; line-height: 1.6;">
+                        <span style="flex-shrink: 0; font-weight: bold; color: #1e3a8a; font-size: 14px;">活動地點：</span>
+                        <div>
+                            國立陽明交通大學－光復校區<br>
+                            <span style="color: #64748b; font-size: 12px;">（新竹市東區大學路1001號）</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="border-bottom: 1.5px dashed #e2e8f0; margin-bottom: 15px; padding-bottom: 5px; font-weight: 800; color: #1e3a8a; font-size: 14px;">🎫 購票資訊</div>
+                <ul style="list-style: none; padding: 0; font-size: 14px; line-height: 1.8; color: #475569; margin-bottom: 20px;">
+                    <!-- 順序重整：票價 -> 早鳥 -> 地點 -->
+                    <li>・票價：$800／張</li>
+                    <li>・早鳥優惠：03/01－03/14（含）享 $650／張</li>
+                    <li>・購票地點：MIA 光復館櫃台</li>
+                </ul>
+
+                <div style="border-bottom: 1.5px dashed #e2e8f0; margin-bottom: 15px; padding-bottom: 5px; font-weight: 800; color: #1e3a8a; font-size: 14px;">📌 注意事項</div>
+                <!-- 凸排處理：確保第二行對齊 "1、" 之後的第一個字 -->
+                <div class="note-list-container">
+                    <div class="note-item"><div class="note-num">1、</div><div class="note-content">每人每次限購 5 張（含）為上限。</div></div>
+                    <div class="note-item"><div class="note-num">2、</div><div class="note-content">票券售出後恕不退換，亦不得轉讓，請自行妥善保管，遺失恕不補發。</div></div>
+                    <div class="note-item"><div class="note-num">3、</div><div class="note-content">3 歲以上孩童皆須購票入場；若孩童無法安靜觀賞，請斟酌購票，以維護觀賞品質。</div></div>
+                    <div class="note-item"><div class="note-num">4、</div><div class="note-content">本系統僅供座位參考，購票請洽 MIA 工作人員。</div></div>
+                </div>
+
+                <button class="btn-confirm-final" onclick="window.closeModal('modal-event-info')">進入系統</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理員登入視窗 -->
     <div class="modal-overlay" id="modal-login">
         <div class="modal" style="max-width: 400px;">
-            <!-- 標題加入 login-header class -->
             <div class="modal-header login-header">管理員登入<span class="close-x" onclick="window.closeModal('modal-login')">&times;</span></div>
             <div class="modal-body">
                 <div class="form-group" style="margin-bottom: 25px;">
-                    <!-- Label 移除 -->
                     <input type="password" id="admin-pw-input" placeholder="請輸入管理員密碼" style="padding:16px; border:1.5px solid #ddd; border-radius:12px; width:100%; box-sizing:border-box; font-size: 16px;">
-                    <!-- 密碼錯誤顏色改為正紅 #ef4444 -->
                     <div id="login-error-msg" style="color: #ef4444; font-size: 13px; margin-top: 10px; font-weight: bold; display: none; text-align: center;">密碼錯誤，請重新輸入！</div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <!-- 新增取消按鈕 -->
-                    <button class="btn-prev-step" onclick="window.closeModal('modal-login')">取消</button>
-                    <!-- 按鈕更名為登入 -->
+                    <button class="btn-confirm-final" style="background: white; color: #64748b; border: 1.5px solid #cbd5e1;" onclick="window.closeModal('modal-login')">取消</button>
                     <button class="btn-confirm-final" onclick="window.submitLogin()">登入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登出確認視窗 -->
+    <div class="modal-overlay" id="modal-logout-confirm">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header login-header">系統登出<span class="close-x" onclick="window.closeModal('modal-logout-confirm')">&times;</span></div>
+            <div class="modal-body">
+                <div style="text-align: center; font-size: 16px; color: #475569; margin-bottom: 30px; font-weight: bold;">您確定要登出管理員模式嗎？</div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-confirm-final" style="background: white; color: #64748b; border: 1.5px solid #cbd5e1;" onclick="window.closeModal('modal-logout-confirm')">取消</button>
+                    <button class="btn-confirm-final" style="background: #ef4444;" onclick="window.confirmLogout()">確認登出</button>
                 </div>
             </div>
         </div>
@@ -452,7 +518,7 @@
                     <div class="stat-label">總營收</div>
                     <div class="stat-value" id="stat-revenue">$0</div>
                     <div class="stat-icon-wrapper icon-revenue">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" cy="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -473,7 +539,7 @@
                     <div class="stat-label">待核銷筆數</div>
                     <div class="stat-value pending" id="stat-pending">0 <span>筆</span></div>
                     <div class="stat-icon-wrapper icon-pending">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" cy="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" cy="16"></line></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" cy="8" x2="12" cy="12"></line><line x1="12" y1="16" x2="12.01" cy="16"></line></svg>
                     </div>
                 </div>
             </div>
@@ -511,7 +577,7 @@
         </div>
     </div>
 
-    <!-- 懸浮列 -->
+    <!-- 懸浮購票列 -->
     <div class="floating-bar" id="floating-bar">
         <div class="floating-bar-left">
             <div class="floating-cart-icon">
@@ -540,7 +606,8 @@
                 <div class="form-group">
                     <label>票價類型</label>
                     <select id="p-type" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;" onchange="window.updateTotalDisplay()">
-                        <option value="600">早鳥優惠 NT$ 600 / 張</option>
+                        <!-- 早鳥價更新為 650 -->
+                        <option value="650">早鳥優惠 NT$ 650 / 張</option>
                         <option value="800">一般原價 NT$ 800 / 張</option>
                         <option value="0">公關票價 NT$ 0 / 張</option>
                     </select>
@@ -613,60 +680,6 @@
         </div>
     </div>
 
-    <!-- 收款對帳視窗 -->
-    <div class="modal-overlay" id="modal-verify">
-        <div class="modal" style="max-width: 350px;">
-            <div class="modal-header" id="verify-modal-title">收款確認<span class="close-x" onclick="window.closeModal('modal-verify')">&times;</span></div>
-            <div class="modal-body" style="text-align: center;">
-                <input type="hidden" id="verify-order-id">
-                <div style="text-align: left; background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                    <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;">購票者姓名</div>
-                    <div id="verify-name" style="font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #1e293b;">-</div>
-                    <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;">訂單總金額</div>
-                    <div id="verify-total" style="font-size: 18px; font-weight: bold; color: var(--primary-blue); margin-bottom: 12px;">-</div>
-                    
-                    <div id="verify-transfer-info">
-                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;">匯款後五碼</div>
-                        <div id="verify-bank-code" style="font-size: 24px; font-weight: 900; color: #d97706;">- - - - -</div>
-                    </div>
-                    
-                    <div id="verify-cash-info" style="display:none;">
-                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;">收款日期</div>
-                        <input type="date" id="verify-receipt-date" style="padding:10px; border:1px solid #ddd; border-radius:8px; width:100%; box-sizing:border-box; font-size:16px;">
-                    </div>
-                </div>
-                <button id="btn-confirm-verify" class="btn-complete" style="width: 100%;" onclick="window.confirmVerify()">確認已入帳</button>
-                <div id="verify-error-msg" style="color: #ef4444; font-size: 12px; font-weight: bold; margin-top: 10px; display: none;">資訊空白，無法核銷！</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 編輯訂單 -->
-    <div class="modal-overlay" id="modal-edit-order">
-        <div class="modal" style="max-width: 400px;">
-            <div class="modal-header">編輯訂單資訊<span class="close-x" onclick="window.closeModal('modal-edit-order')">&times;</span></div>
-            <div class="modal-body">
-                <input type="hidden" id="edit-order-id">
-                <div class="form-group">
-                    <label>匯款後五碼</label>
-                    <input type="text" id="edit-order-bank" maxlength="5" style="padding:12px; border:1px solid #ddd; border-radius:8px;">
-                </div>
-                <div class="form-group">
-                    <label>備註</label>
-                    <input type="text" id="edit-order-note" style="padding:12px; border:1px solid #ddd; border-radius:8px;">
-                </div>
-                <div class="form-group">
-                    <label>付款方式</label>
-                    <select id="edit-order-status" style="padding:12px; border:1px solid #ddd; border-radius:8px;">
-                        <option value="pending-transfer">匯款 (待入帳)</option>
-                        <option value="pending-cash">現金 (待付款)</option>
-                    </select>
-                </div>
-                <button class="btn-confirm-final" onclick="window.saveOrderEdit()">儲存變更</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
@@ -727,7 +740,7 @@
                 document.getElementById('login-error-msg').style.display = 'none';
                 setTimeout(() => document.getElementById('admin-pw-input').focus(), 100);
             } else {
-                window.handleLogout();
+                document.getElementById('modal-logout-confirm').style.display = 'flex';
             }
         };
 
@@ -748,7 +761,7 @@
             }
         };
 
-        window.handleLogout = () => { 
+        window.confirmLogout = () => {
             isAdmin = false; 
             selectedIds = []; 
             document.getElementById('main-body').classList.remove('logged-in'); 
@@ -756,8 +769,9 @@
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'none';
             window.closeOrderManager();
+            window.closeModal('modal-logout-confirm');
             render(); 
-            window.showToast("已登出", "success");
+            window.showToast("已成功登出", "success");
         };
 
         const layout = [
