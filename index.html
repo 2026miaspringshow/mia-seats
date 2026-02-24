@@ -171,14 +171,6 @@
             flex-shrink: 0; 
         }
 
-        /* 活動資訊專用標題裝飾：改為資訊 (i) icon */
-        .modal-header.info-header {
-            background-image: 
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='16' x2='12' y2='12'/%3E%3Cline x1='12' y1='8' x2='12.01' y2='8'/%3E%3C/svg%3E"),
-                var(--mia-gradient); 
-            background-position: right -15px center, center;
-        }
-        
         .modal-header.login-header { 
             background-image: 
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E"),
@@ -249,13 +241,6 @@
         .btn-complete:active { transform: scale(0.98); }
         .btn-complete:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; transform: none !important; }
 
-        /* 注意事項列表凸排處理樣式 */
-        .note-list-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-        .note-item { display: flex; font-size: 13px; line-height: 1.6; color: #475569; align-items: flex-start; }
-        .note-num { flex-shrink: 0; font-weight: bold; margin-right: 2px; }
-        .note-content { flex: 1; }
-
-        /* --- 訂單管理樣式 --- */
         .order-page { flex: 1; overflow-y: auto; padding: 30px 20px; width: 100%; display: none; flex-direction: column; align-items: center; background-color: var(--bg-gray); }
         .order-page-inner { width: 100%; max-width: 1000px; }
         .order-page-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
@@ -264,16 +249,90 @@
         .btn-action-outline { background: white; border: 2px solid #e2e8f0; padding: 10px 16px; border-radius: 12px; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px; }
         .btn-action-outline:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
         
-        .order-controls { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; width: 100%; }
-        .filter-tabs { display: flex; background: white; padding: 4px; border-radius: 12px; border: 1px solid #e2e8f0; width: fit-content; }
-        .filter-tab { padding: 8px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; color: #64748b; transition: all 0.2s; user-select: none; }
-        .filter-tab.active { background: #f1f5f9; color: #1e293b; }
-        .filter-tab:hover:not(.active) { color: var(--primary-blue); }
+        /* 篩選控制面板全新樣式 (無底框版) */
+        .filter-panel {
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .filter-row-top {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #475569;
+            white-space: nowrap;
+        }
+        .filter-control {
+            padding: 0 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #1e293b;
+            outline: none;
+            transition: 0.2s;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            height: 42px;
+            box-sizing: border-box;
+        }
+        .filter-control:focus { border-color: var(--primary-blue); }
+        
+        /* 修改「清除篩選」按鈕樣式：藍色底、白色字 */
+        .btn-clear-filters {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 15px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+        }
+        .btn-clear-filters:hover { 
+            background: #4f46e5; 
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px -2px rgba(99, 102, 241, 0.4);
+        }
+        .btn-clear-filters:active {
+            transform: translateY(0);
+        }
 
-        .search-container { position: relative; flex: 1; max-width: 300px; min-width: 200px; }
-        .search-input { padding: 10px 16px 10px 40px; border: 2px solid #e2e8f0; border-radius: 12px; width: 100%; box-sizing: border-box; font-size: 14px; transition: all 0.2s; height: 42px; }
-        .search-input:focus { border-color: var(--primary-blue); outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .search-group { position: relative; flex: 1; min-width: 200px; }
+        .search-input { padding: 10px 16px 10px 42px; border: 2px solid #e2e8f0; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 14px; transition: all 0.2s; height: 42px; outline: none;}
+        .search-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 18px; height: 18px; }
+
+        /* 符合條件筆數樣式 */
+        .results-summary {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .results-count {
+            color: var(--primary-blue);
+            font-weight: 800;
+        }
 
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
@@ -356,8 +415,10 @@
         @media screen and (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .order-page-header { gap: 10px; }
-            .order-controls { flex-direction: column; align-items: flex-start; }
-            .search-container { max-width: 100%; width: 100%; }
+            .filter-row-top { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .filter-group { width: 100%; }
+            .filter-control { flex: 1; }
+            .search-group { width: 100%; }
         }
     </style>
 </head>
@@ -370,48 +431,6 @@
             <line x1="12" y1="16" x2="12.01" cy="16"></line>
         </svg>
         <span id="toast-msg">上限為 5 張</span>
-    </div>
-
-    <!-- 活動資訊視窗：初始顯示 -->
-    <div class="modal-overlay" id="modal-event-info" style="display: flex;">
-        <div class="modal" style="max-width: 500px;">
-            <!-- 標題圖示更換為資訊 (i) 圖示 -->
-            <div class="modal-header info-header">活動資訊與注意事項<span class="close-x" onclick="window.closeModal('modal-event-info')">&times;</span></div>
-            <div class="modal-body">
-                <div style="background: #f8fafc; padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                    <!-- 標籤加粗、變大、變藍色 -->
-                    <div style="font-size: 14px; margin-bottom: 8px;"><b style="color: #1e3a8a; font-size: 14px;">活動日期：</b>3/21（六）</div>
-                    <div style="font-size: 14px; margin-bottom: 8px;"><b style="color: #1e3a8a; font-size: 14px;">活動時間：</b>17:00－19:20</div>
-                    <div style="font-size: 14px; margin-bottom: 8px;"><b style="color: #1e3a8a; font-size: 14px;">入場時間：</b>16:20－17:00</div>
-                    <div style="display: flex; font-size: 14px; line-height: 1.6;">
-                        <span style="flex-shrink: 0; font-weight: bold; color: #1e3a8a; font-size: 14px;">活動地點：</span>
-                        <div>
-                            國立陽明交通大學－光復校區<br>
-                            <span style="color: #64748b; font-size: 12px;">（新竹市東區大學路1001號）</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="border-bottom: 1.5px dashed #e2e8f0; margin-bottom: 15px; padding-bottom: 5px; font-weight: 800; color: #1e3a8a; font-size: 14px;">🎫 購票資訊</div>
-                <ul style="list-style: none; padding: 0; font-size: 14px; line-height: 1.8; color: #475569; margin-bottom: 20px;">
-                    <!-- 順序重整：票價 -> 早鳥 -> 地點 -->
-                    <li>・票價：$800／張</li>
-                    <li>・早鳥優惠：03/01－03/14（含）享 $650／張</li>
-                    <li>・購票地點：MIA 光復館櫃台</li>
-                </ul>
-
-                <div style="border-bottom: 1.5px dashed #e2e8f0; margin-bottom: 15px; padding-bottom: 5px; font-weight: 800; color: #1e3a8a; font-size: 14px;">📌 注意事項</div>
-                <!-- 凸排處理：確保第二行對齊 "1、" 之後的第一個字 -->
-                <div class="note-list-container">
-                    <div class="note-item"><div class="note-num">1、</div><div class="note-content">每人每次限購 5 張（含）為上限。</div></div>
-                    <div class="note-item"><div class="note-num">2、</div><div class="note-content">票券售出後恕不退換，亦不得轉讓，請自行妥善保管，遺失恕不補發。</div></div>
-                    <div class="note-item"><div class="note-num">3、</div><div class="note-content">3 歲以上孩童皆須購票入場；若孩童無法安靜觀賞，請斟酌購票，以維護觀賞品質。</div></div>
-                    <div class="note-item"><div class="note-num">4、</div><div class="note-content">本系統僅供座位參考，購票請洽 MIA 工作人員。</div></div>
-                </div>
-
-                <button class="btn-confirm-final" onclick="window.closeModal('modal-event-info')">進入系統</button>
-            </div>
-        </div>
     </div>
 
     <!-- 管理員登入視窗 -->
@@ -517,6 +536,7 @@
                 <div class="stat-card">
                     <div class="stat-label">總營收</div>
                     <div class="stat-value" id="stat-revenue">$0</div>
+                    <div id="stat-cash-revenue" style="font-size: 13px; color: #ef4444; font-weight: 600; margin-top: 5px;">現金收入 $0</div>
                     <div class="stat-icon-wrapper icon-revenue">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" cy="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                     </div>
@@ -539,24 +559,56 @@
                     <div class="stat-label">待核銷筆數</div>
                     <div class="stat-value pending" id="stat-pending">0 <span>筆</span></div>
                     <div class="stat-icon-wrapper icon-pending">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" cy="8" x2="12" cy="12"></line><line x1="12" y1="16" x2="12.01" cy="16"></line></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" cy="4" x2="12" y2="15"></line>
+                            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                        </svg>
                     </div>
                 </div>
             </div>
 
-            <div class="order-controls">
-                <div class="filter-tabs">
-                    <div class="filter-tab active" data-filter="all" onclick="window.setOrderFilter('all')">全部</div>
-                    <div class="filter-tab" data-filter="pending" onclick="window.setOrderFilter('pending')">待處理</div>
-                    <div class="filter-tab" data-filter="paid" onclick="window.setOrderFilter('paid')">已完成</div>
+            <!-- 篩選面板 -->
+            <div class="filter-panel">
+                <div class="filter-row-top">
+                    <div class="filter-group">
+                        <span class="filter-label">訂單日期</span>
+                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()" title="按訂單建立日篩選">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">收款日期</span>
+                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()" title="按核銷收款日篩選">
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">付款方式</span>
+                        <select id="filter-payment" class="filter-control" onchange="window.renderOrders()">
+                            <option value="all">全部</option>
+                            <option value="cash">現金</option>
+                            <option value="transfer">匯款</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">狀態</span>
+                        <select id="filter-status" class="filter-control" onchange="window.renderOrders()">
+                            <option value="all">全部</option>
+                            <option value="pending">待處理</option>
+                            <option value="paid">已完成</option>
+                        </select>
+                    </div>
+                    <button class="btn-clear-filters" onclick="window.clearAllFilters()" title="清除所有篩選條件預設">清除篩選</button>
+                    <div class="search-group">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" cy="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="order-search-input" class="search-input" placeholder="搜尋姓名/電話/座位..." oninput="window.renderOrders()">
+                    </div>
                 </div>
-                <div class="search-container">
-                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" cy="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="order-search-input" class="search-input" placeholder="搜尋姓名/電話/座位..." oninput="window.renderOrders()">
-                </div>
+            </div>
+
+            <!-- 符合篩選條件統計 -->
+            <div class="results-summary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>共計 <span id="results-count-number" class="results-count">0</span> 筆符合篩選條件</span>
             </div>
 
             <div class="order-table-container">
@@ -564,11 +616,11 @@
                     <thead>
                         <tr>
                             <th>訂單時間</th>
-                            <th>購票者</th>
+                            <th>購票人資訊</th>
                             <th>座位</th>
                             <th>金額/方式</th>
                             <th>狀態</th>
-                            <th style="text-align:center;">操作</th>
+                            <th style="text-align:right;">操作</th>
                         </tr>
                     </thead>
                     <tbody id="order-table-body"></tbody>
@@ -606,7 +658,6 @@
                 <div class="form-group">
                     <label>票價類型</label>
                     <select id="p-type" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;" onchange="window.updateTotalDisplay()">
-                        <!-- 早鳥價更新為 650 -->
                         <option value="650">早鳥優惠 NT$ 650 / 張</option>
                         <option value="800">一般原價 NT$ 800 / 張</option>
                         <option value="0">公關票價 NT$ 0 / 張</option>
@@ -634,11 +685,11 @@
             <div class="modal-header">購票資訊<span class="close-x" onclick="window.closeModal('modal-payment')">&times;</span></div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>購票人姓名</label>
+                    <label>購票姓名</label>
                     <input type="text" id="p-name" placeholder="請輸入姓名" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                 </div>
                 <div class="form-group">
-                    <label>購票人電話</label>
+                    <label>聯絡電話</label>
                     <input type="tel" id="p-phone" placeholder="請輸入電話" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                 </div>
                 <div class="form-group">
@@ -675,6 +726,71 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         點擊複製匯款資訊
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- [ADMIN] 核銷確認視窗 -->
+    <div class="modal-overlay" id="modal-verify">
+        <div class="modal" style="max-width: 460px;">
+            <div class="modal-header" id="verify-modal-title">核銷確認</div>
+            <div class="modal-body">
+                <input type="hidden" id="verify-order-id">
+                
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 0 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 40px;">
+                        <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">購票姓名：</span>
+                        <span id="verify-name" style="font-weight: bold; color: #1e293b; font-size: 15px; text-align: right;"></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 40px;">
+                        <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">應收金額：</span>
+                        <span id="verify-total" style="font-weight: bold; color: var(--primary-blue); font-size: 15px; text-align: right;"></span>
+                    </div>
+                    <!-- 匯款核銷額外資訊 -->
+                    <div id="verify-transfer-info" style="display:none; justify-content: space-between; align-items: center; min-height: 40px;">
+                        <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">匯款末五碼：</span>
+                        <span id="verify-bank-code" style="font-weight: bold; color: #ef4444; font-size: 15px; text-align: right;"></span>
+                    </div>
+                    <!-- 收款日期 -->
+                    <div id="verify-date-info" style="display:flex; justify-content: space-between; align-items: center; min-height: 40px;">
+                        <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">收款日期：</span>
+                        <input type="date" id="verify-receipt-date" class="filter-control" style="width: 160px;">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-prev-step" onclick="window.closeModal('modal-verify')">取消</button>
+                    <button class="btn-complete" id="btn-confirm-verify" onclick="window.confirmVerify()">確認核銷</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- [ADMIN] 訂單編輯視窗 -->
+    <div class="modal-overlay" id="modal-edit-order">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header">編輯訂單<span class="close-x" onclick="window.closeModal('modal-edit-order')">&times;</span></div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-order-id">
+                <div class="form-group">
+                    <label>匯款末五碼</label>
+                    <input type="text" id="edit-order-bank" placeholder="若非匯款請留空" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                </div>
+                <div class="form-group">
+                    <label>備註資訊</label>
+                    <input type="text" id="edit-order-note" placeholder="例如：寄票" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                </div>
+                <div class="form-group">
+                    <label>付款方式</label>
+                    <select id="edit-order-status" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                        <option value="pending-cash">現金（待付款）</option>
+                        <option value="pending-transfer">匯款（待入帳）</option>
+                    </select>
+                </div>
+                <div style="display:flex; gap:10px; margin-top: 10px;">
+                    <button class="btn-prev-step" onclick="window.closeModal('modal-edit-order')">取消</button>
+                    <button class="btn-complete" onclick="window.saveOrderEdit()">儲存更改</button>
                 </div>
             </div>
         </div>
@@ -960,6 +1076,15 @@
             document.getElementById('order-page').style.display = 'flex';
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'flex';
+            
+            // 預設將「訂單日期」設定為今天，符合工作人員習慣
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('order-date-input').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('receipt-date-input').value = ""; // 收款日預設不限制
+            
             window.renderOrders();
         };
 
@@ -973,42 +1098,98 @@
             updateBottomBar();
         };
 
-        window.setOrderFilter = (filter) => {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.getAttribute('data-filter') === filter);
-            });
+        window.clearAllFilters = () => {
+            document.getElementById('order-date-input').value = '';
+            document.getElementById('receipt-date-input').value = '';
+            document.getElementById('filter-payment').value = 'all';
+            document.getElementById('filter-status').value = 'all';
+            document.getElementById('order-search-input').value = '';
             window.renderOrders();
         };
 
         window.renderOrders = () => {
             const tbody = document.getElementById('order-table-body');
             const searchInput = document.getElementById('order-search-input');
+            const orderDateInput = document.getElementById('order-date-input');
+            const receiptDateInput = document.getElementById('receipt-date-input');
+            const paymentInput = document.getElementById('filter-payment');
+            const statusInput = document.getElementById('filter-status');
+            
             const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
+            const selectedOrderDate = orderDateInput ? orderDateInput.value : "";
+            const selectedReceiptDate = receiptDateInput ? receiptDateInput.value : "";
+            const selectedPayment = paymentInput ? paymentInput.value : "all";
+            const selectedStatus = statusInput ? statusInput.value : "all";
+            
             if(!tbody) return;
             tbody.innerHTML = '';
-            const ordersArray = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
-            let totalRevenue = 0, ticketsSold = 0, pendingCount = 0;
-            ordersArray.forEach(o => {
-                if(o.status === 'paid') totalRevenue += o.total || 0;
-                ticketsSold += (o.seats || []).length;
-                if(o.status === 'pending') pendingCount++;
+            const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            let filteredArray = allOrders;
+            
+            // 1. 日期過濾 (雙條件過濾)
+            if (selectedOrderDate !== "" || selectedReceiptDate !== "") {
+                filteredArray = allOrders.filter(o => {
+                    let matchOrderDate = true;
+                    let matchReceiptDate = true;
+
+                    if (selectedOrderDate !== "") {
+                        const oDate = new Date(o.createdAt);
+                        const yyyy = oDate.getFullYear();
+                        const mm = String(oDate.getMonth() + 1).padStart(2, '0');
+                        const dd = String(oDate.getDate()).padStart(2, '0');
+                        matchOrderDate = (`${yyyy}-${mm}-${dd}` === selectedOrderDate);
+                    }
+
+                    if (selectedReceiptDate !== "") {
+                        matchReceiptDate = (o.receiptDate === selectedReceiptDate);
+                    }
+
+                    return matchOrderDate && matchReceiptDate;
+                });
+            }
+
+            // 統計數據計算：以「收款日期篩選器」所選的那一天為準
+            let totalRevenue = 0, cashRevenue = 0;
+            
+            allOrders.forEach(o => {
+                if (o.status === 'paid') {
+                    if (selectedReceiptDate === "" || o.receiptDate === selectedReceiptDate) {
+                        totalRevenue += o.total || 0;
+                        if (o.paymentMethod === 'cash') {
+                            cashRevenue += o.total || 0;
+                        }
+                    }
+                }
             });
 
-            document.getElementById('stat-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
-            document.getElementById('stat-tickets').innerHTML = `${ticketsSold} <span>張</span>`;
-            document.getElementById('stat-orders').innerHTML = `${ordersArray.length} <span>筆</span>`;
-            document.getElementById('stat-pending').innerHTML = `${pendingCount} <span>筆</span>`;
-
-            const filteredArray = ordersArray.filter(o => {
-                if (currentFilter !== 'all' && o.status !== currentFilter) return false;
+            // 2. 狀態、付款方式與關鍵字過濾
+            filteredArray = filteredArray.filter(o => {
+                if (selectedStatus !== 'all' && o.status !== selectedStatus) return false;
+                if (selectedPayment !== 'all' && o.paymentMethod !== selectedPayment) return false;
                 if (keyword === "") return true;
                 const nameMatch = o.name.toLowerCase().includes(keyword);
                 const phoneMatch = o.phone.toLowerCase().includes(keyword);
                 const seatMatch = (o.seats || []).some(s => s.toLowerCase().includes(keyword));
                 return nameMatch || phoneMatch || seatMatch;
             });
+
+            // 更新筆數顯示
+            const countDisplay = document.getElementById('results-count-number');
+            if (countDisplay) countDisplay.innerText = filteredArray.length;
+
+            // 計算當前清單中的票數與待處理數
+            let ticketsSold = 0, pendingCount = 0;
+            filteredArray.forEach(o => {
+                ticketsSold += (o.seats || []).length;
+                if(o.status === 'pending') pendingCount++;
+            });
+
+            document.getElementById('stat-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
+            document.getElementById('stat-cash-revenue').innerText = `現金收入 $${cashRevenue.toLocaleString()}`;
+            document.getElementById('stat-tickets').innerHTML = `${ticketsSold} <span>張</span>`;
+            document.getElementById('stat-orders').innerHTML = `${filteredArray.length} <span>筆</span>`;
+            document.getElementById('stat-pending').innerHTML = `${pendingCount} <span>筆</span>`;
 
             if(filteredArray.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:40px;">找不到符合條件的訂單</td></tr>`;
@@ -1035,9 +1216,18 @@
 
                 const statusHtml = `<span class="status-badge ${statusClass}">${statusLabel}</span>`;
                 const seatsStr = (o.seats || []).join(', ');
+                
+                let receiptDateHtml = '';
+                if (o.status === 'paid' && o.receiptDate) {
+                    receiptDateHtml = `<div style="font-size:11px; font-weight:bold; color:#10b981; margin-top:4px;">收款日: ${o.receiptDate}</div>`;
+                }
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><div style="font-weight:bold;">${timeString}</div></td>
+                    <td>
+                        <div style="font-weight:bold;">${timeString}</div>
+                        ${receiptDateHtml}
+                    </td>
                     <td><div style="font-weight:bold;">${o.name}</div><div style="font-size:11px; color:#94a3b8;">${o.phone}</div></td>
                     <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${seatsStr}">${seatsStr}</td>
                     <td>
@@ -1045,17 +1235,19 @@
                         <div style="font-size:11px; color:#94a3b8;">${o.paymentMethod === 'cash' ? '現金' : '匯款'}</div>
                     </td>
                     <td>${statusHtml}</td>
-                    <td style="text-align:center;">
-                        ${o.status === 'pending' ? `
-                        <button class="action-icon-btn verify" onclick="window.openVerifyOrder('${o.orderId}')" title="確認收款/入帳">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </button>` : ''}
-                        <button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')" title="編輯">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        </button>
-                        <button class="action-icon-btn delete" onclick="window.deleteOrder('${o.orderId}')" title="刪除">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
+                    <td>
+                        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
+                            ${o.status === 'pending' ? `
+                            <button class="action-icon-btn verify" onclick="window.openVerifyOrder('${o.orderId}')" title="確認收款/入帳">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </button>` : ''}
+                            <button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')" title="編輯">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button class="action-icon-btn delete" onclick="window.deleteOrder('${o.orderId}')" title="刪除">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1072,29 +1264,27 @@
             const isCash = o.paymentMethod === 'cash';
             const closeBtn = `<span class="close-x" onclick="window.closeModal('modal-verify')">&times;</span>`;
             document.getElementById('verify-modal-title').innerHTML = isCash ? `現金收款確認${closeBtn}` : `匯款入帳確認${closeBtn}`;
-            document.getElementById('verify-transfer-info').style.display = isCash ? 'none' : 'block';
-            document.getElementById('verify-cash-info').style.display = isCash ? 'block' : 'none';
+            document.getElementById('verify-transfer-info').style.display = isCash ? 'none' : 'flex';
             
             const verifyBtn = document.getElementById('btn-confirm-verify');
-            const errorMsg = document.getElementById('verify-error-msg');
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('verify-receipt-date').value = `${yyyy}-${mm}-${dd}`;
 
             if (!isCash) {
                 const bankCode = (o.bankCode || "").trim();
                 if(bankCode === "") {
                     document.getElementById('verify-bank-code').innerText = "未提供";
-                    document.getElementById('verify-bank-code').style.color = "#ef4444";
                     verifyBtn.disabled = true;
-                    errorMsg.style.display = "block";
                 } else {
                     document.getElementById('verify-bank-code').innerText = bankCode;
-                    document.getElementById('verify-bank-code').style.color = "#d97706";
                     verifyBtn.disabled = false;
-                    errorMsg.style.display = "none";
                 }
             } else {
-                document.getElementById('verify-receipt-date').value = new Date().toISOString().split('T')[0];
                 verifyBtn.disabled = false;
-                errorMsg.style.display = "none";
             }
             document.getElementById('modal-verify').style.display = 'flex';
         };
@@ -1105,8 +1295,12 @@
             if(!o) return;
             
             const updates = {};
-            const today = new Date().toISOString().split('T')[0];
-            const finalReceiptDate = o.paymentMethod === 'cash' ? document.getElementById('verify-receipt-date').value : today;
+            const finalReceiptDate = document.getElementById('verify-receipt-date').value;
+            
+            if(!finalReceiptDate) {
+                window.showToast("請選擇收款日期！", "error");
+                return;
+            }
             
             updates[`orders/${orderId}/status`] = 'paid';
             updates[`orders/${orderId}/receiptDate`] = finalReceiptDate;
@@ -1192,13 +1386,13 @@
                 const data = snapshot.val() || {};
                 let csv = "\ufeff";
                 if(type === 'seats') {
-                    csv += "座位,購票人,電話,票價類型,收款日期,付款方式,備註\n";
+                    csv += "座位,購票姓名,電話,票價類型,收款日期,付款方式,備註\n";
                     Object.keys(data).forEach(id => {
                         const s = data[id];
                         if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.receiptDate || ''},${s.paymentMethod==='cash'?'現金':'匯款'},${s.note || ''}\n`;
                     });
                 } else if(type === 'orders') {
-                    csv += "訂單編號,訂單時間,購票人,電話,座位,金額,付款方式,末五碼,收款日期,狀態,備註\n";
+                    csv += "訂單編號,訂單時間,購票姓名,電話,座位,金額,付款方式,末五碼,收款日期,狀態,備註\n";
                     Object.keys(data).forEach(id => {
                         const o = data[id];
                         const dateObj = new Date(o.createdAt);
