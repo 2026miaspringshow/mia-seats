@@ -249,7 +249,6 @@
         .btn-action-outline { background: white; border: 2px solid #e2e8f0; padding: 10px 16px; border-radius: 12px; font-weight: bold; color: #64748b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px; }
         .btn-action-outline:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
         
-        /* 篩選控制面板全新樣式 (無底框版) */
         .filter-panel {
             margin-bottom: 10px;
             width: 100%;
@@ -288,7 +287,6 @@
         }
         .filter-control:focus { border-color: var(--primary-blue); }
         
-        /* 修改「清除篩選」按鈕樣式：藍色底、白色字 */
         .btn-clear-filters {
             background: var(--primary-blue);
             color: white;
@@ -319,7 +317,6 @@
         .search-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 18px; height: 18px; }
 
-        /* 符合條件筆數樣式 */
         .results-summary {
             font-size: 13px;
             color: #94a3b8;
@@ -403,8 +400,7 @@
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
+            justify-content: center; gap: 6px;
         }
         .btn-copy-action:hover {
             background: #f8fafc;
@@ -433,7 +429,7 @@
         <span id="toast-msg">上限為 5 張</span>
     </div>
 
-    <!-- 管理員登入視窗 -->
+    <!-- 管理員登入 -->
     <div class="modal-overlay" id="modal-login">
         <div class="modal" style="max-width: 400px;">
             <div class="modal-header login-header">管理員登入<span class="close-x" onclick="window.closeModal('modal-login')">&times;</span></div>
@@ -450,7 +446,7 @@
         </div>
     </div>
 
-    <!-- 登出確認視窗 -->
+    <!-- 登出確認 -->
     <div class="modal-overlay" id="modal-logout-confirm">
         <div class="modal" style="max-width: 400px;">
             <div class="modal-header login-header">系統登出<span class="close-x" onclick="window.closeModal('modal-logout-confirm')">&times;</span></div>
@@ -520,15 +516,13 @@
         </div>
     </div>
 
-    <!-- 訂單管理頁面 -->
+    <!-- 訂單管理 -->
     <div class="order-page" id="order-page">
         <div class="order-page-inner">
             <div class="order-page-header">
                 <h2 class="order-page-title">訂單管理</h2>
                 <div class="header-actions-group">
-                    <button class="btn-action-outline" onclick="window.exportData('orders')" title="匯出 CSV">
-                        匯出訂單名冊
-                    </button>
+                    <button class="btn-action-outline" onclick="window.exportData('orders')" title="匯出 CSV">匯出訂單名冊</button>
                 </div>
             </div>
 
@@ -567,16 +561,15 @@
                 </div>
             </div>
 
-            <!-- 篩選面板 -->
             <div class="filter-panel">
                 <div class="filter-row-top">
                     <div class="filter-group">
                         <span class="filter-label">訂單日期</span>
-                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()" title="按訂單建立日篩選">
+                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">收款日期</span>
-                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()" title="按核銷收款日篩選">
+                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">付款方式</span>
@@ -590,11 +583,11 @@
                         <span class="filter-label">狀態</span>
                         <select id="filter-status" class="filter-control" onchange="window.renderOrders()">
                             <option value="all">全部</option>
-                            <option value="pending">待處理</option>
+                            <option value="pending">待核銷</option>
                             <option value="paid">已完成</option>
                         </select>
                     </div>
-                    <button class="btn-clear-filters" onclick="window.clearAllFilters()" title="清除所有篩選條件預設">清除篩選</button>
+                    <button class="btn-clear-filters" onclick="window.clearAllFilters()">清除篩選</button>
                     <div class="search-group">
                         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -605,7 +598,6 @@
                 </div>
             </div>
 
-            <!-- 符合篩選條件統計 -->
             <div class="results-summary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                 <span>共計 <span id="results-count-number" class="results-count">0</span> 筆符合篩選條件</span>
@@ -646,7 +638,7 @@
         <button class="btn-floating-confirm" id="btn-open-modal">確認購票</button>
     </div>
 
-    <!-- 購票步驟一：購票資訊 -->
+    <!-- 購票步驟 -->
     <div class="modal-overlay" id="modal-purchase">
         <div class="modal">
             <div class="modal-header">購票資訊<span class="close-x" onclick="window.closeModal('modal-purchase')">&times;</span></div>
@@ -679,7 +671,6 @@
         </div>
     </div>
 
-    <!-- 購票步驟二：填寫購票人資訊 -->
     <div class="modal-overlay" id="modal-payment">
         <div class="modal">
             <div class="modal-header">購票資訊<span class="close-x" onclick="window.closeModal('modal-payment')">&times;</span></div>
@@ -707,7 +698,6 @@
         </div>
     </div>
 
-    <!-- 劃位完成結果視窗 -->
     <div class="modal-overlay" id="modal-success">
         <div class="modal">
             <div class="modal-header success-header">劃位完成<span class="close-x" onclick="window.closeModal('modal-success')">&times;</span></div>
@@ -718,26 +708,20 @@
                     </svg>
                 </div>
                 <div id="success-status-label" style="display: inline-block; padding: 8px 24px; border-radius: 999px; font-weight: bold; font-size: 15px; margin-bottom: 5px;">訂單狀態：待付款</div>
-                
-                <!-- 匯款專用複製區塊 -->
                 <div id="copy-transfer-box" class="copy-info-box" style="display:none;">
                     <div id="copy-transfer-text" class="copy-info-text"></div>
-                    <button class="btn-copy-action" onclick="window.copyTransferInfo()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        點擊複製匯款資訊
-                    </button>
+                    <button class="btn-copy-action" onclick="window.copyTransferInfo()">點擊複製匯款資訊</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- [ADMIN] 核銷確認視窗 -->
+    <!-- 管理員核銷確認 -->
     <div class="modal-overlay" id="modal-verify">
         <div class="modal" style="max-width: 460px;">
             <div class="modal-header" id="verify-modal-title">核銷確認</div>
             <div class="modal-body">
                 <input type="hidden" id="verify-order-id">
-                
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 0 5px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; min-height: 40px;">
                         <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">購票姓名：</span>
@@ -747,18 +731,11 @@
                         <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">應收金額：</span>
                         <span id="verify-total" style="font-weight: bold; color: var(--primary-blue); font-size: 15px; text-align: right;"></span>
                     </div>
-                    <!-- 匯款核銷額外資訊 -->
                     <div id="verify-transfer-info" style="display:none; justify-content: space-between; align-items: center; min-height: 40px;">
                         <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">匯款末五碼：</span>
                         <span id="verify-bank-code" style="font-weight: bold; color: #ef4444; font-size: 15px; text-align: right;"></span>
                     </div>
-                    <!-- 收款日期 -->
-                    <div id="verify-date-info" style="display:flex; justify-content: space-between; align-items: center; min-height: 40px;">
-                        <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">收款日期：</span>
-                        <input type="date" id="verify-receipt-date" class="filter-control" style="width: 160px;">
-                    </div>
                 </div>
-
                 <div style="display:flex; gap:10px;">
                     <button class="btn-prev-step" onclick="window.closeModal('modal-verify')">取消</button>
                     <button class="btn-complete" id="btn-confirm-verify" onclick="window.confirmVerify()">確認核銷</button>
@@ -767,7 +744,7 @@
         </div>
     </div>
 
-    <!-- [ADMIN] 訂單編輯視窗 -->
+    <!-- 編輯訂單 -->
     <div class="modal-overlay" id="modal-edit-order">
         <div class="modal" style="max-width: 420px;">
             <div class="modal-header">編輯訂單<span class="close-x" onclick="window.closeModal('modal-edit-order')">&times;</span></div>
@@ -782,8 +759,9 @@
                     <input type="text" id="edit-order-note" placeholder="例如：寄票" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                 </div>
                 <div class="form-group">
-                    <label>付款方式</label>
+                    <label>付款方式 / 狀態</label>
                     <select id="edit-order-status" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                        <option value="paid" id="edit-option-paid" style="display:none;">已完成（不變動狀態）</option>
                         <option value="pending-cash">現金（待付款）</option>
                         <option value="pending-transfer">匯款（待入帳）</option>
                     </select>
@@ -791,6 +769,21 @@
                 <div style="display:flex; gap:10px; margin-top: 10px;">
                     <button class="btn-prev-step" onclick="window.closeModal('modal-edit-order')">取消</button>
                     <button class="btn-complete" onclick="window.saveOrderEdit()">儲存更改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 防呆確認視窗 -->
+    <div class="modal-overlay" id="modal-confirm-revert" style="z-index: 4000;">
+        <div class="modal" style="max-width: 380px;">
+            <div class="modal-header login-header">變更確認<span class="close-x" onclick="window.closeModal('modal-confirm-revert')">&times;</span></div>
+            <div class="modal-body" style="text-align: center;">
+                <div style="font-size: 16px; font-weight: bold; color: #1e293b; margin-bottom: 15px;">此筆訂單已完成核銷</div>
+                <div style="font-size: 14px; color: #ef4444; margin-bottom: 25px; line-height: 1.6;">變更付款方式將會<br><b>「退回未核銷狀態」</b><br>並清除收款日期，是否確定要變更？</div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-prev-step" onclick="window.closeModal('modal-confirm-revert')">取消</button>
+                    <button class="btn-complete" style="background: #ef4444;" onclick="window.executeOrderEdit()">確定變更</button>
                 </div>
             </div>
         </div>
@@ -817,8 +810,8 @@
         let seatsData = {};
         let ordersData = {};
         let selectedIds = [];
-        let currentFilter = 'all'; 
         let toastTimeout = null;
+        let originalOrderState = null;
         
         const iconLock = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
         const iconUnlock = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`;
@@ -880,7 +873,6 @@
         window.confirmLogout = () => {
             isAdmin = false; 
             selectedIds = []; 
-            document.getElementById('main-body').classList.remove('logged-in'); 
             document.getElementById('header-action-btn').innerHTML = iconLock;
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'none';
@@ -1077,13 +1069,12 @@
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'flex';
             
-            // 預設將「訂單日期」設定為今天，符合工作人員習慣
             const today = new Date();
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
             document.getElementById('order-date-input').value = `${yyyy}-${mm}-${dd}`;
-            document.getElementById('receipt-date-input').value = ""; // 收款日預設不限制
+            document.getElementById('receipt-date-input').value = ""; 
             
             window.renderOrders();
         };
@@ -1125,71 +1116,68 @@
             tbody.innerHTML = '';
             
             const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            let filteredArray = allOrders;
             
-            // 1. 日期過濾 (雙條件過濾)
+            let dateFilteredOrders = allOrders;
             if (selectedOrderDate !== "" || selectedReceiptDate !== "") {
-                filteredArray = allOrders.filter(o => {
+                dateFilteredOrders = allOrders.filter(o => {
                     let matchOrderDate = true;
                     let matchReceiptDate = true;
-
                     if (selectedOrderDate !== "") {
                         const oDate = new Date(o.createdAt);
-                        const yyyy = oDate.getFullYear();
-                        const mm = String(oDate.getMonth() + 1).padStart(2, '0');
-                        const dd = String(oDate.getDate()).padStart(2, '0');
-                        matchOrderDate = (`${yyyy}-${mm}-${dd}` === selectedOrderDate);
+                        const y = oDate.getFullYear(), m = String(oDate.getMonth()+1).padStart(2,'0'), d = String(oDate.getDate()).padStart(2,'0');
+                        const createdDateStr = `${y}-${m}-${d}`;
+                        matchOrderDate = (createdDateStr === selectedOrderDate || o.reportDate === selectedOrderDate);
                     }
-
                     if (selectedReceiptDate !== "") {
-                        matchReceiptDate = (o.receiptDate === selectedReceiptDate);
+                        matchReceiptDate = (o.receiptDate === selectedReceiptDate || o.reportDate === selectedReceiptDate);
                     }
-
                     return matchOrderDate && matchReceiptDate;
                 });
             }
 
-            // 統計數據計算：以「收款日期篩選器」所選的那一天為準
-            let totalRevenue = 0, cashRevenue = 0;
-            
-            allOrders.forEach(o => {
-                if (o.status === 'paid') {
-                    if (selectedReceiptDate === "" || o.receiptDate === selectedReceiptDate) {
-                        totalRevenue += o.total || 0;
-                        if (o.paymentMethod === 'cash') {
-                            cashRevenue += o.total || 0;
-                        }
-                    }
-                }
-            });
-
-            // 2. 狀態、付款方式與關鍵字過濾
-            filteredArray = filteredArray.filter(o => {
+            let filteredArray = dateFilteredOrders.filter(o => {
                 if (selectedStatus !== 'all' && o.status !== selectedStatus) return false;
                 if (selectedPayment !== 'all' && o.paymentMethod !== selectedPayment) return false;
-                if (keyword === "") return true;
-                const nameMatch = o.name.toLowerCase().includes(keyword);
-                const phoneMatch = o.phone.toLowerCase().includes(keyword);
-                const seatMatch = (o.seats || []).some(s => s.toLowerCase().includes(keyword));
-                return nameMatch || phoneMatch || seatMatch;
+                if (keyword !== "") {
+                    const nameMatch = o.name.toLowerCase().includes(keyword);
+                    const phoneMatch = o.phone.toLowerCase().includes(keyword);
+                    const seatMatch = (o.seats || []).some(s => s.toLowerCase().includes(keyword));
+                    if (!nameMatch && !phoneMatch && !seatMatch) return false;
+                }
+                return true;
             });
 
-            // 更新筆數顯示
-            const countDisplay = document.getElementById('results-count-number');
-            if (countDisplay) countDisplay.innerText = filteredArray.length;
-
-            // 計算當前清單中的票數與待處理數
-            let ticketsSold = 0, pendingCount = 0;
+            let totalRevenue = 0, cashRevenue = 0;
             filteredArray.forEach(o => {
-                ticketsSold += (o.seats || []).length;
-                if(o.status === 'pending') pendingCount++;
+                let isCountable = false;
+                if (o.paymentMethod === 'transfer') {
+                    if ((o.bankCode && o.bankCode.trim() !== "") || o.status === 'paid') {
+                        isCountable = true;
+                    }
+                } else {
+                    isCountable = true; 
+                }
+                if (isCountable) {
+                    totalRevenue += o.total || 0;
+                }
+                if (o.status === 'paid' && o.paymentMethod === 'cash') {
+                    cashRevenue += o.total || 0;
+                }
             });
 
             document.getElementById('stat-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
             document.getElementById('stat-cash-revenue').innerText = `現金收入 $${cashRevenue.toLocaleString()}`;
-            document.getElementById('stat-tickets').innerHTML = `${ticketsSold} <span>張</span>`;
-            document.getElementById('stat-orders').innerHTML = `${filteredArray.length} <span>筆</span>`;
+            
+            let ticketsCount = 0, ordersCount = 0, pendingCount = 0;
+            filteredArray.forEach(o => {
+                ordersCount++;
+                ticketsCount += (o.seats || []).length;
+                if(o.status === 'pending') pendingCount++;
+            });
+            document.getElementById('stat-tickets').innerHTML = `${ticketsCount} <span>張</span>`;
+            document.getElementById('stat-orders').innerHTML = `${ordersCount} <span>筆</span>`;
             document.getElementById('stat-pending').innerHTML = `${pendingCount} <span>筆</span>`;
+            document.getElementById('results-count-number').innerText = filteredArray.length;
 
             if(filteredArray.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:40px;">找不到符合條件的訂單</td></tr>`;
@@ -1200,53 +1188,32 @@
                 const dateObj = new Date(o.createdAt);
                 const timeString = dateObj.toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 
-                let statusLabel = '待處理';
-                let statusClass = 'status-pending';
-                
-                if (o.status === 'paid') {
-                    statusLabel = '已完成';
-                    statusClass = 'status-paid';
-                } else if (o.paymentMethod === 'cash') {
-                    statusLabel = '待付款';
-                    statusClass = 'status-unpaid-red';
-                } else {
-                    statusLabel = '待入帳';
-                    statusClass = 'status-pending-orange';
-                }
+                // 狀態顯示修正：現金單 pending 顯示待付款，匯款單 pending 顯示待入帳
+                let statusLabel = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                let statusClass = (o.status === 'paid') ? 'status-paid' : (o.paymentMethod === 'cash' ? 'status-unpaid-red' : 'status-pending-orange');
 
-                const statusHtml = `<span class="status-badge ${statusClass}">${statusLabel}</span>`;
-                const seatsStr = (o.seats || []).join(', ');
-                
-                let receiptDateHtml = '';
+                let subDateHtml = '';
                 if (o.status === 'paid' && o.receiptDate) {
-                    receiptDateHtml = `<div style="font-size:11px; font-weight:bold; color:#10b981; margin-top:4px;">收款日: ${o.receiptDate}</div>`;
+                    subDateHtml += `<div style="font-size:10px; font-weight:bold; color:#10b981; margin-top:4px;">收款日: ${o.receiptDate}</div>`;
+                } else if (o.reportDate && o.paymentMethod === 'transfer') {
+                    subDateHtml += `<div style="font-size:10px; font-weight:bold; color:var(--primary-blue); margin-top:4px;">收款日: ${o.reportDate}</div>`;
                 }
                 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>
-                        <div style="font-weight:bold;">${timeString}</div>
-                        ${receiptDateHtml}
-                    </td>
+                    <td><div style="font-weight:bold;">${timeString}</div>${subDateHtml}</td>
                     <td><div style="font-weight:bold;">${o.name}</div><div style="font-size:11px; color:#94a3b8;">${o.phone}</div></td>
-                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${seatsStr}">${seatsStr}</td>
+                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${(o.seats || []).join(', ')}</td>
                     <td>
                         <div style="font-weight:bold; color:var(--primary-blue);">NT$ ${o.total.toLocaleString()}</div>
                         <div style="font-size:11px; color:#94a3b8;">${o.paymentMethod === 'cash' ? '現金' : '匯款'}</div>
                     </td>
-                    <td>${statusHtml}</td>
+                    <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
                     <td>
                         <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
-                            ${o.status === 'pending' ? `
-                            <button class="action-icon-btn verify" onclick="window.openVerifyOrder('${o.orderId}')" title="確認收款/入帳">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </button>` : ''}
-                            <button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')" title="編輯">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                            </button>
-                            <button class="action-icon-btn delete" onclick="window.deleteOrder('${o.orderId}')" title="刪除">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            </button>
+                            ${o.status === 'pending' ? `<button class="action-icon-btn verify" onclick="window.openVerifyOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>` : ''}
+                            <button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                            <button class="action-icon-btn delete" onclick="window.deleteOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
                         </div>
                     </td>
                 `;
@@ -1260,31 +1227,14 @@
             document.getElementById('verify-order-id').value = orderId;
             document.getElementById('verify-name').innerText = o.name;
             document.getElementById('verify-total').innerText = `NT$ ${o.total.toLocaleString()}`;
-            
             const isCash = o.paymentMethod === 'cash';
-            const closeBtn = `<span class="close-x" onclick="window.closeModal('modal-verify')">&times;</span>`;
-            document.getElementById('verify-modal-title').innerHTML = isCash ? `現金收款確認${closeBtn}` : `匯款入帳確認${closeBtn}`;
+            document.getElementById('verify-modal-title').innerText = isCash ? '現金收款確認' : '匯款入帳確認';
             document.getElementById('verify-transfer-info').style.display = isCash ? 'none' : 'flex';
-            
-            const verifyBtn = document.getElementById('btn-confirm-verify');
-
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            document.getElementById('verify-receipt-date').value = `${yyyy}-${mm}-${dd}`;
-
             if (!isCash) {
-                const bankCode = (o.bankCode || "").trim();
-                if(bankCode === "") {
-                    document.getElementById('verify-bank-code').innerText = "未提供";
-                    verifyBtn.disabled = true;
-                } else {
-                    document.getElementById('verify-bank-code').innerText = bankCode;
-                    verifyBtn.disabled = false;
-                }
+                document.getElementById('verify-bank-code').innerText = o.bankCode || "未提供";
+                document.getElementById('btn-confirm-verify').disabled = (!o.bankCode || o.bankCode.trim() === "");
             } else {
-                verifyBtn.disabled = false;
+                document.getElementById('btn-confirm-verify').disabled = false;
             }
             document.getElementById('modal-verify').style.display = 'flex';
         };
@@ -1293,27 +1243,21 @@
             const orderId = document.getElementById('verify-order-id').value;
             const o = ordersData[orderId];
             if(!o) return;
-            
+            let finalDate = "";
+            if (o.paymentMethod === 'transfer') {
+                finalDate = o.reportDate; 
+            } else {
+                const today = new Date();
+                finalDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            }
+            if(!finalDate) { window.showToast("資料異常：找不到有效收款日！"); return; }
             const updates = {};
-            const finalReceiptDate = document.getElementById('verify-receipt-date').value;
-            
-            if(!finalReceiptDate) {
-                window.showToast("請選擇收款日期！", "error");
-                return;
-            }
-            
             updates[`orders/${orderId}/status`] = 'paid';
-            updates[`orders/${orderId}/receiptDate`] = finalReceiptDate;
-            
-            if (o.seats) {
-                o.seats.forEach(seatId => {
-                    updates[`seats/${seatId}/receiptDate`] = finalReceiptDate;
-                });
-            }
-
-            update(ref(db), updates).then(() => {
-                window.closeModal('modal-verify');
-                window.showToast("核銷成功！", "success");
+            updates[`orders/${orderId}/receiptDate`] = finalDate;
+            if (o.seats) o.seats.forEach(s => updates[`seats/${s}/receiptDate`] = finalDate);
+            update(ref(db), updates).then(() => { 
+                window.closeModal('modal-verify'); 
+                window.showToast("核銷成功！", "success"); 
             });
         };
 
@@ -1324,13 +1268,31 @@
             document.getElementById('edit-order-bank').value = o.bankCode || "";
             document.getElementById('edit-order-note').value = o.note || "";
             
+            originalOrderState = { status: o.status, paymentMethod: o.paymentMethod };
+
             const statusSelect = document.getElementById('edit-order-status');
-            statusSelect.value = o.paymentMethod === 'cash' ? 'pending-cash' : 'pending-transfer';
+            const paidOption = document.getElementById('edit-option-paid');
             
+            if (o.status === 'paid') {
+                paidOption.style.display = 'block';
+                statusSelect.value = 'paid';
+            } else {
+                paidOption.style.display = 'none';
+                statusSelect.value = o.paymentMethod === 'cash' ? 'pending-cash' : 'pending-transfer';
+            }
             document.getElementById('modal-edit-order').style.display = 'flex';
         };
 
         window.saveOrderEdit = () => {
+            const statusVal = document.getElementById('edit-order-status').value;
+            if (originalOrderState && originalOrderState.status === 'paid' && statusVal !== 'paid') {
+                document.getElementById('modal-confirm-revert').style.display = 'flex';
+                return;
+            }
+            window.executeOrderEdit();
+        };
+
+        window.executeOrderEdit = () => {
             const orderId = document.getElementById('edit-order-id').value;
             const newBank = document.getElementById('edit-order-bank').value.trim();
             const newNote = document.getElementById('edit-order-note').value.trim();
@@ -1338,51 +1300,54 @@
             
             const o = ordersData[orderId];
             if(!o) return;
-            
-            const finalStatus = 'pending';
-            const finalMethod = statusVal === 'pending-cash' ? 'cash' : 'transfer';
+
+            let finalStatus = (statusVal === 'paid') ? 'paid' : 'pending';
+            let finalMethod = (statusVal === 'pending-cash') ? 'cash' : (statusVal === 'pending-transfer' ? 'transfer' : o.paymentMethod);
 
             const updates = {};
             updates[`orders/${orderId}/bankCode`] = newBank;
             updates[`orders/${orderId}/note`] = newNote;
-            updates[`orders/${orderId}/status`] = finalStatus;
             updates[`orders/${orderId}/paymentMethod`] = finalMethod;
-            updates[`orders/${orderId}/receiptDate`] = null;
+            updates[`orders/${orderId}/status`] = finalStatus;
 
-            if(o.seats) {
-                o.seats.forEach(seatId => {
-                    updates[`seats/${seatId}/bankCode`] = newBank;
-                    updates[`seats/${seatId}/note`] = newNote;
-                    updates[`seats/${seatId}/paymentMethod`] = finalMethod;
-                    updates[`seats/${seatId}/receiptDate`] = null;
-                });
+            if (finalStatus === 'pending') {
+                updates[`orders/${orderId}/receiptDate`] = null;
             }
 
-            update(ref(db), updates).then(() => {
-                window.closeModal('modal-edit-order');
-                window.showToast("資訊已更新，請重新核銷", "success");
+            if (newBank !== "" && (!o.bankCode || o.bankCode === "")) {
+                const today = new Date();
+                updates[`orders/${orderId}/reportDate`] = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            } else if (newBank === "") {
+                updates[`orders/${orderId}/reportDate`] = null;
+            }
+
+            if(o.seats) o.seats.forEach(s => {
+                updates[`seats/${s}/bankCode`] = newBank;
+                updates[`seats/${s}/note`] = newNote;
+                updates[`seats/${s}/paymentMethod`] = finalMethod;
+                updates[`seats/${s}/receiptDate`] = (finalStatus === 'pending') ? null : (o.receiptDate || null);
+                updates[`seats/${s}/reportDate`] = updates[`orders/${orderId}/reportDate`];
+            });
+
+            update(ref(db), updates).then(() => { 
+                window.closeModal('modal-edit-order'); 
+                window.closeModal('modal-confirm-revert');
+                window.showToast("已儲存變更", "success"); 
             });
         };
 
         window.deleteOrder = (orderId) => {
             const o = ordersData[orderId];
-            if(!o) return;
-            if(confirm(`⚠️ 警告：確定要刪除【${o.name}】的訂單嗎？\n\n這將會使該訂單綁定的所有座位恢復為「可選位」。`)) {
-                const updates = {};
-                if(o.seats && Array.isArray(o.seats)) {
-                    o.seats.forEach(seatId => { updates[`seats/${seatId}`] = null; });
-                }
-                updates[`orders/${orderId}`] = null;
-                update(ref(db), updates).then(() => {
-                    window.showToast("訂單已刪除，座位已釋放！", "success");
-                });
-            }
+            if(!o || !confirm(`確定要刪除【${o.name}】的訂單嗎？座位將會釋出。`)) return;
+            const updates = {};
+            if(o.seats) o.seats.forEach(s => updates[`seats/${s}`] = null);
+            updates[`orders/${orderId}`] = null;
+            update(ref(db), updates).then(() => window.showToast("已刪除", "success"));
         };
 
         window.exportData = (type) => {
             if(!isAdmin) return;
-            const dataRef = ref(db, type);
-            onValue(dataRef, (snapshot) => {
+            onValue(ref(db, type), (snapshot) => {
                 const data = snapshot.val() || {};
                 let csv = "\ufeff";
                 if(type === 'seats') {
@@ -1391,22 +1356,17 @@
                         const s = data[id];
                         if(s.status === 'sold') csv += `${id},${s.name},${s.phone},${s.ticketType},${s.receiptDate || ''},${s.paymentMethod==='cash'?'現金':'匯款'},${s.note || ''}\n`;
                     });
-                } else if(type === 'orders') {
+                } else {
                     csv += "訂單編號,訂單時間,購票姓名,電話,座位,金額,付款方式,末五碼,收款日期,狀態,備註\n";
-                    Object.keys(data).forEach(id => {
-                        const o = data[id];
-                        const dateObj = new Date(o.createdAt);
-                        const timeString = dateObj.toLocaleString('zh-TW');
-                        const seatsStr = (o.seats || []).join('; ');
-                        let st = o.status === 'paid' ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
-                        
-                        csv += `${o.orderId},${timeString},${o.name},${o.phone},"${seatsStr}",${o.total},${o.paymentMethod==='cash'?'現金':'匯款'},${o.bankCode || ''},${o.receiptDate || ''},${st},${o.note || ''}\n`;
+                    Object.values(data).forEach(o => {
+                        const t = new Date(o.createdAt).toLocaleString('zh-TW');
+                        const st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                        csv += `${o.orderId},${t},${o.name},${o.phone},"${(o.seats || []).join('; ')}",${o.total},${o.paymentMethod==='cash'?'現金':'匯款'},${o.bankCode || ''},${o.receiptDate || ''},${st},${o.note || ''}\n`;
                     });
                 }
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = `MIA_${type === 'seats' ? 'Seats' : 'Orders'}_${new Date().toLocaleDateString()}.csv`;
+                link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+                link.download = `MIA_${type}_${new Date().toLocaleDateString()}.csv`;
                 link.click();
             }, { onlyOnce: true });
         };
