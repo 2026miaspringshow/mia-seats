@@ -116,7 +116,7 @@
         .selected { background-color: var(--seat-bg-selected) !important; color: var(--seat-text-selected) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-selected) !important; border: none !important; transform: translateY(1px) !important; }
         .reserve-seat { background-color: var(--seat-bg-reserve) !important; color: var(--seat-text-reserve) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-reserve) !important; border: none !important; }
         .reserve-seat.selected { background-color: var(--seat-bg-selected) !important; color: var(--seat-text-selected) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-selected) !important; border: none !important; transform: translateY(1px) !important; }
-        .sold.reserve-seat { background-color: var(--seat-bg-sold) !important; color: var(--seat-text-sold) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-sold) !important; border: none !important; }
+        .sold.reserve-seat { background-color: #f59e0b !important; color: #fffbeb !important; box-shadow: 0 3px 0 0 #d97706 !important; border: none !important; }
         .camera-seat { background-color: var(--seat-bg-camera) !important; color: var(--seat-text-camera) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-camera) !important; border: none !important; cursor: default; }
         
         .blocked-seat { 
@@ -153,7 +153,8 @@
         .custom-toast.success { background-color: #10b981; }
         .custom-toast svg { width: 22px; height: 22px; }
 
-        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
+        /* 在這裡加上 backdrop-filter 產生背景模糊效果 */
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
         .modal { background: white; width: 100%; max-width: 480px; max-height: 95vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         
         .modal-header { 
@@ -215,7 +216,6 @@
             background-position: right -15px center, center;
         }
 
-        /* 修改後的完美置中關閉按鈕 */
         .close-x { 
             position: absolute; 
             right: 15px; 
@@ -243,6 +243,7 @@
 
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #666; }
+        .required-star { color: #ef4444; margin-left: 4px; font-weight: 900; }
 
         .total-summary-row { 
             margin-top: 20px; 
@@ -265,9 +266,13 @@
         .btn-prev-step { background: white; color: #64748b; border: 1px solid #cbd5e1; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; flex: 1; font-size: 15px; }
         .btn-prev-step:hover { background: #f8fafc; }
         .btn-complete { background: #10b981; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; flex: 2; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-complete:hover { background: #059669; transform: scale(1.02); }
-        .btn-complete:active { transform: scale(0.98); }
-        .btn-complete:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; transform: none !important; }
+        .btn-complete:hover:not(:disabled) { background: #059669; transform: scale(1.02); }
+        .btn-complete:active:not(:disabled) { transform: scale(0.98); }
+        .btn-complete:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.8; transform: none; }
+
+        /* Loading Spinner Animation */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spinner { animation: spin 1s linear infinite; width: 20px; height: 20px; }
 
         .order-page { flex: 1; overflow-y: auto; padding: 30px 20px; width: 100%; display: none; flex-direction: column; align-items: center; background-color: var(--bg-gray); }
         .order-page-inner { width: 100%; max-width: 1000px; }
@@ -469,6 +474,42 @@
         <span id="toast-msg">上限為 5 張</span>
     </div>
 
+    <!-- 開場歡迎提示視窗 (預設顯示 style="display: flex;") -->
+    <div class="modal-overlay" id="modal-welcome" style="display: flex; z-index: 9999;">
+        <div class="modal" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="padding: 25px 20px;">
+                <span>系統公告</span>
+            </div>
+            <div class="modal-body" style="padding: 40px 30px;">
+                <div style="margin-bottom: 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                </div>
+                <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 19px; line-height: 1.4;">歡迎來到 MIA 春季成發<br>即時座位系統</h3>
+                <p style="margin: 0 0 30px 0; color: #475569; font-size: 15px; line-height: 1.6;">
+                    目前顯示的座位為即時狀態。<br>
+                    如需劃位，請洽詢MIA光復館櫃台人員！
+                </p>
+                <button class="btn-complete" style="width: 100%; margin-bottom: 20px;" onclick="window.closeModal('modal-welcome')">我知道了</button>
+                
+                <!-- 隱藏版管理員捷徑 -->
+                <div style="display: inline-flex; justify-content: center; align-items: center; gap: 6px; color: #cbd5e1; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s;" 
+                     onclick="window.closeModal('modal-welcome'); window.handleHeaderAction();" 
+                     onmouseover="this.style.color='#94a3b8'" 
+                     onmouseout="this.style.color='#cbd5e1'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    管理員專區
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 管理員登入 -->
     <div class="modal-overlay" id="modal-login">
         <div class="modal" style="max-width: 400px;">
@@ -633,6 +674,7 @@
                             <option value="all">全部</option>
                             <option value="cash">現金</option>
                             <option value="transfer">匯款</option>
+                            <option value="free">免付費</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -742,12 +784,12 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>購票姓名</label>
+                    <label id="label-name">購票姓名 <span class="required-star">*</span></label>
                     <input type="text" id="p-name" placeholder="請輸入姓名" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                 </div>
                 <div class="form-group">
-                    <label>聯絡電話</label>
-                    <input type="tel" id="p-phone" placeholder="請輸入電話" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                    <label id="label-phone">聯絡電話 <span class="required-star">*</span></label>
+                    <input type="tel" id="p-phone" placeholder="請輸入 09 開頭的 10 碼電話" maxlength="10" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                 </div>
                 <div class="form-group">
                     <label>備註資訊</label>
@@ -755,7 +797,8 @@
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn-prev-step" onclick="window.goToStep1()">上一步</button>
-                    <button class="btn-complete" onclick="window.submitFinalOrder()">
+                    <!-- 加上 id 以便操作 Loading 狀態 -->
+                    <button class="btn-complete" id="btn-submit-order" onclick="window.submitFinalOrder()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         確認訂票
                     </button>
@@ -814,13 +857,14 @@
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn-prev-step" onclick="window.closeModal('modal-verify')">取消</button>
+                    <!-- 加上 id 以便操作 Loading 狀態 -->
                     <button class="btn-complete" id="btn-confirm-verify" onclick="window.confirmVerify()">確認核銷</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 編輯訂單 (整合防呆視窗，實現同頁切換) -->
+    <!-- 編輯訂單 -->
     <div class="modal-overlay" id="modal-edit-order">
         <div class="modal" style="max-width: 420px;">
             
@@ -846,13 +890,14 @@
                         <label>付款方式 / 狀態</label>
                         <select id="edit-order-status" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                             <option value="paid" id="edit-option-paid" style="display:none;">已完成</option>
-                            <option value="pending-cash">現金（待付款）</option>
-                            <option value="pending-transfer">匯款（待入帳）</option>
+                            <option value="paid-free" id="edit-option-free" style="display:none;">免付費 (已完成)</option>
+                            <option value="pending-cash" id="edit-option-cash">現金（待付款）</option>
+                            <option value="pending-transfer" id="edit-option-transfer">匯款（待入帳）</option>
                         </select>
                     </div>
                     <div style="display:flex; gap:10px; margin-top: 10px;">
                         <button class="btn-prev-step" onclick="window.closeModal('modal-edit-order')">取消</button>
-                        <button class="btn-complete" onclick="window.saveOrderEdit()">儲存更改</button>
+                        <button class="btn-complete" onclick="window.saveOrderEdit()">確認變更</button>
                     </div>
                 </div>
             </div>
@@ -878,7 +923,8 @@
                     </div>
                     <div style="display:flex; gap:12px;">
                         <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.cancelWarning()">取消</button>
-                        <button class="btn-complete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeOrderEdit()">確定變更</button>
+                        <!-- 加上 id 以便操作 Loading 狀態 -->
+                        <button class="btn-complete" id="btn-execute-edit" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeOrderEdit()">確定變更</button>
                     </div>
                 </div>
             </div>
@@ -907,14 +953,15 @@
                 
                 <div style="margin-bottom: 25px;">
                     <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">您即將刪除 <span id="del-order-name" style="color:var(--primary-blue)"></span> 的訂單</h3>
-                    <p style="margin: 0; color: #ef4444; font-weight: bold; font-size: 14px; line-height: 1.6;">刪除後資料將無法恢復，<br>且該訂單的所有座位將立即釋出！</p>
+                    <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 16px;">資料<span style="color: #ef4444;">無法恢復</span>，且座位將<span style="color: #ef4444;">立即釋出！</span></p>
                 </div>
 
                 <input type="hidden" id="delete-target-id">
 
                 <div style="display:flex; gap:12px;">
                     <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.closeModal('modal-delete-order')">取消</button>
-                    <button class="btn-complete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeDeleteOrder()">確定刪除</button>
+                    <!-- 加上 id 以便操作 Loading 狀態 -->
+                    <button class="btn-complete" id="btn-execute-delete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeDeleteOrder()">確定刪除</button>
                 </div>
             </div>
         </div>
@@ -951,6 +998,8 @@
         const reserveSeats = [];
         for(let i=1; i<=27; i++) reserveSeats.push("A"+i); 
         for(let i=1; i<=27; i++) reserveSeats.push("B"+i); 
+        for(let i=10; i<=14; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
+        for(let i=18; i<=22; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
         onValue(ref(db, 'orders'), (snapshot) => { 
@@ -1112,13 +1161,26 @@
             const price = parseInt(document.getElementById('p-type').value) || 0;
             const total = selectedIds.length * price;
             document.getElementById('buy-final-total').innerText = `NT$ ${total.toLocaleString()}`;
+
+            // 新增：根據票價動態調整付款方式
+            const paySelect = document.getElementById('p-pay-method-select');
+            if (price === 0) {
+                paySelect.innerHTML = '<option value="free">免付費</option>';
+                paySelect.disabled = true; // 鎖定不可選
+            } else {
+                paySelect.innerHTML = `
+                    <option value="cash">現金</option>
+                    <option value="transfer">匯款</option>
+                `;
+                paySelect.disabled = false; // 開放選擇
+            }
         };
 
         document.getElementById('btn-open-modal').onclick = () => {
             document.getElementById('p-name').value = ""; 
             document.getElementById('p-phone').value = "";
             document.getElementById('p-note').value = "";
-            document.getElementById('p-pay-method-select').value = "cash";
+            document.getElementById('p-type').value = "650"; // 預設選擇早鳥票
             document.getElementById('modal-payment').style.display = 'none';
             document.getElementById('modal-purchase').style.display = 'flex';
             document.getElementById('buy-seat-list').value = selectedIds.join(', ');
@@ -1126,6 +1188,29 @@
         };
 
         window.goToStep2 = () => {
+            // 動態切換第二步的文案與必填星號狀態
+            const price = parseInt(document.getElementById('p-type').value) || 0;
+            const nameLabel = document.getElementById('label-name');
+            const nameInput = document.getElementById('p-name');
+            const phoneLabel = document.getElementById('label-phone');
+            const phoneInput = document.getElementById('p-phone');
+            
+            const reqStarHtml = '<span class="required-star">*</span>';
+
+            if (price === 0) {
+                nameLabel.innerHTML = `貴賓稱呼 / 單位 ${reqStarHtml}`;
+                nameInput.placeholder = "請輸入貴賓稱呼或單位";
+                phoneLabel.innerHTML = `聯絡電話`; // 移除必填星號
+                phoneInput.placeholder = "請輸入聯絡電話"; // 移除 "(選填)"
+                phoneInput.removeAttribute('maxlength'); // 放寬長度限制
+            } else {
+                nameLabel.innerHTML = `購票姓名 ${reqStarHtml}`;
+                nameInput.placeholder = "請輸入姓名";
+                phoneLabel.innerHTML = `聯絡電話 ${reqStarHtml}`; // 加上必填星號
+                phoneInput.placeholder = "請輸入 09 開頭的 10 碼電話";
+                phoneInput.setAttribute('maxlength', '10');
+            }
+
             document.getElementById('modal-purchase').style.display = 'none';
             document.getElementById('modal-payment').style.display = 'flex';
         };
@@ -1146,33 +1231,74 @@
             window.showToast("已複製資訊！", "success");
         };
 
+        // 建立 Loading 狀態的通用函數
+        const setLoadingState = (btnId, isLoading, originalHtml = '', loadingText = '處理中...') => {
+            const btn = document.getElementById(btnId);
+            if (!btn) return originalHtml;
+            
+            if (isLoading) {
+                const html = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>${loadingText}`;
+                return html; // 回傳原始內容以便後續恢復
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        };
+
         window.submitFinalOrder = () => {
             const name = document.getElementById('p-name').value.trim();
             const phone = document.getElementById('p-phone').value.trim();
             const note = document.getElementById('p-note').value.trim();
+            const method = document.getElementById('p-pay-method-select').value;
             
-            if(!name || !phone) {
-                window.showToast("請填寫姓名與電話！", "error"); return;
+            // 針對公關票與一般票做不同的防呆驗證
+            if (method === 'free') {
+                if(!name) {
+                    window.showToast("請填寫貴賓稱呼 / 單位！", "error"); return;
+                }
+                // 免付費票，電話為選填，不做手機格式強制檢查
+            } else {
+                if(!name || !phone) {
+                    window.showToast("請填寫姓名與電話！", "error"); return;
+                }
+                const phoneRegex = /^09\d{8}$/;
+                if (!phoneRegex.test(phone)) {
+                    window.showToast("手機號碼格式錯誤，請輸入 09 開頭的 10 碼數字！", "error"); return;
+                }
             }
 
-            const method = document.getElementById('p-pay-method-select').value;
+            // 防呆 Loading 動畫開啟
+            const originalBtnHtml = setLoadingState('btn-submit-order', true);
+
             const typeText = document.getElementById('p-type').options[document.getElementById('p-type').selectedIndex].text;
             const price = parseInt(document.getElementById('p-type').value) || 0;
             const orderId = 'ORD-' + Date.now();
-            const status = 'pending'; 
+            const status = (method === 'free') ? 'paid' : 'pending'; 
             const total = selectedIds.length * price;
             const createdAt = new Date().toISOString();
+
+            // 若為免付費，自動加上今日的收款日期
+            let finalDate = null;
+            if (method === 'free') {
+                const today = new Date();
+                finalDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            }
 
             const updates = {};
             updates[`orders/${orderId}`] = {
                 orderId, name, phone, ticketType: typeText, seats: selectedIds, 
                 total, paymentMethod: method, bankCode: "", note, status, createdAt
             };
+            if (finalDate) updates[`orders/${orderId}`].receiptDate = finalDate;
+
             selectedIds.forEach(id => {
                 updates[`seats/${id}`] = { 
                     status: 'sold', name, phone, ticketType: typeText, bankCode: "", note, 
                     paymentMethod: method, orderId
                 };
+                if (finalDate) updates[`seats/${id}`].receiptDate = finalDate;
             });
 
             update(ref(db), updates).then(() => { 
@@ -1183,7 +1309,12 @@
                 const statusLabel = document.getElementById('success-status-label');
                 const copyBox = document.getElementById('copy-transfer-box');
                 
-                if (method === 'cash') {
+                if (method === 'free') {
+                    statusLabel.innerText = "訂單狀態：已完成 (公關免付費)";
+                    statusLabel.style.background = "#dcfce7";
+                    statusLabel.style.color = "#059669";
+                    copyBox.style.display = "none";
+                } else if (method === 'cash') {
                     statusLabel.innerText = "訂單狀態：待付款";
                     statusLabel.style.background = "#fee2e2";
                     statusLabel.style.color = "#b91c1c";
@@ -1201,6 +1332,12 @@
                 document.getElementById('modal-success').style.display = 'flex';
                 render(); 
                 window.showToast("劃位完成！", "success");
+            }).catch((err) => {
+                console.error(err);
+                window.showToast("送出失敗，請檢查網路連線", "error");
+            }).finally(() => {
+                // 防呆 Loading 動畫關閉
+                setLoadingState('btn-submit-order', false, originalBtnHtml);
             });
         };
 
@@ -1340,6 +1477,10 @@
                     subDateHtml += `<div style="font-size:10px; font-weight:bold; color:var(--primary-blue); margin-top:4px;">收款日: ${o.reportDate}</div>`;
                 }
                 
+                let methodStr = '免付費';
+                if (o.paymentMethod === 'cash') methodStr = '現金';
+                else if (o.paymentMethod === 'transfer') methodStr = '匯款';
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><div style="font-weight:bold;">${timeString}</div>${subDateHtml}</td>
@@ -1347,7 +1488,7 @@
                     <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${(o.seats || []).join(', ')}</td>
                     <td>
                         <div style="font-weight:bold; color:var(--primary-blue);">NT$ ${o.total.toLocaleString()}</div>
-                        <div style="font-size:11px; color:#94a3b8;">${o.paymentMethod === 'cash' ? '現金' : '匯款'}</div>
+                        <div style="font-size:11px; color:#94a3b8;">${methodStr}</div>
                     </td>
                     <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
                     <td>
@@ -1384,6 +1525,9 @@
             const orderId = document.getElementById('verify-order-id').value;
             const o = ordersData[orderId];
             if(!o) return;
+
+            const originalBtnHtml = setLoadingState('btn-confirm-verify', true);
+
             let finalDate = "";
             if (o.paymentMethod === 'transfer') {
                 finalDate = o.reportDate; 
@@ -1391,14 +1535,24 @@
                 const today = new Date();
                 finalDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
             }
-            if(!finalDate) { window.showToast("資料異常：找不到有效收款日！"); return; }
+            if(!finalDate) { 
+                window.showToast("資料異常：找不到有效收款日！"); 
+                setLoadingState('btn-confirm-verify', false, originalBtnHtml);
+                return; 
+            }
             const updates = {};
             updates[`orders/${orderId}/status`] = 'paid';
             updates[`orders/${orderId}/receiptDate`] = finalDate;
             if (o.seats) o.seats.forEach(s => updates[`seats/${s}/receiptDate`] = finalDate);
+            
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-verify'); 
                 window.showToast("核銷成功！", "success"); 
+            }).catch(err => {
+                console.error(err);
+                window.showToast("核銷失敗，請重試", "error");
+            }).finally(() => {
+                setLoadingState('btn-confirm-verify', false, originalBtnHtml);
             });
         };
 
@@ -1413,12 +1567,26 @@
 
             const statusSelect = document.getElementById('edit-order-status');
             const paidOption = document.getElementById('edit-option-paid');
+            const freeOption = document.getElementById('edit-option-free');
+            const cashOption = document.getElementById('edit-option-cash');
+            const transferOption = document.getElementById('edit-option-transfer');
             
-            if (o.status === 'paid') {
+            paidOption.style.display = 'none';
+            freeOption.style.display = 'none';
+            cashOption.style.display = 'block';
+            transferOption.style.display = 'block';
+            document.getElementById('edit-order-bank').disabled = false;
+
+            if (o.paymentMethod === 'free') {
+                freeOption.style.display = 'block';
+                cashOption.style.display = 'none';
+                transferOption.style.display = 'none';
+                statusSelect.value = 'paid-free';
+                document.getElementById('edit-order-bank').disabled = true;
+            } else if (o.status === 'paid') {
                 paidOption.style.display = 'block';
                 statusSelect.value = 'paid';
             } else {
-                paidOption.style.display = 'none';
                 statusSelect.value = o.paymentMethod === 'cash' ? 'pending-cash' : 'pending-transfer';
             }
             
@@ -1429,15 +1597,16 @@
 
         window.saveOrderEdit = () => {
             const statusVal = document.getElementById('edit-order-status').value;
-            if (originalOrderState && originalOrderState.status === 'paid' && statusVal !== 'paid') {
+            if (originalOrderState && (originalOrderState.status === 'paid' || originalOrderState.paymentMethod === 'free') && (statusVal !== 'paid' && statusVal !== 'paid-free')) {
                 document.getElementById('edit-step-1').style.display = 'none';
                 document.getElementById('edit-step-2').style.display = 'flex';
                 return;
             }
-            window.executeOrderEdit();
+            // 如果只有一頁編輯就直接存檔（但為了防呆加了動畫狀態，原本沒有特別指定 btn id，這裡簡單處理）
+            window.executeOrderEdit(false); 
         };
 
-        window.executeOrderEdit = () => {
+        window.executeOrderEdit = (fromWarningPage = true) => {
             const orderId = document.getElementById('edit-order-id').value;
             const newBank = document.getElementById('edit-order-bank').value.trim();
             const newNote = document.getElementById('edit-order-note').value.trim();
@@ -1446,8 +1615,17 @@
             const o = ordersData[orderId];
             if(!o) return;
 
-            let finalStatus = (statusVal === 'paid') ? 'paid' : 'pending';
-            let finalMethod = (statusVal === 'pending-cash') ? 'cash' : (statusVal === 'pending-transfer' ? 'transfer' : o.paymentMethod);
+            // 如果是從第二頁(防呆警告)按下來的，才會有這個按鈕 ID
+            let originalBtnHtml = '';
+            if(fromWarningPage) {
+                originalBtnHtml = setLoadingState('btn-execute-edit', true);
+            }
+
+            let finalStatus = (statusVal === 'paid' || statusVal === 'paid-free') ? 'paid' : 'pending';
+            let finalMethod = o.paymentMethod;
+            if (statusVal === 'pending-cash') finalMethod = 'cash';
+            if (statusVal === 'pending-transfer') finalMethod = 'transfer';
+            if (statusVal === 'paid-free') finalMethod = 'free';
 
             const updates = {};
             updates[`orders/${orderId}/bankCode`] = newBank;
@@ -1460,7 +1638,7 @@
             }
 
             let currentReportDate = o.reportDate || null;
-            if (newBank !== "" && (!o.bankCode || o.bankCode === "")) {
+            if (finalMethod !== 'free' && newBank !== "" && (!o.bankCode || o.bankCode === "")) {
                 const today = new Date();
                 currentReportDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
                 updates[`orders/${orderId}/reportDate`] = currentReportDate;
@@ -1479,11 +1657,12 @@
 
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-edit-order'); 
-                window.closeModal('modal-confirm-revert');
                 window.showToast("已儲存變更", "success"); 
             }).catch((err) => {
                 console.error(err);
                 window.showToast("儲存失敗，請重試");
+            }).finally(() => {
+                if(fromWarningPage) setLoadingState('btn-execute-edit', false, originalBtnHtml);
             });
         };
 
@@ -1500,6 +1679,8 @@
             const o = ordersData[orderId];
             if(!o) return;
             
+            const originalBtnHtml = setLoadingState('btn-execute-delete', true);
+
             const updates = {};
             // 將訂單內的所有座位還原為空位
             if(o.seats) {
@@ -1516,6 +1697,8 @@
             }).catch(err => {
                 console.error(err);
                 window.showToast("刪除失敗，請重試", "error");
+            }).finally(() => {
+                setLoadingState('btn-execute-delete', false, originalBtnHtml);
             });
         };
 
@@ -1652,7 +1835,7 @@
                     phone: o.phone,
                     seats: (o.seats || []).join(', '),
                     total: o.total,
-                    method: o.paymentMethod === 'cash' ? '現金' : '匯款',
+                    method: o.paymentMethod === 'cash' ? '現金' : (o.paymentMethod === 'transfer' ? '匯款' : '免付費'),
                     bankCode: o.bankCode || '',
                     receiptDate: o.receiptDate || o.reportDate || '',
                     status: st,
@@ -1730,7 +1913,7 @@
                         phone: o.phone,
                         seats: (o.seats || []).join(', '),
                         total: o.total,
-                        method: o.paymentMethod === 'cash' ? '現金' : '匯款',
+                        method: o.paymentMethod === 'cash' ? '現金' : (o.paymentMethod === 'transfer' ? '匯款' : '免付費'),
                         bankCode: o.bankCode || '',
                         receiptDate: o.receiptDate || o.reportDate || '',
                         status: st,
