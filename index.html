@@ -62,7 +62,7 @@
         .menu-btn:hover { opacity: 0.7; transform: scale(1.1); }
         .menu-btn svg { width: 24px; height: 24px; }
 
-        .main-content { flex: 1; overflow-y: auto; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .main-content { flex: 1; overflow-y: auto; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; width: 100%; position: relative; }
         
         .legend-area { display: flex; gap: 15px; margin: 15px 0; font-size: 14px; color: #666; justify-content: center; flex-wrap: wrap; align-items: center; }
         .legend-item { display: flex; align-items: center; gap: 6px; }
@@ -109,8 +109,8 @@
             cursor: pointer;
         }
         
-        .seat:hover:not(.camera-seat):not(.sold):not(.blocked-seat) { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--seat-shadow-avail); z-index: 5; }
-        .seat:active:not(.camera-seat):not(.sold):not(.blocked-seat) { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--seat-shadow-avail); }
+        .seat:hover:not(.camera-seat):not(.sold):not(.blocked-seat):not(.disabled-seat) { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--seat-shadow-avail); z-index: 5; }
+        .seat:active:not(.camera-seat):not(.sold):not(.blocked-seat):not(.disabled-seat) { transform: translateY(2px); box-shadow: 0 1px 0 0 var(--seat-shadow-avail); }
 
         .sold { background-color: var(--seat-bg-sold) !important; color: var(--seat-text-sold) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-sold) !important; border: none !important; cursor: not-allowed; transform: none !important; }
         .selected { background-color: var(--seat-bg-selected) !important; color: var(--seat-text-selected) !important; box-shadow: 0 3px 0 0 var(--seat-shadow-selected) !important; border: none !important; transform: translateY(1px) !important; }
@@ -127,6 +127,25 @@
             cursor: default !important; 
             pointer-events: none; 
         }
+
+        /* 換位模式專用 CSS (加強層級，確保保留席也能變色) */
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+        .seat.swap-selected-old,
+        .seat.sold.swap-selected-old,
+        .seat.reserve-seat.swap-selected-old,
+        .seat.sold.reserve-seat.swap-selected-old { background-color: #ef4444 !important; color: white !important; animation: pulse-red 1.5s infinite; border: none !important; z-index: 10; transform: translateY(-2px) !important; box-shadow: 0 5px 0 0 #b91c1c !important; }
+        .swap-selectable-old { cursor: pointer !important; }
+        .disabled-seat { opacity: 0.25 !important; cursor: not-allowed !important; pointer-events: none !important; filter: grayscale(100%); }
+
+        /* 更新：質感深色換位橫幅 */
+        .swap-banner {
+            display: none; position: sticky; top: 0; left: 0; width: 100%; background: #1e293b; padding: 12px 20px; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-sizing: border-box; color: #f8fafc;
+        }
+        .swap-banner-text { font-size: 15px; line-height: 1.5; font-weight: 500; }
+        .swap-banner-text b { color: #38bdf8; font-weight: 800; font-size: 16px; }
+        .swap-banner-text .highlight-red { color: #f87171; font-weight: bold; }
+        .swap-banner-text .highlight-green { color: #34d399; font-weight: bold; }
 
         .floating-bar {
             position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px;
@@ -153,7 +172,7 @@
         .custom-toast.success { background-color: #10b981; }
         .custom-toast svg { width: 22px; height: 22px; }
 
-        /* 在這裡加上 backdrop-filter 產生背景模糊效果 */
+        /* 背景模糊效果 (毛玻璃) */
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
         .modal { background: white; width: 100%; max-width: 480px; max-height: 95vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         
@@ -345,10 +364,10 @@
             transform: translateY(0);
         }
 
-        .search-group { position: relative; flex: 1; min-width: 200px; }
-        .search-input { padding: 10px 16px 10px 42px; border: 2px solid #e2e8f0; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 14px; transition: all 0.2s; height: 42px; outline: none;}
+        .search-group { position: relative; flex: 1; min-width: 200px; display: flex; align-items: center; }
+        .search-input { padding: 0 16px 0 40px; border: 2px solid #e2e8f0; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 14px; transition: all 0.2s; height: 42px; outline: none; line-height: normal; }
         .search-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 18px; height: 18px; }
+        .search-icon { position: absolute; left: 12px; top: 50%; margin-top: -9px; transform: none; color: #94a3b8; width: 18px; height: 18px; pointer-events: none; }
 
         .results-summary {
             font-size: 13px;
@@ -382,6 +401,14 @@
         .order-table td { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
         .order-table tr:hover { background: #f1f5f9; }
         
+        /* 新增：分頁控制器樣式 */
+        .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 14px; color: #475569; padding: 0 5px; flex-wrap: wrap; gap: 15px; }
+        .page-info { display: flex; align-items: center; gap: 10px; }
+        .page-btn { padding: 8px 16px; border: 1px solid #cbd5e1; background: white; border-radius: 8px; cursor: pointer; transition: 0.2s; color: #1e293b; font-weight: bold; }
+        .page-btn:hover:not(:disabled) { background: #f1f5f9; border-color: var(--primary-blue); color: var(--primary-blue); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .items-per-page-select { padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; outline: none; font-family: inherit; cursor: pointer; font-weight: bold;}
+
         .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold; white-space: nowrap; border: 1px solid transparent; }
         .status-paid { background: #dcfce7; color: #059669; border-color: #a7f3d0; }
         .status-unpaid-red { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
@@ -586,6 +613,17 @@
         </div>
     </div>
 
+    <!-- 新增：換位模式專屬質感橫幅 -->
+    <div id="swap-banner" class="swap-banner">
+        <div id="swap-banner-text" class="swap-banner-text"></div>
+        <div style="display:flex; gap:10px; flex-wrap: nowrap; align-items: center;">
+            <button class="btn-prev-step" style="padding:8px 16px; white-space: nowrap; margin: 0;" onclick="window.cancelSwapMode()">取消換位</button>
+            <button id="btn-swap-prev" class="btn-prev-step" style="padding:8px 16px; display:none; white-space: nowrap; margin: 0;" onclick="window.goToSwapStep1()">上一步</button>
+            <button id="btn-swap-next" class="btn-complete" style="padding:8px 16px; display:none; white-space: nowrap; margin: 0;" onclick="window.goToSwapStep2()">下一步</button>
+            <button id="btn-swap-confirm" class="btn-complete" style="padding:8px 16px; display:none; background:var(--primary-blue); white-space: nowrap; margin: 0;" onclick="window.confirmSwap()">確認換位</button>
+        </div>
+    </div>
+
     <div class="main-content" id="main-content-area">
         <div class="legend-area">
             <div class="legend-item"><div class="legend-box" style="background:var(--seat-bg-avail); border: 1px solid var(--seat-border-avail); box-shadow: 0 2px 0 0 var(--seat-shadow-avail);"></div> 可選位</div>
@@ -635,7 +673,6 @@
                 <div class="stat-card">
                     <div class="stat-label">已售票數</div>
                     <div class="stat-value" id="stat-tickets">0 <span>張</span></div>
-                    <!-- 修改：簡短化剩餘票數顯示 -->
                     <div id="stat-remaining-info" style="font-size: 11px; color: #64748b; margin-top: 5px; font-weight: 600;">剩餘 0 張；保留席 0 張</div>
                     <div class="stat-icon-wrapper icon-tickets">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
@@ -664,15 +701,15 @@
                 <div class="filter-row-top">
                     <div class="filter-group">
                         <span class="filter-label">訂單日期</span>
-                        <input type="date" id="order-date-input" class="filter-control" onchange="window.renderOrders()">
+                        <input type="date" id="order-date-input" class="filter-control" onchange="window.handleFilterChange()">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">收款日期</span>
-                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.renderOrders()">
+                        <input type="date" id="receipt-date-input" class="filter-control" onchange="window.handleFilterChange()">
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">付款方式</span>
-                        <select id="filter-payment" class="filter-control" onchange="window.renderOrders()">
+                        <select id="filter-payment" class="filter-control" onchange="window.handleFilterChange()">
                             <option value="all">全部</option>
                             <option value="cash">現金</option>
                             <option value="transfer">匯款</option>
@@ -681,7 +718,7 @@
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">狀態</span>
-                        <select id="filter-status" class="filter-control" onchange="window.renderOrders()">
+                        <select id="filter-status" class="filter-control" onchange="window.handleFilterChange()">
                             <option value="all">全部</option>
                             <option value="pending">待核銷</option>
                             <option value="paid">已完成</option>
@@ -693,7 +730,7 @@
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" cy="21" x2="16.65" y2="16.65"></line>
                         </svg>
-                        <input type="text" id="order-search-input" class="search-input" placeholder="搜尋姓名/電話/座位..." oninput="window.renderOrders()">
+                        <input type="text" id="order-search-input" class="search-input" placeholder="搜尋姓名/電話/座位..." oninput="window.handleFilterChange()">
                     </div>
                 </div>
             </div>
@@ -717,6 +754,27 @@
                     </thead>
                     <tbody id="order-table-body"></tbody>
                 </table>
+            </div>
+            
+            <!-- 新增：分頁控制區塊 -->
+            <div class="pagination" id="pagination-controls" style="display:none;">
+                <div class="page-info">
+                    <span>每頁顯示</span>
+                    <select id="items-per-page" class="items-per-page-select" onchange="window.changeItemsPerPage()">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span>筆</span>
+                </div>
+                <div class="page-info">
+                    <span id="page-indicator" style="font-weight: bold; color: var(--primary-blue);">第 1 / 1 頁</span>
+                    <div style="display:flex; gap: 8px;">
+                        <button class="page-btn" id="btn-prev-page" onclick="window.prevPage()">上一頁</button>
+                        <button class="page-btn" id="btn-next-page" onclick="window.nextPage()">下一頁</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -901,6 +959,12 @@
                         <button class="btn-prev-step" onclick="window.closeModal('modal-edit-order')">取消</button>
                         <button class="btn-complete" onclick="window.saveOrderEdit()">確認變更</button>
                     </div>
+                    
+                    <!-- 新增：更換座位按鈕 -->
+                    <button class="btn-action-outline" style="width:100%; justify-content:center; margin-top:15px; border-color:var(--primary-blue); color:var(--primary-blue);" onclick="window.startSwapMode()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        進入更換座位模式
+                    </button>
                 </div>
             </div>
 
@@ -969,6 +1033,30 @@
         </div>
     </div>
 
+    <!-- 確認換位視窗 -->
+    <div class="modal-overlay" id="modal-swap-confirm" style="z-index: 4000;">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header">
+                <span>確認更換座位</span>
+                <span class="close-x" onclick="window.closeModal('modal-swap-confirm')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <p style="font-size:16px; color:#1e293b; font-weight:bold; text-align:center; line-height:1.8; margin:0;">
+                    確定要將<br>
+                    <span style="color:#ef4444; font-size: 20px;" id="swap-confirm-old"></span><br>
+                    更換為<br>
+                    <span style="color:var(--primary-blue); font-size: 20px;" id="swap-confirm-new"></span> 嗎？
+                </p>
+                <div style="display:flex; gap:10px; margin-top:25px;">
+                    <button class="btn-prev-step" onclick="window.closeModal('modal-swap-confirm')">取消</button>
+                    <button id="btn-execute-swap" class="btn-complete" onclick="window.executeSwap()">確認更換</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
@@ -993,6 +1081,13 @@
         let toastTimeout = null;
         let originalOrderState = null;
         
+        // 新增：分頁狀態變數
+        let currentPage = 1;
+        let itemsPerPage = 20;
+
+        // 換位模式狀態管理
+        window.swapState = { active: false, step: 1, orderId: null, oldSeats: [], newSeats: [], type: '' };
+
         const iconLock = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
         const iconUnlock = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`;
 
@@ -1090,21 +1185,64 @@
             if(rowName==='A' || rowName==='G' || rowName==='Q') block.innerHTML = '';
             const rowDiv = document.createElement('div');
             rowDiv.className = 'row';
+            
+            const isSwapActive = window.swapState && window.swapState.active;
+
             for(let s=start; s<=end; s++){
                 const id = rowName + s;
                 const div = document.createElement('div');
                 div.innerText = id;
                 const isBlocked = ( (rowName === 'A' || rowName === 'B') && (bid.startsWith('L') || bid.startsWith('R')) );
+                
+                let isSwapDisabled = false;
+                let swapClasses = [];
+                const isReserve = reserveSeats.includes(id);
+
+                if (isSwapActive && !isBlocked && !cameraSeats.includes(id)) {
+                    if (window.swapState.step === 1) {
+                        const o = ordersData[window.swapState.orderId];
+                        if (!o.seats.includes(id)) {
+                            isSwapDisabled = true;
+                        } else {
+                            swapClasses.push('swap-selectable-old'); // 讓原座位顯示為可點擊
+                            if (window.swapState.oldSeats.includes(id)) swapClasses.push('swap-selected-old');
+                        }
+                    } else { // step 2
+                        const matchType = (window.swapState.type === 'reserve' && isReserve) || (window.swapState.type === 'regular' && !isReserve);
+                        const currentStatus = seatsData[id]?.status || 'available';
+                        const isFreed = window.swapState.oldSeats.includes(id);
+
+                        if (!matchType) {
+                            isSwapDisabled = true; // 屬性不對，鎖死
+                        } else if (isFreed) {
+                            isSwapDisabled = true; // 原座位直接鎖死，顯示禁止符號
+                        } else if (currentStatus === 'sold') {
+                            isSwapDisabled = true; // 別人買走的，鎖死
+                        }
+
+                        if (window.swapState.newSeats.includes(id)) {
+                            swapClasses.push('selected');
+                        }
+                    }
+                } else if (isSwapActive) {
+                    isSwapDisabled = true; // 換位時擋住走道跟攝影席
+                }
+
                 if (isBlocked) {
                     div.innerText = "x";
                     div.className = "seat blocked-seat";
+                    if(isSwapActive) div.classList.add('disabled-seat');
                 } else if (cameraSeats.includes(id)) {
                     div.className = "seat camera-seat";
+                    if(isSwapActive) div.classList.add('disabled-seat');
                 } else {
                     const status = (seatsData[id] && seatsData[id].status) ? seatsData[id].status : 'available';
-                    const isReserve = reserveSeats.includes(id);
                     div.className = `seat ${status} ${isReserve ? 'reserve-seat' : ''}`;
-                    if(selectedIds.includes(id)) div.classList.add('selected');
+                    
+                    if (isSwapDisabled) div.classList.add('disabled-seat');
+                    swapClasses.forEach(cls => div.classList.add(cls));
+                    if (!isSwapActive && selectedIds.includes(id)) div.classList.add('selected');
+                    
                     div.onclick = () => window.handleSeatClick(id);
                 }
                 rowDiv.appendChild(div);
@@ -1114,6 +1252,53 @@
 
         window.handleSeatClick = (id) => {
             if(!isAdmin) return;
+
+            // 換位模式專屬點擊邏輯
+            if (window.swapState && window.swapState.active) {
+                const { step, orderId, oldSeats, newSeats, type } = window.swapState;
+                const o = ordersData[orderId];
+                
+                if (step === 1) {
+                    if (!o.seats.includes(id)) return; // 只能點自己的舊位子
+                    if (oldSeats.includes(id)) {
+                        window.swapState.oldSeats = oldSeats.filter(s => s !== id);
+                    } else {
+                        window.swapState.oldSeats.push(id);
+                    }
+                    updateSwapBanner();
+                    render();
+                } else if (step === 2) {
+                    const isSeatReserve = reserveSeats.includes(id);
+                    if ((type === 'reserve' && !isSeatReserve) || (type === 'regular' && isSeatReserve)) {
+                        window.showToast(`請選擇「${type === 'reserve' ? '保留席' : '一般席'}」空位！`, "error");
+                        return;
+                    }
+                    
+                    if (oldSeats.includes(id)) {
+                        return; // 不允許選擇原本要退出的座位
+                    }
+
+                    const currentStatus = seatsData[id]?.status || 'available';
+                    if (currentStatus === 'sold') {
+                        return; // 已被買走的位子
+                    }
+
+                    if (newSeats.includes(id)) {
+                        window.swapState.newSeats = newSeats.filter(s => s !== id);
+                    } else {
+                        if (newSeats.length >= oldSeats.length) {
+                            window.showToast(`您只退出了 ${oldSeats.length} 個座位，最多只能選 ${oldSeats.length} 個新座位！`, "error");
+                            return;
+                        }
+                        window.swapState.newSeats.push(id);
+                    }
+                    updateSwapBanner();
+                    render();
+                }
+                return; // 跳過正常選位邏輯
+            }
+
+            // 正常選位邏輯
             const current = seatsData[id] || { status: 'available' };
             if(current.status === 'sold') {
                 window.showToast("此座位已售出，請至「訂單管理」進行編輯或刪除", "error");
@@ -1137,10 +1322,141 @@
             if(displaySub) displaySub.innerText = `已選 ${count} 座位`;
             const floatingBar = document.getElementById('floating-bar');
             if (floatingBar) {
+                // 如果在換位模式，強制隱藏下方正常購票列
+                if (window.swapState && window.swapState.active) {
+                    floatingBar.classList.remove('show');
+                    return;
+                }
                 if (count > 0 && isAdmin && document.getElementById('order-page').style.display !== 'flex') floatingBar.classList.add('show');
                 else floatingBar.classList.remove('show');
             }
         }
+
+        // --- 換位模式專屬函數開始 ---
+        window.startSwapMode = () => {
+            const oid = document.getElementById('edit-order-id').value;
+            const o = ordersData[oid];
+            if(!o || !o.seats || o.seats.length === 0) return;
+            
+            // 判斷票種屬性 (用該單的第一個座位去判斷最準確)
+            const isReserveOrder = reserveSeats.includes(o.seats[0]);
+
+            window.swapState = { 
+                active: true, 
+                step: 1, 
+                orderId: oid, 
+                oldSeats: [], 
+                newSeats: [], 
+                type: isReserveOrder ? 'reserve' : 'regular' 
+            };
+            
+            selectedIds = []; // 清空正常選位，避免干擾
+            window.closeModal('modal-edit-order');
+            document.getElementById('order-page').style.display = 'none'; // 確保切回座位圖
+            document.getElementById('main-content-area').style.display = 'flex';
+            document.getElementById('swap-banner').style.display = 'flex';
+            
+            updateSwapBanner();
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelSwapMode = () => {
+            window.swapState = { active: false, step: 1, orderId: null, oldSeats: [], newSeats: [], type: '' };
+            document.getElementById('swap-banner').style.display = 'none';
+            render();
+        };
+
+        window.goToSwapStep1 = () => {
+            window.swapState.step = 1;
+            window.swapState.newSeats = []; // 退回上一步時，自動清空新座位，避免防呆邏輯錯誤
+            updateSwapBanner();
+            render();
+        };
+
+        window.goToSwapStep2 = () => {
+            window.swapState.step = 2;
+            updateSwapBanner();
+            render();
+        };
+
+        function updateSwapBanner() {
+            const bText = document.getElementById('swap-banner-text');
+            const bPrev = document.getElementById('btn-swap-prev');
+            const bNext = document.getElementById('btn-swap-next');
+            const bConfirm = document.getElementById('btn-swap-confirm');
+            const o = ordersData[window.swapState.orderId];
+
+            if (window.swapState.step === 1) {
+                bText.innerHTML = `正在為 <b>${o.name}</b> 更換座位<br>第一步：請點選要退出的「原座位」 <span class="highlight-red">(已選 ${window.swapState.oldSeats.length} 個)</span>`;
+                if(bPrev) bPrev.style.display = 'none';
+                bNext.style.display = window.swapState.oldSeats.length > 0 ? 'block' : 'none';
+                bConfirm.style.display = 'none';
+            } else {
+                const required = window.swapState.oldSeats.length;
+                const current = window.swapState.newSeats.length;
+                const typeName = window.swapState.type === 'reserve' ? '保留席' : '一般席';
+                bText.innerHTML = `第二步：請選擇 <b>${required}</b> 個新的「${typeName}」空位<br><span class="highlight-green">(已選 ${current} / 需選 ${required})</span>`;
+                if(bPrev) bPrev.style.display = 'block';
+                bNext.style.display = 'none';
+                bConfirm.style.display = current === required ? 'block' : 'none';
+            }
+        }
+
+        window.confirmSwap = () => {
+            document.getElementById('swap-confirm-old').innerText = window.swapState.oldSeats.join(', ');
+            document.getElementById('swap-confirm-new').innerText = window.swapState.newSeats.join(', ');
+            document.getElementById('modal-swap-confirm').style.display = 'flex';
+        };
+
+        window.executeSwap = () => {
+            const oldHtml = setLoadingState('btn-execute-swap', true);
+            const { orderId, oldSeats, newSeats } = window.swapState;
+            const o = ordersData[orderId];
+            
+            // 重組該訂單的座位清單 (移除舊的，加入新的)
+            let updatedSeats = o.seats.filter(s => !oldSeats.includes(s));
+            updatedSeats = [...updatedSeats, ...newSeats];
+
+            const updates = {};
+            updates[`orders/${orderId}/seats`] = updatedSeats;
+
+            // 釋放舊座位
+            oldSeats.forEach(s => {
+                if (!updatedSeats.includes(s)) { // 防呆：如果他選了同一個座位當新座位就不釋放
+                    updates[`seats/${s}`] = null;
+                }
+            });
+
+            // 寫入新座位
+            newSeats.forEach(s => {
+                updates[`seats/${s}`] = { 
+                    status: 'sold', 
+                    name: o.name, 
+                    phone: o.phone, 
+                    ticketType: o.ticketType, 
+                    bankCode: o.bankCode || "", 
+                    note: o.note || "", 
+                    paymentMethod: o.paymentMethod, 
+                    orderId: orderId 
+                };
+                if (o.receiptDate) updates[`seats/${s}`].receiptDate = o.receiptDate;
+                if (o.reportDate) updates[`seats/${s}`].reportDate = o.reportDate;
+            });
+
+            update(ref(db), updates).then(() => {
+                window.closeModal('modal-swap-confirm');
+                window.cancelSwapMode(); // 結束換位模式
+                window.openOrderManager(); // 換完直接回到訂單管理方便看
+                window.showToast("座位更換成功！", "success");
+            }).catch(err => {
+                console.error(err);
+                window.showToast("更換失敗，請重試", "error");
+            }).finally(() => {
+                setLoadingState('btn-execute-swap', false, oldHtml);
+            });
+        };
+        // --- 換位模式專屬函數結束 ---
 
         window.closeModal = (mid) => { 
             const m = document.getElementById(mid);
@@ -1369,12 +1685,43 @@
             updateBottomBar();
         };
 
+        // 新增：處理過濾條件變更，自動重置頁碼為第 1 頁
+        window.handleFilterChange = () => {
+            currentPage = 1;
+            window.renderOrders();
+        };
+
+        // 新增：上一頁
+        window.prevPage = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                window.renderOrders();
+                document.getElementById('order-page').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // 新增：下一頁
+        window.nextPage = () => {
+            currentPage++;
+            window.renderOrders();
+            document.getElementById('order-page').scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // 新增：改變每頁顯示筆數
+        window.changeItemsPerPage = () => {
+            itemsPerPage = parseInt(document.getElementById('items-per-page').value);
+            currentPage = 1; // 改變筆數時回到第1頁
+            window.renderOrders();
+            document.getElementById('order-page').scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
         window.clearAllFilters = () => {
             document.getElementById('order-date-input').value = '';
             document.getElementById('receipt-date-input').value = '';
             document.getElementById('filter-payment').value = 'all';
             document.getElementById('filter-status').value = 'all';
             document.getElementById('order-search-input').value = '';
+            currentPage = 1; // 清除篩選時也回到第1頁
             window.renderOrders();
         };
 
@@ -1500,12 +1847,35 @@
             document.getElementById('stat-pending').innerHTML = `${pendingCount} <span>筆</span>`;
             document.getElementById('results-count-number').innerText = filteredArray.length;
 
+            const paginationControls = document.getElementById('pagination-controls');
+
             if(filteredArray.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:40px;">找不到符合條件的訂單</td></tr>`;
+                if(paginationControls) paginationControls.style.display = 'none';
                 return;
             }
 
-            filteredArray.forEach(o => {
+            // 新增：計算分頁範圍並裁切陣列
+            const totalItems = filteredArray.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            
+            // 防呆：確保當前頁碼不會超過總頁數
+            if (currentPage > totalPages) currentPage = totalPages;
+            
+            // 更新分頁 UI 顯示
+            if(paginationControls) {
+                paginationControls.style.display = 'flex';
+                document.getElementById('page-indicator').innerText = `第 ${currentPage} / ${totalPages} 頁`;
+                document.getElementById('btn-prev-page').disabled = currentPage === 1;
+                document.getElementById('btn-next-page').disabled = currentPage >= totalPages;
+            }
+
+            // 裁切出目前頁面需要顯示的訂單
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedArray = filteredArray.slice(startIndex, endIndex);
+
+            paginatedArray.forEach(o => {
                 const dateObj = new Date(o.createdAt);
                 const timeString = dateObj.toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
                 
