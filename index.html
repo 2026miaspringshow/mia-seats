@@ -635,6 +635,8 @@
                 <div class="stat-card">
                     <div class="stat-label">已售票數</div>
                     <div class="stat-value" id="stat-tickets">0 <span>張</span></div>
+                    <!-- 修改：簡短化剩餘票數顯示 -->
+                    <div id="stat-remaining-info" style="font-size: 11px; color: #64748b; margin-top: 5px; font-weight: 600;">剩餘 0 張；保留席 0 張</div>
                     <div class="stat-icon-wrapper icon-tickets">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
                     </div>
@@ -996,8 +998,7 @@
 
         const cameraSeats = ["G15", "G16", "G17", "H15", "H16", "H17"];
         const reserveSeats = [];
-        for(let i=1; i<=27; i++) reserveSeats.push("A"+i); 
-        for(let i=1; i<=27; i++) reserveSeats.push("B"+i); 
+        for(let i=1; i<=27; i++) { reserveSeats.push("A"+i); reserveSeats.push("B"+i); }
         for(let i=10; i<=14; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
         for(let i=18; i<=22; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
 
@@ -1258,7 +1259,7 @@
                 if(!name) {
                     window.showToast("請填寫貴賓稱呼 / 單位！", "error"); return;
                 }
-                // 免付費票，電話為選填，不做手機格式強制檢查
+                // 免付費票，電話為選填，不做手機格式檢查
             } else {
                 if(!name || !phone) {
                     window.showToast("請填寫姓名與電話！", "error"); return;
@@ -1396,6 +1397,47 @@
             
             const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
+            // 1. 計算剩餘票數資訊 (全域狀態，不受目前篩選器影響)
+            let totalRegularCount = 0;
+            let totalReserveCount = 0;
+            let soldRegularCount = 0;
+            let soldReserveCount = 0;
+
+            // 計算場內總可用座位數
+            layout.forEach(sec => {
+                for (let r = 0; r < sec.rows; r++) {
+                    const rowName = String.fromCharCode(sec.start.charCodeAt(0) + r);
+                    const cL = Array.isArray(sec.L) ? sec.L[r] : sec.L;
+                    const cM = Array.isArray(sec.M) ? sec.M[r] : sec.M;
+                    const cR = Array.isArray(sec.R) ? sec.R[r] : sec.R;
+                    const totalCols = cL + cM + cR;
+                    for (let s = 1; s <= totalCols; s++) {
+                        const id = rowName + s;
+                        const isBlocked = ((rowName === 'A' || rowName === 'B') && (s <= cL || s > cL + cM));
+                        if (!isBlocked && !cameraSeats.includes(id)) {
+                            if (reserveSeats.includes(id)) totalReserveCount++;
+                            else totalRegularCount++;
+                        }
+                    }
+                }
+            });
+
+            // 從全域座位資料中統計已售出
+            Object.keys(seatsData).forEach(id => {
+                if (seatsData[id].status === 'sold') {
+                    if (reserveSeats.includes(id)) soldReserveCount++;
+                    else soldRegularCount++;
+                }
+            });
+
+            const remainingRegular = totalRegularCount - soldRegularCount;
+            const remainingReserve = totalReserveCount - soldReserveCount;
+            
+            // 修改：套用簡短化的格式顯示
+            const infoEl = document.getElementById('stat-remaining-info');
+            if (infoEl) infoEl.innerText = `剩餘 ${remainingRegular} 張；保留席 ${remainingReserve} 張`;
+
+            // 2. 進行訂單列表篩選
             let dateFilteredOrders = allOrders;
             if (selectedOrderDate !== "" || selectedReceiptDate !== "") {
                 dateFilteredOrders = allOrders.filter(o => {
@@ -1426,8 +1468,10 @@
                 return true;
             });
 
-            let totalRevenue = 0, cashRevenue = 0;
+            // 3. 渲染列表與計算當前視圖營收
+            let totalRevenue = 0, cashRevenue = 0, ticketsInView = 0;
             filteredArray.forEach(o => {
+                ticketsInView += (o.seats || []).length;
                 let isCountable = false;
                 if (o.paymentMethod === 'transfer') {
                     if ((o.bankCode && o.bankCode.trim() !== "") || o.status === 'paid') {
@@ -1447,13 +1491,11 @@
             document.getElementById('stat-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
             document.getElementById('stat-cash-revenue').innerText = `現金收入 $${cashRevenue.toLocaleString()}`;
             
-            let ticketsCount = 0, ordersCount = 0, pendingCount = 0;
+            let ordersCount = filteredArray.length, pendingCount = 0;
             filteredArray.forEach(o => {
-                ordersCount++;
-                ticketsCount += (o.seats || []).length;
                 if(o.status === 'pending') pendingCount++;
             });
-            document.getElementById('stat-tickets').innerHTML = `${ticketsCount} <span>張</span>`;
+            document.getElementById('stat-tickets').innerHTML = `${ticketsInView} <span>張</span>`;
             document.getElementById('stat-orders').innerHTML = `${ordersCount} <span>筆</span>`;
             document.getElementById('stat-pending').innerHTML = `${pendingCount} <span>筆</span>`;
             document.getElementById('results-count-number').innerText = filteredArray.length;
@@ -1859,9 +1901,9 @@
 
         window.exportDailyReceipts = async () => {
             if(!isAdmin) return;
-            const targetDate = document.getElementById('receipt-date-input').value;
+            const targetDateInput = document.getElementById('receipt-date-input').value;
             
-            if(!targetDate) {
+            if(!targetDateInput) {
                 window.showToast("請先在上方選擇「收款日期」", "error");
                 return;
             }
@@ -1872,71 +1914,72 @@
             workbook.creator = 'MIA Ticketing System';
             const ws = workbook.addWorksheet('當日收款名冊');
 
+            // 調整為教室專用格式的欄位名稱
             ws.columns = [
-                { header: '訂單編號', key: 'orderId', width: 22 },
-                { header: '訂單時間', key: 'time', width: 20 },
-                { header: '購票姓名', key: 'name', width: 15 },
-                { header: '電話', key: 'phone', width: 15 },
-                { header: '座位', key: 'seats', width: 35 },
-                { header: '金額', key: 'total', width: 12 },
-                { header: '付款方式', key: 'method', width: 12 },
-                { header: '末五碼', key: 'bankCode', width: 12 },
-                { header: '收款日期', key: 'receiptDate', width: 15 },
-                { header: '狀態', key: 'status', width: 15 },
-                { header: '備註', key: 'note', width: 25 }
+                { header: '填寫日期', key: 'date', width: 15 },
+                { header: '付款類別', key: 'method', width: 12 },
+                { header: '繳費期別', key: 'period', width: 12 },
+                { header: '收費項目', key: 'item', width: 20 },
+                { header: '付款人', key: 'payer', width: 15 },
+                { header: '繳費明細/數量 詳細', key: 'details', width: 45 }, // 加寬以容納長字串
+                { header: '收入金額', key: 'income', width: 12 },
+                { header: '新/舊生/其他', key: 'note', width: 15 }
             ];
 
-            ws.getRow(1).font = { bold: true, color: { argb: 'FF475569' } };
-            ws.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
-            ws.getRow(1).border = { bottom: { style: 'medium', color: { argb: 'FFCBD5E1' } } };
+            ws.getRow(1).font = { bold: true };
+            ws.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
 
             const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            let dailyTotal = 0;
-            let count = 0;
 
             allOrders.forEach(o => {
+                // 修改：排除免付費 (只匯出現金跟匯款)
+                if (o.paymentMethod === 'free') return;
+
                 let match = false;
-                if (o.status === 'paid' && o.receiptDate === targetDate) {
+                // 比對收款日期
+                if (o.status === 'paid' && o.receiptDate === targetDateInput) {
                     match = true;
-                } else if (o.paymentMethod === 'transfer' && o.reportDate === targetDate) {
+                } else if (o.paymentMethod === 'transfer' && o.reportDate === targetDateInput) {
                     match = true;
                 }
 
                 if(match) {
-                    const t = new Date(o.createdAt).toLocaleString('zh-TW', { hour12: false });
-                    const st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                    // 格式化日期為 YYYY/MM/DD
+                    const formattedDate = targetDateInput.replace(/-/g, '/');
                     
+                    // 映射付款類別
+                    let category = o.paymentMethod === 'cash' ? '現金' : '匯款';
+
+                    // 處理票種簡化 (例如：早鳥優惠 NT$ 650 / 張 -> 早鳥$650)
+                    let cleanTicketType = o.ticketType || "";
+                    cleanTicketType = cleanTicketType
+                        .replace('優惠 ', '')
+                        .replace(' NT$ ', '$')
+                        .replace(' / 張', '')
+                        .replace('一般原價', '原價');
+
+                    // 修改：組合繳費明細字串
+                    const detailString = `MIA 8th 成發門票 / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
+
                     ws.addRow({
-                        orderId: o.orderId,
-                        time: t,
-                        name: o.name,
-                        phone: o.phone,
-                        seats: (o.seats || []).join(', '),
-                        total: o.total,
-                        method: o.paymentMethod === 'cash' ? '現金' : (o.paymentMethod === 'transfer' ? '匯款' : '免付費'),
-                        bankCode: o.bankCode || '',
-                        receiptDate: o.receiptDate || o.reportDate || '',
-                        status: st,
-                        note: o.note || ''
+                        date: formattedDate,
+                        method: category,
+                        period: '',  
+                        item: '門票', // 修改：固定帶入 "門票"
+                        payer: o.name,
+                        details: detailString, // 修改：帶入組合後的格式
+                        income: o.total,
+                        note: ''     
                     });
-                    dailyTotal += (o.total || 0);
-                    count++;
                 }
             });
-
-            ws.addRow({});
-            const summaryRow = ws.addRow({
-                seats: `共計 ${count} 筆`,
-                total: `總計: $${dailyTotal.toLocaleString()}`
-            });
-            summaryRow.font = { bold: true, color: { argb: 'FF1E293B' } };
 
             try {
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = `MIA_當日收款名冊_${targetDate.replace(/-/g, '')}.xlsx`;
+                link.download = `MIA_教室上傳用_${targetDateInput.replace(/-/g, '')}.xlsx`;
                 link.click();
                 window.showToast("Excel 匯出成功！", "success");
             } catch (err) {
