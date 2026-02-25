@@ -171,6 +171,9 @@
             font-weight: bold; 
             position: relative; 
             flex-shrink: 0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .modal-header.login-header { 
@@ -196,6 +199,23 @@
             background-position: right -15px center, center;
         }
 
+        .modal-header.delete-header { 
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='3 6 5 6 21 6'/%3E%3Cpath d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/%3E%3Cline x1='10' y1='11' x2='10' y2='17'/%3E%3Cline x1='14' y1='11' x2='14' y2='17'/%3E%3C/svg%3E"),
+                linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); 
+            background-size: 110px, cover;
+            background-position: right -15px center, center;
+        }
+
+        .modal-header.verify-header { 
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/%3E%3Cpolyline points='22 4 12 14.01 9 11.01'/%3E%3C/svg%3E"),
+                var(--success-gradient); 
+            background-size: 110px, cover;
+            background-position: right -15px center, center;
+        }
+
+        /* 修改後的完美置中關閉按鈕 */
         .close-x { 
             position: absolute; 
             right: 15px; 
@@ -385,7 +405,7 @@
             display: flex; align-items: center; justify-content: center;
             color: #ef4444;
         }
-        .warning-exclamation svg { width: 45px; height: 45px; }
+        .warning-exclamation svg { width: 40px; height: 40px; }
 
         .copy-info-box {
             background: #f1f5f9;
@@ -427,10 +447,13 @@
 
         @media screen and (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .order-page-header { gap: 10px; }
-            .filter-row-top { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .order-page-header { flex-direction: column; align-items: stretch; gap: 15px; }
+            .header-actions-group { flex-direction: column; width: 100%; gap: 10px; }
+            .btn-action-outline { width: 100%; justify-content: center; }
+            .filter-row-top { flex-direction: column; align-items: stretch; gap: 12px; }
             .filter-group { width: 100%; }
-            .filter-control { flex: 1; }
+            .filter-control { flex: 1; width: 100%; box-sizing: border-box; }
+            .btn-clear-filters { width: 100%; }
             .search-group { width: 100%; }
         }
     </style>
@@ -766,8 +789,8 @@
 
     <!-- 管理員核銷確認 -->
     <div class="modal-overlay" id="modal-verify">
-        <div class="modal" style="max-width: 460px;">
-            <div class="modal-header">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header verify-header">
                 <span id="verify-modal-title-text">核銷確認</span>
                 <span class="close-x" onclick="window.closeModal('modal-verify')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -797,7 +820,7 @@
         </div>
     </div>
 
-    <!-- 編輯訂單 (整合防呆視窗) -->
+    <!-- 編輯訂單 (整合防呆視窗，實現同頁切換) -->
     <div class="modal-overlay" id="modal-edit-order">
         <div class="modal" style="max-width: 420px;">
             
@@ -860,6 +883,40 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- 刪除訂單專屬視窗 -->
+    <div class="modal-overlay" id="modal-delete-order" style="z-index: 4000;">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header delete-header">
+                <span>刪除訂單</span>
+                <span class="close-x" onclick="window.closeModal('modal-delete-order')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body" style="padding: 32px 24px; text-align: center;">
+                <div class="warning-exclamation" style="margin-bottom: 15px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">您即將刪除 <span id="del-order-name" style="color:var(--primary-blue)"></span> 的訂單</h3>
+                    <p style="margin: 0; color: #ef4444; font-weight: bold; font-size: 14px; line-height: 1.6;">刪除後資料將無法恢復，<br>且該訂單的所有座位將立即釋出！</p>
+                </div>
+
+                <input type="hidden" id="delete-target-id">
+
+                <div style="display:flex; gap:12px;">
+                    <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.closeModal('modal-delete-order')">取消</button>
+                    <button class="btn-complete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeDeleteOrder()">確定刪除</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1297,7 +1354,7 @@
                         <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                             ${o.status === 'pending' ? `<button class="action-icon-btn verify" onclick="window.openVerifyOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>` : ''}
                             <button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                            <button class="action-icon-btn delete" onclick="window.deleteOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+                            <button class="action-icon-btn delete" onclick="window.openDeleteModal('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
                         </div>
                     </td>
                 `;
@@ -1430,13 +1487,36 @@
             });
         };
 
-        window.deleteOrder = (orderId) => {
+        window.openDeleteModal = (orderId) => {
             const o = ordersData[orderId];
-            if(!o || !confirm(`確定要刪除【${o.name}】的訂單嗎？座位將會釋出。`)) return;
+            if(!o) return;
+            document.getElementById('delete-target-id').value = orderId;
+            document.getElementById('del-order-name').innerText = o.name;
+            document.getElementById('modal-delete-order').style.display = 'flex';
+        };
+
+        window.executeDeleteOrder = () => {
+            const orderId = document.getElementById('delete-target-id').value;
+            const o = ordersData[orderId];
+            if(!o) return;
+            
             const updates = {};
-            if(o.seats) o.seats.forEach(s => updates[`seats/${s}`] = null);
+            // 將訂單內的所有座位還原為空位
+            if(o.seats) {
+                o.seats.forEach(s => {
+                    updates[`seats/${s}`] = null;
+                });
+            }
+            // 刪除整筆訂單資料
             updates[`orders/${orderId}`] = null;
-            update(ref(db), updates).then(() => window.showToast("已刪除", "success"));
+            
+            update(ref(db), updates).then(() => {
+                window.closeModal('modal-delete-order');
+                window.showToast("訂單已刪除，座位已釋放！", "success");
+            }).catch(err => {
+                console.error(err);
+                window.showToast("刪除失敗，請重試", "error");
+            });
         };
 
         window.exportToExcel = async () => {
@@ -1580,9 +1660,6 @@
                 });
             });
 
-            // ==========================================
-            // 觸發下載
-            // ==========================================
             try {
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -1684,9 +1761,6 @@
                 window.showToast("匯出失敗，請重試", "error");
             }
         };
-
-        // 為避免錯誤，保留舊的 exportData 函式，但按鈕已經全面改用 Excel 匯出
-        window.exportData = window.exportToExcel;
     </script>
 </body>
 </html>
