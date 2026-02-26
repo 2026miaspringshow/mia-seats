@@ -128,7 +128,7 @@
             pointer-events: none; 
         }
 
-        /* 換位模式專用 CSS (加強層級，確保保留席也能變色) */
+        /* 換位模式專用 CSS */
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
         .seat.swap-selected-old,
         .seat.sold.swap-selected-old,
@@ -137,7 +137,7 @@
         .swap-selectable-old { cursor: pointer !important; }
         .disabled-seat { opacity: 0.25 !important; cursor: not-allowed !important; pointer-events: none !important; filter: grayscale(100%); }
 
-        /* 更新：質感深色換位橫幅 */
+        /* 換位模式專屬質感橫幅 */
         .swap-banner {
             display: none; position: sticky; top: 0; left: 0; width: 100%; background: #1e293b; padding: 12px 20px; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
             justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-sizing: border-box; color: #f8fafc;
@@ -172,7 +172,7 @@
         .custom-toast.success { background-color: #10b981; }
         .custom-toast svg { width: 22px; height: 22px; }
 
-        /* 背景模糊效果 (毛玻璃) */
+        /* 背景模糊效果 */
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
         .modal { background: white; width: 100%; max-width: 480px; max-height: 95vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         
@@ -400,7 +400,7 @@
         .order-table td { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
         .order-table tr:hover { background: #f1f5f9; }
         
-        /* 新增：分頁控制器樣式 */
+        /* 分頁控制器樣式 */
         .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 14px; color: #475569; padding: 0 5px; flex-wrap: wrap; gap: 15px; }
         .page-info { display: flex; align-items: center; gap: 10px; }
         .page-btn { padding: 8px 16px; border: 1px solid #cbd5e1; background: white; border-radius: 8px; cursor: pointer; transition: 0.2s; color: #1e293b; font-weight: bold; }
@@ -412,12 +412,18 @@
         .status-paid { background: #dcfce7; color: #059669; border-color: #a7f3d0; }
         .status-unpaid-red { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
         .status-pending-orange { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+        /* 退款相關 Badge */
+        .status-pending-refund { background: #ffedd5; color: #c2410c; border-color: #fed7aa; }
+        .status-refunded { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
         
         .action-icon-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;}
         .action-icon-btn.edit:hover { background: #e0e7ff; color: #4338ca; }
+        .action-icon-btn.delete { color: #94a3b8; }
         .action-icon-btn.delete:hover { background: #fee2e2; color: #b91c1c; }
         .action-icon-btn.verify { color: #10b981; }
         .action-icon-btn.verify:hover { background: #d1fae5; color: #065f46; }
+        .action-icon-btn.refund { color: #8b5cf6; }
+        .action-icon-btn.refund:hover { background: #ffedd5; color: #c2410c; }
         .action-icon-btn svg { width: 18px; height: 18px; }
 
         .success-checkmark {
@@ -500,7 +506,7 @@
         <span id="toast-msg">上限為 5 張</span>
     </div>
 
-    <!-- 開場歡迎提示視窗 (預設顯示 style="display: flex;") -->
+    <!-- 開場歡迎提示視窗 -->
     <div class="modal-overlay" id="modal-welcome" style="display: flex; z-index: 9999;">
         <div class="modal" style="max-width: 400px; text-align: center;">
             <div class="modal-header" style="padding: 25px 20px;">
@@ -612,7 +618,7 @@
         </div>
     </div>
 
-    <!-- 新增：換位模式專屬質感橫幅 -->
+    <!-- 換位模式專屬質感橫幅 -->
     <div id="swap-banner" class="swap-banner">
         <div id="swap-banner-text" class="swap-banner-text"></div>
         <div style="display:flex; gap:10px; flex-wrap: nowrap; align-items: center;">
@@ -685,7 +691,7 @@
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">目前待核銷</div>
+                    <div class="stat-label">目前待處理筆數</div>
                     <div class="stat-value pending" id="stat-pending">0 <span>筆</span></div>
                     <div class="stat-icon-wrapper icon-pending">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -717,10 +723,13 @@
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">狀態</span>
+                        <!-- 🌟 新增：將待退款、已退款獨立成為選項 -->
                         <select id="filter-status" class="filter-control" onchange="window.handleFilterChange()">
                             <option value="all">全部</option>
-                            <option value="pending">待核銷</option>
+                            <option value="pending">待入帳</option>
                             <option value="paid">已完成</option>
+                            <option value="pending_refund">待退款</option>
+                            <option value="refunded">已退款</option>
                         </select>
                     </div>
                     <button class="btn-clear-filters" onclick="window.clearAllFilters()">清除篩選</button>
@@ -751,7 +760,7 @@
                 </table>
             </div>
             
-            <!-- 新增：分頁控制區塊 -->
+            <!-- 分頁控制區塊 -->
             <div class="pagination" id="pagination-controls" style="display:none;">
                 <div class="page-info">
                     <span>每頁顯示</span>
@@ -912,8 +921,113 @@
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn-prev-step" onclick="window.closeModal('modal-verify')">取消</button>
-                    <!-- 加上 id 以便操作 Loading 狀態 -->
                     <button class="btn-complete" id="btn-confirm-verify" onclick="window.confirmVerify()">確認核銷</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 管理員退款核銷確認 -->
+    <div class="modal-overlay" id="modal-verify-refund">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header verify-header">
+                <span>退款完成確認</span>
+                <span class="close-x" onclick="window.closeModal('modal-verify-refund')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="verify-refund-order-id">
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 0 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 40px;">
+                        <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">退款對象：</span>
+                        <span id="verify-refund-name" style="font-weight: bold; color: #1e293b; font-size: 15px; text-align: right;"></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 40px;">
+                        <span style="font-size: 15px; font-weight: bold; color: #666; white-space: nowrap; flex-shrink: 0;">應退金額：</span>
+                        <span id="verify-refund-total" style="font-weight: bold; color: #ef4444; font-size: 15px; text-align: right;"></span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                        <span style="font-size: 14px; font-weight: bold; color: #666;">實際退款日期：</span>
+                        <input type="date" id="verify-refund-date-input" style="padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-prev-step" onclick="window.closeModal('modal-verify-refund')">取消</button>
+                    <button class="btn-complete" id="btn-confirm-verify-refund" onclick="window.confirmVerifyRefund()">確認已退款</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 重新分開：退票作業專屬視窗 -->
+    <div class="modal-overlay" id="modal-create-refund" style="z-index: 4000;">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header">
+                <span>退票作業</span>
+                <span class="close-x" onclick="window.closeModal('modal-create-refund')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="refund-order-id">
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">您正在處理 <span id="refund-order-name" style="color:var(--primary-blue)"></span> 的退票</h3>
+                </div>
+
+                <div class="form-group">
+                    <label>請勾選要退出的座位（全選即全單退票）</label>
+                    <div id="refund-seat-checkboxes" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+                        <!-- JS dynamically injects checkboxes here -->
+                    </div>
+                </div>
+
+                <div class="form-group" id="refund-method-group">
+                    <label>預計退款方式</label>
+                    <select id="refund-method-select" class="filter-control" style="width:100%;">
+                        <option value="cash">現金退款</option>
+                        <option value="transfer">匯款退款</option>
+                    </select>
+                </div>
+
+                <div id="refund-note-text" style="margin-bottom: 20px; font-size: 13px; color: #64748b; line-height: 1.5;">
+                    <!-- 動態提示文字 -->
+                </div>
+
+                <div style="display:flex; gap:12px;">
+                    <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.closeModal('modal-create-refund')">取消</button>
+                    <button class="btn-complete" id="btn-execute-create-refund" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeCreateRefund()">確認退票</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刪除訂單專屬視窗 -->
+    <div class="modal-overlay" id="modal-delete-order" style="z-index: 4000;">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header delete-header">
+                <span>刪除訂單</span>
+                <span class="close-x" onclick="window.closeModal('modal-delete-order')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body" style="padding: 32px 24px; text-align: center;">
+                <div class="warning-exclamation" style="margin-bottom: 15px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">您即將刪除 <span id="del-order-name" style="color:var(--primary-blue)"></span> 的整筆訂單</h3>
+                    <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 16px;">此操作將<span style="color: #ef4444;">不留任何帳面紀錄</span>，且座位將立即釋出供他人劃位！</p>
+                </div>
+
+                <input type="hidden" id="delete-target-id">
+
+                <div style="display:flex; gap:12px;">
+                    <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.closeModal('modal-delete-order')">取消</button>
+                    <!-- 加上 id 以便操作 Loading 狀態 -->
+                    <button class="btn-complete" id="btn-execute-delete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeDeleteOrder()">確定作廢</button>
                 </div>
             </div>
         </div>
@@ -939,15 +1053,12 @@
                     </div>
                     <div class="form-group">
                         <label>備註資訊</label>
-                        <input type="text" id="edit-order-note" placeholder="例如：寄票" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                        <input type="text" id="edit-order-note" placeholder="例如：寄票或退款帳號" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
                     </div>
                     <div class="form-group">
-                        <label>付款方式 / 狀態</label>
+                        <label>付款/退款 狀態</label>
                         <select id="edit-order-status" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
-                            <option value="paid" id="edit-option-paid" style="display:none;">已完成</option>
-                            <option value="paid-free" id="edit-option-free" style="display:none;">免付費 (已完成)</option>
-                            <option value="pending-cash" id="edit-option-cash">現金（待付款）</option>
-                            <option value="pending-transfer" id="edit-option-transfer">匯款（待入帳）</option>
+                            <!-- JS 動態寫入選項 -->
                         </select>
                     </div>
                     <div style="display:flex; gap:10px; margin-top: 10px;">
@@ -955,8 +1066,8 @@
                         <button class="btn-complete" onclick="window.saveOrderEdit()">確認變更</button>
                     </div>
                     
-                    <!-- 新增：更換座位按鈕 -->
-                    <button class="btn-action-outline" style="width:100%; justify-content:center; margin-top:15px; border-color:var(--primary-blue); color:var(--primary-blue);" onclick="window.startSwapMode()">
+                    <!-- 更換座位按鈕 (退費單不顯示) -->
+                    <button id="btn-open-swap" class="btn-action-outline" style="width:100%; justify-content:center; margin-top:15px; border-color:var(--primary-blue); color:var(--primary-blue);" onclick="window.startSwapMode()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         進入更換座位模式
                     </button>
@@ -980,7 +1091,7 @@
                         </svg>
                     </div>
                     <div style="margin-bottom: 30px; text-align: center; padding: 0 10px;">
-                        <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: bold; line-height: 1.6;">此筆訂單已完成核銷，變更付款方式將會：<br><span style="color: #ef4444; font-weight: 800;">退回未核銷狀態</span> 並且 <span style="color: #ef4444; font-weight: 800;">清除收款日期</span></p>
+                        <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: bold; line-height: 1.6;">此筆訂單已完成核銷，變更狀態將會：<br><span style="color: #ef4444; font-weight: 800;">退回未核銷狀態</span> 並且 <span style="color: #ef4444; font-weight: 800;">清除相應日期</span></p>
                     </div>
                     <div style="display:flex; gap:12px;">
                         <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.cancelWarning()">取消</button>
@@ -990,65 +1101,6 @@
                 </div>
             </div>
 
-        </div>
-    </div>
-
-    <!-- 刪除訂單專屬視窗 -->
-    <div class="modal-overlay" id="modal-delete-order" style="z-index: 4000;">
-        <div class="modal" style="max-width: 420px;">
-            <div class="modal-header delete-header">
-                <span>刪除訂單</span>
-                <span class="close-x" onclick="window.closeModal('modal-delete-order')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </span>
-            </div>
-            <div class="modal-body" style="padding: 32px 24px; text-align: center;">
-                <div class="warning-exclamation" style="margin-bottom: 15px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                </div>
-                
-                <div style="margin-bottom: 25px;">
-                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">您即將刪除 <span id="del-order-name" style="color:var(--primary-blue)"></span> 的訂單</h3>
-                    <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 16px;">資料<span style="color: #ef4444;">無法恢復</span>，且座位將<span style="color: #ef4444;">立即釋出！</span></p>
-                </div>
-
-                <input type="hidden" id="delete-target-id">
-
-                <div style="display:flex; gap:12px;">
-                    <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.closeModal('modal-delete-order')">取消</button>
-                    <!-- 加上 id 以便操作 Loading 狀態 -->
-                    <button class="btn-complete" id="btn-execute-delete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeDeleteOrder()">確定刪除</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 確認換位視窗 -->
-    <div class="modal-overlay" id="modal-swap-confirm" style="z-index: 4000;">
-        <div class="modal" style="max-width: 420px;">
-            <div class="modal-header">
-                <span>確認更換座位</span>
-                <span class="close-x" onclick="window.closeModal('modal-swap-confirm')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </span>
-            </div>
-            <div class="modal-body" style="padding: 30px;">
-                <p style="font-size:16px; color:#1e293b; font-weight:bold; text-align:center; line-height:1.8; margin:0;">
-                    確定要將<br>
-                    <span style="color:#ef4444; font-size: 20px;" id="swap-confirm-old"></span><br>
-                    更換為<br>
-                    <span style="color:var(--primary-blue); font-size: 20px;" id="swap-confirm-new"></span> 嗎？
-                </p>
-                <div style="display:flex; gap:10px; margin-top:25px;">
-                    <button class="btn-prev-step" onclick="window.closeModal('modal-swap-confirm')">取消</button>
-                    <button id="btn-execute-swap" class="btn-complete" onclick="window.executeSwap()">確認更換</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -1076,7 +1128,7 @@
         let toastTimeout = null;
         let originalOrderState = null;
         
-        // 新增：分頁狀態變數
+        // 分頁狀態變數
         let currentPage = 1;
         let itemsPerPage = 20;
 
@@ -1092,7 +1144,7 @@
         for(let i=10; i<=14; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
         for(let i=18; i<=22; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
 
-        // === 新增：建立票券流水號對照表 ===
+        // 建立票券流水號對照表
         const ticketMapping = {};
         const serialList = [];
 
@@ -1110,11 +1162,11 @@
         addMapping(32, 'D', 1, 31);
         addMapping(65, 'E', 1, 33);
         addMapping(100, 'F', 1, 14);
-        addMapping(660, 'F', 15, 3); // 手寫補上的 F15~F17
+        addMapping(660, 'F', 15, 3); 
         addMapping(114, 'F', 18, 14);
         addMapping(128, 'G', 1, 14);
-        addMapping(142, 'G', 18, 14); // 跳過 G15~G17
-        addMapping(156, 'H', 1, 31); // H排全印
+        addMapping(142, 'G', 18, 14); 
+        addMapping(156, 'H', 1, 31); 
         
         let currentSerial = 187;
         const midRows = ['I', 'J', 'K', 'L', 'M', 'N', 'O'];
@@ -1123,15 +1175,12 @@
         const backRows = ['P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'];
         for(let r of backRows) { addMapping(currentSerial, r, 1, 25); currentSerial += 25; }
 
-        // 新增：多印但需要核銷的空白票券 (包含 654~659 以及跳號的 030, 031, 063, 064, 098, 099)
         const extraBlanks = [30, 31, 63, 64, 98, 99, 654, 655, 656, 657, 658, 659];
         for (let num of extraBlanks) {
             serialList.push({ serial: String(num).padStart(3, '0'), seat: '-' });
         }
 
-        // 確保核銷表嚴格依照流水號排序
         serialList.sort((a, b) => parseInt(a.serial) - parseInt(b.serial));
-        // ===================================
 
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
         onValue(ref(db, 'orders'), (snapshot) => { 
@@ -1194,7 +1243,6 @@
             window.showToast("已成功登出", "success");
         };
 
-        // 已修改：C, D, E排的左右座位數量
         const layout = [
             { id: 'T', rows: 6, L: [6, 7, 8, 9, 10, 9], M: [13, 13, 13, 13, 13, 13], R: [6, 7, 8, 9, 10, 9], start: 'A' }, 
             { id: 'M', rows: 10, L: [9, 9, 9, 9, 9, 9, 9, 9, 8, 5], M: [13, 13, 13, 13, 13, 13, 13, 13, 15, 15], R: [9, 9, 9, 9, 9, 9, 9, 9, 8, 5], start: 'G' }, 
@@ -1238,10 +1286,11 @@
                 if (isSwapActive && !isBlocked && !cameraSeats.includes(id)) {
                     if (window.swapState.step === 1) {
                         const o = ordersData[window.swapState.orderId];
-                        if (!o.seats.includes(id)) {
+                        const isRefunded = (o.refundedSeats || []).includes(id);
+                        if (!o.seats.includes(id) || isRefunded) {
                             isSwapDisabled = true;
                         } else {
-                            swapClasses.push('swap-selectable-old'); // 讓原座位顯示為可點擊
+                            swapClasses.push('swap-selectable-old');
                             if (window.swapState.oldSeats.includes(id)) swapClasses.push('swap-selected-old');
                         }
                     } else { // step 2
@@ -1250,11 +1299,11 @@
                         const isFreed = window.swapState.oldSeats.includes(id);
 
                         if (!matchType) {
-                            isSwapDisabled = true; // 屬性不對，鎖死
+                            isSwapDisabled = true;
                         } else if (isFreed) {
-                            isSwapDisabled = true; // 原座位直接鎖死，顯示禁止符號
+                            isSwapDisabled = true;
                         } else if (currentStatus === 'sold') {
-                            isSwapDisabled = true; // 別人買走的，鎖死
+                            isSwapDisabled = true;
                         }
 
                         if (window.swapState.newSeats.includes(id)) {
@@ -1262,7 +1311,7 @@
                         }
                     }
                 } else if (isSwapActive) {
-                    isSwapDisabled = true; // 換位時擋住走道跟攝影席
+                    isSwapDisabled = true;
                 }
 
                 if (isBlocked) {
@@ -1290,13 +1339,13 @@
         window.handleSeatClick = (id) => {
             if(!isAdmin) return;
 
-            // 換位模式專屬點擊邏輯
             if (window.swapState && window.swapState.active) {
                 const { step, orderId, oldSeats, newSeats, type } = window.swapState;
                 const o = ordersData[orderId];
                 
                 if (step === 1) {
-                    if (!o.seats.includes(id)) return; // 只能點自己的舊位子
+                    const isRefunded = (o.refundedSeats || []).includes(id);
+                    if (!o.seats.includes(id) || isRefunded) return;
                     if (oldSeats.includes(id)) {
                         window.swapState.oldSeats = oldSeats.filter(s => s !== id);
                     } else {
@@ -1312,12 +1361,12 @@
                     }
                     
                     if (oldSeats.includes(id)) {
-                        return; // 不允許選擇原本要退出的座位
+                        return; 
                     }
 
                     const currentStatus = seatsData[id]?.status || 'available';
                     if (currentStatus === 'sold') {
-                        return; // 已被買走的位子
+                        return; 
                     }
 
                     if (newSeats.includes(id)) {
@@ -1332,10 +1381,9 @@
                     updateSwapBanner();
                     render();
                 }
-                return; // 跳過正常選位邏輯
+                return; 
             }
 
-            // 正常選位邏輯
             const current = seatsData[id] || { status: 'available' };
             if(current.status === 'sold') {
                 window.showToast("此座位已售出，請至「訂單管理」進行編輯或刪除", "error");
@@ -1359,7 +1407,6 @@
             if(displaySub) displaySub.innerText = `已選 ${count} 座位`;
             const floatingBar = document.getElementById('floating-bar');
             if (floatingBar) {
-                // 如果在換位模式，強制隱藏下方正常購票列
                 if (window.swapState && window.swapState.active) {
                     floatingBar.classList.remove('show');
                     return;
@@ -1369,13 +1416,11 @@
             }
         }
 
-        // --- 換位模式專屬函數開始 ---
         window.startSwapMode = () => {
             const oid = document.getElementById('edit-order-id').value;
             const o = ordersData[oid];
             if(!o || !o.seats || o.seats.length === 0) return;
             
-            // 判斷票種屬性 (用該單的第一個座位去判斷最準確)
             const isReserveOrder = reserveSeats.includes(o.seats[0]);
 
             window.swapState = { 
@@ -1387,9 +1432,9 @@
                 type: isReserveOrder ? 'reserve' : 'regular' 
             };
             
-            selectedIds = []; // 清空正常選位，避免干擾
+            selectedIds = []; 
             window.closeModal('modal-edit-order');
-            document.getElementById('order-page').style.display = 'none'; // 確保切回座位圖
+            document.getElementById('order-page').style.display = 'none'; 
             document.getElementById('main-content-area').style.display = 'flex';
             document.getElementById('swap-banner').style.display = 'flex';
             
@@ -1406,7 +1451,7 @@
 
         window.goToSwapStep1 = () => {
             window.swapState.step = 1;
-            window.swapState.newSeats = []; // 退回上一步時，自動清空新座位，避免防呆邏輯錯誤
+            window.swapState.newSeats = []; 
             updateSwapBanner();
             render();
         };
@@ -1451,21 +1496,18 @@
             const { orderId, oldSeats, newSeats } = window.swapState;
             const o = ordersData[orderId];
             
-            // 重組該訂單的座位清單 (移除舊的，加入新的)
             let updatedSeats = o.seats.filter(s => !oldSeats.includes(s));
             updatedSeats = [...updatedSeats, ...newSeats];
 
             const updates = {};
             updates[`orders/${orderId}/seats`] = updatedSeats;
 
-            // 釋放舊座位
             oldSeats.forEach(s => {
-                if (!updatedSeats.includes(s)) { // 防呆：如果他選了同一個座位當新座位就不釋放
+                if (!updatedSeats.includes(s)) { 
                     updates[`seats/${s}`] = null;
                 }
             });
 
-            // 寫入新座位
             newSeats.forEach(s => {
                 updates[`seats/${s}`] = { 
                     status: 'sold', 
@@ -1483,8 +1525,8 @@
 
             update(ref(db), updates).then(() => {
                 window.closeModal('modal-swap-confirm');
-                window.cancelSwapMode(); // 結束換位模式
-                window.openOrderManager(); // 換完直接回到訂單管理方便看
+                window.cancelSwapMode(); 
+                window.openOrderManager(); 
                 window.showToast("座位更換成功！", "success");
             }).catch(err => {
                 console.error(err);
@@ -1493,7 +1535,6 @@
                 setLoadingState('btn-execute-swap', false, oldHtml);
             });
         };
-        // --- 換位模式專屬函數結束 ---
 
         window.closeModal = (mid) => { 
             const m = document.getElementById(mid);
@@ -1516,17 +1557,16 @@
             const total = selectedIds.length * price;
             document.getElementById('buy-final-total').innerText = `NT$ ${total.toLocaleString()}`;
 
-            // 新增：根據票價動態調整付款方式
             const paySelect = document.getElementById('p-pay-method-select');
             if (price === 0) {
                 paySelect.innerHTML = '<option value="free">免付費</option>';
-                paySelect.disabled = true; // 鎖定不可選
+                paySelect.disabled = true; 
             } else {
                 paySelect.innerHTML = `
                     <option value="cash">現金</option>
                     <option value="transfer">匯款</option>
                 `;
-                paySelect.disabled = false; // 開放選擇
+                paySelect.disabled = false; 
             }
         };
 
@@ -1534,7 +1574,7 @@
             document.getElementById('p-name').value = ""; 
             document.getElementById('p-phone').value = "";
             document.getElementById('p-note').value = "";
-            document.getElementById('p-type').value = "650"; // 預設選擇早鳥票
+            document.getElementById('p-type').value = "650"; 
             document.getElementById('modal-payment').style.display = 'none';
             document.getElementById('modal-purchase').style.display = 'flex';
             document.getElementById('buy-seat-list').value = selectedIds.join(', ');
@@ -1542,7 +1582,6 @@
         };
 
         window.goToStep2 = () => {
-            // 動態切換第二步的文案與必填星號狀態
             const price = parseInt(document.getElementById('p-type').value) || 0;
             const nameLabel = document.getElementById('label-name');
             const nameInput = document.getElementById('p-name');
@@ -1554,13 +1593,13 @@
             if (price === 0) {
                 nameLabel.innerHTML = `貴賓稱呼 / 單位 ${reqStarHtml}`;
                 nameInput.placeholder = "請輸入貴賓稱呼或單位";
-                phoneLabel.innerHTML = `聯絡電話`; // 移除必填星號
-                phoneInput.placeholder = "請輸入聯絡電話"; // 移除 "(選填)"
-                phoneInput.removeAttribute('maxlength'); // 放寬長度限制
+                phoneLabel.innerHTML = `聯絡電話`; 
+                phoneInput.placeholder = "請輸入聯絡電話"; 
+                phoneInput.removeAttribute('maxlength'); 
             } else {
                 nameLabel.innerHTML = `購票姓名 ${reqStarHtml}`;
                 nameInput.placeholder = "請輸入姓名";
-                phoneLabel.innerHTML = `聯絡電話 ${reqStarHtml}`; // 加上必填星號
+                phoneLabel.innerHTML = `聯絡電話 ${reqStarHtml}`; 
                 phoneInput.placeholder = "請輸入 09 開頭的 10 碼電話";
                 phoneInput.setAttribute('maxlength', '10');
             }
@@ -1585,7 +1624,6 @@
             window.showToast("已複製資訊！", "success");
         };
 
-        // 建立 Loading 狀態的通用函數
         const setLoadingState = (btnId, isLoading, originalHtml = '', loadingText = '處理中...') => {
             const btn = document.getElementById(btnId);
             if (!btn) return originalHtml;
@@ -1594,7 +1632,7 @@
                 const html = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = `<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>${loadingText}`;
-                return html; // 回傳原始內容以便後續恢復
+                return html; 
             } else {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -1607,12 +1645,10 @@
             const note = document.getElementById('p-note').value.trim();
             const method = document.getElementById('p-pay-method-select').value;
             
-            // 針對公關票與一般票做不同的防呆驗證
             if (method === 'free') {
                 if(!name) {
                     window.showToast("請填寫貴賓稱呼 / 單位！", "error"); return;
                 }
-                // 免付費票，電話為選填，不做手機格式檢查
             } else {
                 if(!name || !phone) {
                     window.showToast("請填寫姓名與電話！", "error"); return;
@@ -1623,7 +1659,6 @@
                 }
             }
 
-            // 防呆 Loading 動畫開啟
             const originalBtnHtml = setLoadingState('btn-submit-order', true);
 
             const typeText = document.getElementById('p-type').options[document.getElementById('p-type').selectedIndex].text;
@@ -1633,7 +1668,6 @@
             const total = selectedIds.length * price;
             const createdAt = new Date().toISOString();
 
-            // 若為免付費，自動加上今日的收款日期
             let finalDate = null;
             if (method === 'free') {
                 const today = new Date();
@@ -1690,7 +1724,6 @@
                 console.error(err);
                 window.showToast("送出失敗，請檢查網路連線", "error");
             }).finally(() => {
-                // 防呆 Loading 動畫關閉
                 setLoadingState('btn-submit-order', false, originalBtnHtml);
             });
         };
@@ -1702,7 +1735,6 @@
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'flex';
             
-            // 直接呼叫清除所有篩選，確保一進來就是乾淨的歷史總覽
             window.clearAllFilters();
         };
 
@@ -1716,13 +1748,11 @@
             updateBottomBar();
         };
 
-        // 新增：處理過濾條件變更，自動重置頁碼為第 1 頁
         window.handleFilterChange = () => {
             currentPage = 1;
             window.renderOrders();
         };
 
-        // 新增：上一頁
         window.prevPage = () => {
             if (currentPage > 1) {
                 currentPage--;
@@ -1731,17 +1761,15 @@
             }
         };
 
-        // 新增：下一頁
         window.nextPage = () => {
             currentPage++;
             window.renderOrders();
             document.getElementById('order-page').scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // 新增：改變每頁顯示筆數
         window.changeItemsPerPage = () => {
             itemsPerPage = parseInt(document.getElementById('items-per-page').value);
-            currentPage = 1; // 改變筆數時回到第1頁
+            currentPage = 1; 
             window.renderOrders();
             document.getElementById('order-page').scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -1752,7 +1780,7 @@
             document.getElementById('filter-payment').value = 'all';
             document.getElementById('filter-status').value = 'all';
             document.getElementById('order-search-input').value = '';
-            currentPage = 1; // 清除篩選時也回到第1頁
+            currentPage = 1; 
             window.renderOrders();
         };
 
@@ -1775,13 +1803,11 @@
             
             const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
-            // 1. 計算剩餘票數資訊 (全域狀態，不受目前篩選器影響)
             let totalRegularCount = 0;
             let totalReserveCount = 0;
             let soldRegularCount = 0;
             let soldReserveCount = 0;
 
-            // 計算場內總可用座位數
             layout.forEach(sec => {
                 for (let r = 0; r < sec.rows; r++) {
                     const rowName = String.fromCharCode(sec.start.charCodeAt(0) + r);
@@ -1800,7 +1826,6 @@
                 }
             });
 
-            // 從全域座位資料中統計已售出
             Object.keys(seatsData).forEach(id => {
                 if (seatsData[id].status === 'sold') {
                     if (reserveSeats.includes(id)) soldReserveCount++;
@@ -1811,11 +1836,9 @@
             const remainingRegular = totalRegularCount - soldRegularCount;
             const remainingReserve = totalReserveCount - soldReserveCount;
             
-            // 修改：套用簡短化的格式顯示
             const infoEl = document.getElementById('stat-remaining-info');
             if (infoEl) infoEl.innerText = `剩餘：一般 ${remainingRegular} 張 ｜ 保留 ${remainingReserve} 張`;
 
-            // 2. 進行訂單列表篩選
             let dateFilteredOrders = allOrders;
             if (selectedOrderDate !== "" || selectedReceiptDate !== "") {
                 dateFilteredOrders = allOrders.filter(o => {
@@ -1828,7 +1851,11 @@
                         matchOrderDate = (createdDateStr === selectedOrderDate || o.reportDate === selectedOrderDate);
                     }
                     if (selectedReceiptDate !== "") {
-                        matchReceiptDate = (o.receiptDate === selectedReceiptDate || o.reportDate === selectedReceiptDate);
+                        if (o.isRefund) {
+                            matchReceiptDate = (o.status === 'refunded' && o.refundDate === selectedReceiptDate);
+                        } else {
+                            matchReceiptDate = (o.receiptDate === selectedReceiptDate || o.reportDate === selectedReceiptDate);
+                        }
                     }
                     return matchOrderDate && matchReceiptDate;
                 });
@@ -1837,12 +1864,12 @@
             let filteredArray = dateFilteredOrders.filter(o => {
                 if (selectedStatus !== 'all' && o.status !== selectedStatus) return false;
                 if (selectedPayment !== 'all' && o.paymentMethod !== selectedPayment) return false;
+                
                 if (keyword !== "") {
                     const nameMatch = o.name.toLowerCase().includes(keyword);
                     const phoneMatch = o.phone.toLowerCase().includes(keyword);
                     const seatMatch = (o.seats || []).some(s => {
                         const serial = ticketMapping[s] || "";
-                        // 組合：座位號碼、流水號、帶#號的流水號 一起搜尋，這樣打 017 或 #017 都搜得到！
                         const matchStr = `${s} ${serial} #${serial}`.toLowerCase();
                         return matchStr.includes(keyword);
                     });
@@ -1851,28 +1878,32 @@
                 return true;
             });
 
-            // 3. 計算上方看板數據 (與下方列表篩選脫鉤，改為全域/特定邏輯)
             let displayTotalRev = 0;
             let displayCashRev = 0;
             let revTitle = "累計總營收";
             
             if (selectedReceiptDate !== "") {
-                // 【單日結算模式】
                 revTitle = "單日結算營收";
                 allOrders.forEach(o => {
-                    let isCashMatch = (o.paymentMethod === 'cash' && o.status === 'paid' && o.receiptDate === selectedReceiptDate);
-                    let isTransferMatch = (o.paymentMethod === 'transfer' && o.bankCode && o.bankCode.trim() !== "" && o.reportDate === selectedReceiptDate);
-                    
-                    if (isCashMatch) {
-                        displayTotalRev += (o.total || 0);
-                        displayCashRev += (o.total || 0);
-                    }
-                    if (isTransferMatch) {
-                        displayTotalRev += (o.total || 0);
+                    if (o.isRefund) {
+                        if (o.status === 'refunded' && o.refundDate === selectedReceiptDate) {
+                            displayTotalRev += (o.total || 0);
+                            if (o.paymentMethod === 'cash') displayCashRev += (o.total || 0);
+                        }
+                    } else {
+                        let isCashMatch = (o.paymentMethod === 'cash' && o.status === 'paid' && o.receiptDate === selectedReceiptDate);
+                        let isTransferMatch = (o.paymentMethod === 'transfer' && o.bankCode && o.bankCode.trim() !== "" && o.reportDate === selectedReceiptDate);
+                        
+                        if (isCashMatch) {
+                            displayTotalRev += (o.total || 0);
+                            displayCashRev += (o.total || 0);
+                        }
+                        if (isTransferMatch) {
+                            displayTotalRev += (o.total || 0);
+                        }
                     }
                 });
             } else {
-                // 【日常看板模式】(看歷史總和，無論是否核銷)
                 allOrders.forEach(o => {
                     if (o.paymentMethod !== 'free') {
                         displayTotalRev += (o.total || 0);
@@ -1883,25 +1914,28 @@
                 });
             }
 
-            // 計算不受干擾的歷史總計數據
             let totalRegularTickets = 0;
             let totalPendingCount = 0;
             
             allOrders.forEach(o => {
-                if (o.status === 'pending') totalPendingCount++;
-                (o.seats || []).forEach(s => {
-                    if (!reserveSeats.includes(s) && !cameraSeats.includes(s)) {
-                        totalRegularTickets++;
-                    }
-                });
+                if (!o.isRefund && o.status === 'pending') totalPendingCount++;
+                if (o.isRefund && o.status === 'pending_refund') totalPendingCount++;
+                
+                if (!o.isRefund) {
+                    const activeSeats = (o.seats || []).filter(s => !(o.refundedSeats || []).includes(s));
+                    activeSeats.forEach(s => {
+                        if (!reserveSeats.includes(s) && !cameraSeats.includes(s)) {
+                            totalRegularTickets++;
+                        }
+                    });
+                }
             });
 
-            // 更新 DOM
             const revTitleEl = document.getElementById('stat-revenue-title');
             if(revTitleEl) revTitleEl.innerText = revTitle;
             
             document.getElementById('stat-revenue').innerText = `$${displayTotalRev.toLocaleString()}`;
-            document.getElementById('stat-cash-revenue').innerText = `現金收入 $${displayCashRev.toLocaleString()}`;
+            document.getElementById('stat-cash-revenue').innerText = `現金淨收 $${displayCashRev.toLocaleString()}`;
             
             document.getElementById('stat-tickets').innerHTML = `${totalRegularTickets} <span>張</span>`;
             document.getElementById('stat-orders').innerHTML = `${allOrders.length} <span>筆</span>`;
@@ -1917,14 +1951,11 @@
                 return;
             }
 
-            // 新增：計算分頁範圍並裁切陣列
             const totalItems = filteredArray.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             
-            // 防呆：確保當前頁碼不會超過總頁數
             if (currentPage > totalPages) currentPage = totalPages;
             
-            // 更新分頁 UI 顯示
             if(paginationControls) {
                 paginationControls.style.display = 'flex';
                 document.getElementById('page-indicator').innerText = `第 ${currentPage} / ${totalPages} 頁`;
@@ -1932,7 +1963,6 @@
                 document.getElementById('btn-next-page').disabled = currentPage >= totalPages;
             }
 
-            // 裁切出目前頁面需要顯示的訂單
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const paginatedArray = filteredArray.slice(startIndex, endIndex);
@@ -1941,12 +1971,22 @@
                 const dateObj = new Date(o.createdAt);
                 const timeString = dateObj.toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
                 
-                let statusLabel = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
-                let statusClass = (o.status === 'paid') ? 'status-paid' : (o.paymentMethod === 'cash' ? 'status-unpaid-red' : 'status-pending-orange');
+                let statusLabel = '';
+                let statusClass = '';
+                if (o.isRefund) {
+                    statusLabel = (o.status === 'refunded') ? '已退款' : '待退款';
+                    statusClass = (o.status === 'refunded') ? 'status-refunded' : 'status-pending-refund';
+                } else {
+                    statusLabel = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                    statusClass = (o.status === 'paid') ? 'status-paid' : (o.paymentMethod === 'cash' ? 'status-unpaid-red' : 'status-pending-orange');
+                }
 
                 let subDateHtml = '';
-                // 只有「非免付費」的訂單才顯示收款日，避免公關票產生誤會
-                if (o.paymentMethod !== 'free') {
+                if (o.isRefund) {
+                    if (o.status === 'refunded' && o.refundDate) {
+                        subDateHtml += `<div style="font-size:10px; font-weight:bold; color:#ef4444; margin-top:4px;">退款日: ${o.refundDate}</div>`;
+                    }
+                } else if (o.paymentMethod !== 'free') {
                     if (o.status === 'paid' && o.receiptDate) {
                         subDateHtml += `<div style="font-size:10px; font-weight:bold; color:#10b981; margin-top:4px;">收款日: ${o.receiptDate}</div>`;
                     } else if (o.reportDate && o.paymentMethod === 'transfer') {
@@ -1958,21 +1998,51 @@
                 if (o.paymentMethod === 'cash') methodStr = '現金';
                 else if (o.paymentMethod === 'transfer') methodStr = '匯款';
 
-                // 新增：將座位與流水號分兩行顯示，讓畫面更清爽
-                const seatNamesStr = (o.seats || []).join(', ');
+                const seatNamesStr = (o.seats || []).map(s => {
+                    return (o.refundedSeats || []).includes(s) ? `${s}<span style="color:#ef4444;font-size:11px;">(已退)</span>` : s;
+                }).join(', ');
+                
                 const serialsOnlyStr = (o.seats || [])
-                    .map(s => ticketMapping[s])
-                    .filter(Boolean) // 過濾掉沒有流水號的座位 (例如 A, B 排)
-                    .map(serial => `#${serial}`)
+                    .map(s => {
+                        const serial = ticketMapping[s];
+                        if (!serial) return null;
+                        return (o.refundedSeats || []).includes(s) ? `#${serial}(已退)` : `#${serial}`;
+                    })
+                    .filter(Boolean) 
                     .join(', ');
                 
                 const serialHtml = serialsOnlyStr ? `<div style="font-size:11px; color:#94a3b8; margin-top:2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${serialsOnlyStr}</div>` : '';
                 
-                // 滑鼠懸停時顯示的完整資訊
                 const seatsFullTitle = (o.seats || []).map(s => {
                     const serial = ticketMapping[s];
-                    return serial ? `${s} (#${serial})` : s;
+                    const baseStr = serial ? `${s} (#${serial})` : s;
+                    return (o.refundedSeats || []).includes(s) ? `${baseStr} (已退)` : baseStr;
                 }).join(', ');
+
+                // 🌟 操作按鈕區域
+                let actionsHtml = '';
+                if (o.isRefund) {
+                    if (o.status === 'pending_refund') {
+                        actionsHtml += `<button class="action-icon-btn verify" onclick="window.openVerifyRefund('${o.orderId}')" title="確認退款完成"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>`;
+                    }
+                    actionsHtml += `<button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')" title="編輯退款單"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>`;
+                } else {
+                    if (o.status === 'pending') {
+                        actionsHtml += `<button class="action-icon-btn verify" onclick="window.openVerifyOrder('${o.orderId}')" title="確認入帳"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>`;
+                    }
+                    actionsHtml += `<button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')" title="編輯訂單"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>`;
+                    
+                    const activeSeatsCount = (o.seats || []).length - (o.refundedSeats || []).length;
+                    if (activeSeatsCount > 0) {
+                        // 退票按鈕 (垃圾桶)
+                        actionsHtml += `<button class="action-icon-btn refund" onclick="window.openRefundModal('${o.orderId}')" title="部分退票/退費 (保留紀錄)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>`;
+                    }
+                    
+                    // 刪除作廢按鈕 (X 打叉)
+                    actionsHtml += `<button class="action-icon-btn delete" onclick="window.openDeleteModal('${o.orderId}')" title="刪除整筆訂單 (不留紀錄)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>`;
+                }
+
+                const amountColor = o.isRefund ? '#ef4444' : 'var(--primary-blue)';
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -1983,19 +2053,233 @@
                         ${serialHtml}
                     </td>
                     <td>
-                        <div style="font-weight:bold; color:var(--primary-blue);">NT$ ${o.total.toLocaleString()}</div>
+                        <div style="font-weight:bold; color:${amountColor};">NT$ ${o.total.toLocaleString()}</div>
                         <div style="font-size:11px; color:#94a3b8;">${methodStr}</div>
                     </td>
                     <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
                     <td>
                         <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
-                            ${o.status === 'pending' ? `<button class="action-icon-btn verify" onclick="window.openVerifyOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>` : ''}
-                            <button class="action-icon-btn edit" onclick="window.openEditOrder('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                            <button class="action-icon-btn delete" onclick="window.openDeleteModal('${o.orderId}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+                            ${actionsHtml}
                         </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
+            });
+        };
+
+        // --- 退款核銷專屬功能 ---
+        window.openVerifyRefund = (orderId) => {
+            const o = ordersData[orderId];
+            if(!o) return;
+            document.getElementById('verify-refund-order-id').value = orderId;
+            document.getElementById('verify-refund-name').innerText = o.name;
+            document.getElementById('verify-refund-total').innerText = `NT$ ${Math.abs(o.total).toLocaleString()}`;
+            
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            document.getElementById('verify-refund-date-input').value = dateStr;
+            
+            document.getElementById('modal-verify-refund').style.display = 'flex';
+        };
+
+        window.confirmVerifyRefund = () => {
+            const orderId = document.getElementById('verify-refund-order-id').value;
+            const o = ordersData[orderId];
+            if(!o) return;
+
+            const originalBtnHtml = setLoadingState('btn-confirm-verify-refund', true);
+            const refundDate = document.getElementById('verify-refund-date-input').value;
+
+            if(!refundDate) { 
+                window.showToast("請選擇實際退款日期！"); 
+                setLoadingState('btn-confirm-verify-refund', false, originalBtnHtml);
+                return; 
+            }
+
+            const updates = {};
+            updates[`orders/${orderId}/status`] = 'refunded';
+            updates[`orders/${orderId}/refundDate`] = refundDate;
+            
+            update(ref(db), updates).then(() => { 
+                window.closeModal('modal-verify-refund'); 
+                window.showToast("已成功登記退款！", "success"); 
+            }).catch(err => {
+                console.error(err);
+                window.showToast("操作失敗，請重試", "error");
+            }).finally(() => {
+                setLoadingState('btn-confirm-verify-refund', false, originalBtnHtml);
+            });
+        };
+
+        // 🌟 退票功能 (垃圾桶按鈕)
+        window.openRefundModal = (orderId) => {
+            const o = ordersData[orderId];
+            if(!o) return;
+            
+            document.getElementById('refund-order-id').value = orderId;
+            document.getElementById('refund-order-name').innerText = o.name;
+            
+            const container = document.getElementById('refund-seat-checkboxes');
+            container.innerHTML = '';
+            
+            (o.seats || []).forEach(s => {
+                if ((o.refundedSeats || []).includes(s)) return;
+                
+                const label = document.createElement('label');
+                label.style.display = 'flex';
+                label.style.alignItems = 'center';
+                label.style.gap = '5px';
+                label.style.background = '#f1f5f9';
+                label.style.padding = '8px 12px';
+                label.style.borderRadius = '8px';
+                label.style.cursor = 'pointer';
+                label.style.border = '1px solid #e2e8f0';
+                
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = s;
+                cb.className = 'refund-cb';
+                
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(s));
+                container.appendChild(label);
+            });
+            
+            const isFree = o.paymentMethod === 'free';
+            const isPending = o.status === 'pending';
+            const methodGroup = document.getElementById('refund-method-group');
+            const noteEl = document.getElementById('refund-note-text');
+            
+            if (isFree) {
+                methodGroup.style.display = 'none';
+                noteEl.innerHTML = "* 此為免付費票券，確認後將直接釋出座位，不產生退款金流。<br>* 將產生一筆 $0 元退單保留紀錄。";
+            } else if (isPending) {
+                methodGroup.style.display = 'none';
+                noteEl.innerHTML = "* 此為<b>未付款訂單</b>，確認後將<span style='color:#ef4444; font-weight:bold;'>直接扣減原單金額</span>。<br>* 若全選將刪除整筆訂單，不產生退款紀錄。";
+            } else {
+                methodGroup.style.display = 'block';
+                document.getElementById('refund-method-select').value = o.paymentMethod;
+                noteEl.innerHTML = "* 勾選並確認後，系統將立即釋出座位。<br>* 將產生一筆「待退款」負數訂單並保留原單紀錄。";
+            }
+            
+            document.getElementById('modal-create-refund').style.display = 'flex';
+        };
+
+        window.executeCreateRefund = () => {
+            const orderId = document.getElementById('refund-order-id').value;
+            const o = ordersData[orderId];
+            if(!o) return;
+            
+            const cbs = document.querySelectorAll('.refund-cb:checked');
+            const selectedSeats = Array.from(cbs).map(cb => cb.value);
+            
+            if (selectedSeats.length === 0) {
+                window.showToast("請至少勾選一個要退出的座位！");
+                return;
+            }
+            
+            const originalBtnHtml = setLoadingState('btn-execute-create-refund', true);
+            const updates = {};
+            
+            const activeSeats = (o.seats || []).filter(s => !(o.refundedSeats || []).includes(s));
+            const perSeatPrice = o.total / (o.seats.length || 1); 
+            const refundAmount = perSeatPrice * selectedSeats.length;
+
+            const isFree = o.paymentMethod === 'free';
+            const isPending = o.status === 'pending';
+
+            if (isPending && !isFree) {
+                // 防呆：未付款訂單直接作廢扣除，不生退款單
+                if (selectedSeats.length === activeSeats.length && (o.refundedSeats || []).length === 0) {
+                    updates[`orders/${orderId}`] = null;
+                } else {
+                    const newSeats = o.seats.filter(s => !selectedSeats.includes(s));
+                    const newTotal = o.total - refundAmount;
+                    updates[`orders/${orderId}/seats`] = newSeats;
+                    updates[`orders/${orderId}/total`] = newTotal;
+                    
+                    if (newSeats.length === 0) {
+                         updates[`orders/${orderId}`] = null;
+                    }
+                }
+                selectedSeats.forEach(s => updates[`seats/${s}`] = null);
+            } else {
+                // 已付款或免付費訂單：保留歷史、產生退單
+                const method = document.getElementById('refund-method-select').value;
+                const newRefId = 'REF-' + Date.now();
+                
+                const existingRefunded = o.refundedSeats || [];
+                updates[`orders/${orderId}/refundedSeats`] = [...existingRefunded, ...selectedSeats];
+                
+                const refundStatus = isFree ? 'refunded' : 'pending_refund';
+                const refundDate = isFree ? new Date().toISOString().split('T')[0] : null;
+                
+                updates[`orders/${newRefId}`] = {
+                    orderId: newRefId,
+                    originalOrderId: orderId,
+                    isRefund: true,
+                    name: `${o.name} (退票)`,
+                    phone: o.phone,
+                    ticketType: o.ticketType,
+                    seats: selectedSeats,
+                    total: -refundAmount,
+                    paymentMethod: isFree ? 'free' : method,
+                    status: refundStatus,
+                    createdAt: new Date().toISOString()
+                };
+                if (refundDate) updates[`orders/${newRefId}`].refundDate = refundDate;
+                
+                selectedSeats.forEach(s => updates[`seats/${s}`] = null);
+            }
+            
+            update(ref(db), updates).then(() => {
+                window.closeModal('modal-create-refund');
+                window.showToast("退票/作廢 處理完成，座位已釋出！", "success");
+            }).catch(err => {
+                console.error(err);
+                window.showToast("操作失敗，請重試", "error");
+            }).finally(() => {
+                setLoadingState('btn-execute-create-refund', false, originalBtnHtml);
+            });
+        };
+
+        // --- 刪除訂單功能 (X 按鈕) ---
+        window.openDeleteModal = (orderId) => {
+            const o = ordersData[orderId];
+            if(!o) return;
+            document.getElementById('delete-target-id').value = orderId;
+            document.getElementById('del-order-name').innerText = o.name;
+            document.getElementById('modal-delete-order').style.display = 'flex';
+        };
+
+        window.executeDeleteOrder = () => {
+            const orderId = document.getElementById('delete-target-id').value;
+            const o = ordersData[orderId];
+            if(!o) return;
+            
+            const originalBtnHtml = setLoadingState('btn-execute-delete', true);
+            const updates = {};
+            
+            if (!o.isRefund) {
+                if(o.seats) {
+                    o.seats.forEach(s => {
+                        if (!(o.refundedSeats || []).includes(s)) {
+                            updates[`seats/${s}`] = null;
+                        }
+                    });
+                }
+            }
+            
+            updates[`orders/${orderId}`] = null;
+            
+            update(ref(db), updates).then(() => {
+                window.closeModal('modal-delete-order');
+                window.showToast("訂單已徹底刪除！", "success");
+            }).catch(err => {
+                console.error(err);
+                window.showToast("刪除失敗，請重試", "error");
+            }).finally(() => {
+                setLoadingState('btn-execute-delete', false, originalBtnHtml);
             });
         };
 
@@ -2062,28 +2346,48 @@
             originalOrderState = { status: o.status, paymentMethod: o.paymentMethod };
 
             const statusSelect = document.getElementById('edit-order-status');
-            const paidOption = document.getElementById('edit-option-paid');
-            const freeOption = document.getElementById('edit-option-free');
-            const cashOption = document.getElementById('edit-option-cash');
-            const transferOption = document.getElementById('edit-option-transfer');
+            statusSelect.innerHTML = '';
             
-            paidOption.style.display = 'none';
-            freeOption.style.display = 'none';
-            cashOption.style.display = 'block';
-            transferOption.style.display = 'block';
-            document.getElementById('edit-order-bank').disabled = false;
-
-            if (o.paymentMethod === 'free') {
-                freeOption.style.display = 'block';
-                cashOption.style.display = 'none';
-                transferOption.style.display = 'none';
-                statusSelect.value = 'paid-free';
-                document.getElementById('edit-order-bank').disabled = true;
-            } else if (o.status === 'paid') {
-                paidOption.style.display = 'block';
-                statusSelect.value = 'paid';
+            if (o.isRefund) {
+                if (o.status === 'refunded') {
+                    statusSelect.innerHTML = `<option value="refunded">已退款</option>`;
+                } else {
+                    statusSelect.innerHTML = `
+                        <option value="pending_refund-cash">現金（待退款）</option>
+                        <option value="pending_refund-transfer">匯款（待退款）</option>
+                    `;
+                    statusSelect.value = `pending_refund-${o.paymentMethod}`;
+                }
+                document.getElementById('edit-order-bank').disabled = false;
+                document.getElementById('btn-open-swap').style.display = 'none'; 
             } else {
-                statusSelect.value = o.paymentMethod === 'cash' ? 'pending-cash' : 'pending-transfer';
+                statusSelect.innerHTML = `
+                    <option value="paid" id="edit-option-paid" style="display:none;">已完成</option>
+                    <option value="paid-free" id="edit-option-free" style="display:none;">免付費 (已完成)</option>
+                    <option value="pending-cash" id="edit-option-cash">現金（待付款）</option>
+                    <option value="pending-transfer" id="edit-option-transfer">匯款（待入帳）</option>
+                `;
+                document.getElementById('btn-open-swap').style.display = 'flex'; 
+                
+                const paidOption = document.getElementById('edit-option-paid');
+                const freeOption = document.getElementById('edit-option-free');
+                const cashOption = document.getElementById('edit-option-cash');
+                const transferOption = document.getElementById('edit-option-transfer');
+                
+                document.getElementById('edit-order-bank').disabled = false;
+
+                if (o.paymentMethod === 'free') {
+                    freeOption.style.display = 'block';
+                    cashOption.style.display = 'none';
+                    transferOption.style.display = 'none';
+                    statusSelect.value = 'paid-free';
+                    document.getElementById('edit-order-bank').disabled = true;
+                } else if (o.status === 'paid') {
+                    paidOption.style.display = 'block';
+                    statusSelect.value = 'paid';
+                } else {
+                    statusSelect.value = o.paymentMethod === 'cash' ? 'pending-cash' : 'pending-transfer';
+                }
             }
             
             document.getElementById('edit-step-1').style.display = 'flex';
@@ -2093,12 +2397,11 @@
 
         window.saveOrderEdit = () => {
             const statusVal = document.getElementById('edit-order-status').value;
-            if (originalOrderState && (originalOrderState.status === 'paid' || originalOrderState.paymentMethod === 'free') && (statusVal !== 'paid' && statusVal !== 'paid-free')) {
+            if (originalOrderState && (originalOrderState.status === 'paid' || originalOrderState.paymentMethod === 'free') && (statusVal !== 'paid' && statusVal !== 'paid-free' && statusVal !== 'refunded')) {
                 document.getElementById('edit-step-1').style.display = 'none';
                 document.getElementById('edit-step-2').style.display = 'flex';
                 return;
             }
-            // 如果只有一頁編輯就直接存檔（但為了防呆加了動畫狀態，原本沒有特別指定 btn id，這裡簡單處理）
             window.executeOrderEdit(false); 
         };
 
@@ -2111,45 +2414,52 @@
             const o = ordersData[orderId];
             if(!o) return;
 
-            // 如果是從第二頁(防呆警告)按下來的，才會有這個按鈕 ID
             let originalBtnHtml = '';
             if(fromWarningPage) {
                 originalBtnHtml = setLoadingState('btn-execute-edit', true);
             }
 
-            let finalStatus = (statusVal === 'paid' || statusVal === 'paid-free') ? 'paid' : 'pending';
-            let finalMethod = o.paymentMethod;
-            if (statusVal === 'pending-cash') finalMethod = 'cash';
-            if (statusVal === 'pending-transfer') finalMethod = 'transfer';
-            if (statusVal === 'paid-free') finalMethod = 'free';
-
             const updates = {};
             updates[`orders/${orderId}/bankCode`] = newBank;
             updates[`orders/${orderId}/note`] = newNote;
-            updates[`orders/${orderId}/paymentMethod`] = finalMethod;
-            updates[`orders/${orderId}/status`] = finalStatus;
 
-            if (finalStatus === 'pending') {
-                updates[`orders/${orderId}/receiptDate`] = null;
+            if (o.isRefund) {
+                if (statusVal.startsWith('pending_refund-')) {
+                    updates[`orders/${orderId}/paymentMethod`] = statusVal.split('-')[1];
+                    updates[`orders/${orderId}/status`] = 'pending_refund';
+                }
+            } else {
+                let finalStatus = (statusVal === 'paid' || statusVal === 'paid-free') ? 'paid' : 'pending';
+                let finalMethod = o.paymentMethod;
+                if (statusVal === 'pending-cash') finalMethod = 'cash';
+                if (statusVal === 'pending-transfer') finalMethod = 'transfer';
+                if (statusVal === 'paid-free') finalMethod = 'free';
+
+                updates[`orders/${orderId}/paymentMethod`] = finalMethod;
+                updates[`orders/${orderId}/status`] = finalStatus;
+
+                if (finalStatus === 'pending') {
+                    updates[`orders/${orderId}/receiptDate`] = null;
+                }
+
+                let currentReportDate = o.reportDate || null;
+                if (finalMethod !== 'free' && newBank !== "" && (!o.bankCode || o.bankCode === "")) {
+                    const today = new Date();
+                    currentReportDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                    updates[`orders/${orderId}/reportDate`] = currentReportDate;
+                } else if (newBank === "") {
+                    currentReportDate = null;
+                    updates[`orders/${orderId}/reportDate`] = null;
+                }
+
+                if(o.seats) o.seats.forEach(s => {
+                    updates[`seats/${s}/bankCode`] = newBank;
+                    updates[`seats/${s}/note`] = newNote;
+                    updates[`seats/${s}/paymentMethod`] = finalMethod;
+                    updates[`seats/${s}/receiptDate`] = (finalStatus === 'pending') ? null : (o.receiptDate || null);
+                    updates[`seats/${s}/reportDate`] = currentReportDate;
+                });
             }
-
-            let currentReportDate = o.reportDate || null;
-            if (finalMethod !== 'free' && newBank !== "" && (!o.bankCode || o.bankCode === "")) {
-                const today = new Date();
-                currentReportDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-                updates[`orders/${orderId}/reportDate`] = currentReportDate;
-            } else if (newBank === "") {
-                currentReportDate = null;
-                updates[`orders/${orderId}/reportDate`] = null;
-            }
-
-            if(o.seats) o.seats.forEach(s => {
-                updates[`seats/${s}/bankCode`] = newBank;
-                updates[`seats/${s}/note`] = newNote;
-                updates[`seats/${s}/paymentMethod`] = finalMethod;
-                updates[`seats/${s}/receiptDate`] = (finalStatus === 'pending') ? null : (o.receiptDate || null);
-                updates[`seats/${s}/reportDate`] = currentReportDate;
-            });
 
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-edit-order'); 
@@ -2159,42 +2469,6 @@
                 window.showToast("儲存失敗，請重試");
             }).finally(() => {
                 if(fromWarningPage) setLoadingState('btn-execute-edit', false, originalBtnHtml);
-            });
-        };
-
-        window.openDeleteModal = (orderId) => {
-            const o = ordersData[orderId];
-            if(!o) return;
-            document.getElementById('delete-target-id').value = orderId;
-            document.getElementById('del-order-name').innerText = o.name;
-            document.getElementById('modal-delete-order').style.display = 'flex';
-        };
-
-        window.executeDeleteOrder = () => {
-            const orderId = document.getElementById('delete-target-id').value;
-            const o = ordersData[orderId];
-            if(!o) return;
-            
-            const originalBtnHtml = setLoadingState('btn-execute-delete', true);
-
-            const updates = {};
-            // 將訂單內的所有座位還原為空位
-            if(o.seats) {
-                o.seats.forEach(s => {
-                    updates[`seats/${s}`] = null;
-                });
-            }
-            // 刪除整筆訂單資料
-            updates[`orders/${orderId}`] = null;
-            
-            update(ref(db), updates).then(() => {
-                window.closeModal('modal-delete-order');
-                window.showToast("訂單已刪除，座位已釋放！", "success");
-            }).catch(err => {
-                console.error(err);
-                window.showToast("刪除失敗，請重試", "error");
-            }).finally(() => {
-                setLoadingState('btn-execute-delete', false, originalBtnHtml);
             });
         };
 
@@ -2310,7 +2584,7 @@
                 { header: '金額', key: 'total', width: 12 },
                 { header: '付款方式', key: 'method', width: 12 },
                 { header: '末五碼', key: 'bankCode', width: 12 },
-                { header: '收款日期', key: 'receiptDate', width: 15 },
+                { header: '收款日期/退款日期', key: 'receiptDate', width: 15 },
                 { header: '狀態', key: 'status', width: 15 },
                 { header: '備註', key: 'note', width: 25 }
             ];
@@ -2323,12 +2597,19 @@
             
             allOrders.forEach(o => {
                 const t = new Date(o.createdAt).toLocaleString('zh-TW', { hour12: false });
-                const st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
                 
-                // 匯出名冊也加上流水號
+                let st = '';
+                if (o.isRefund) {
+                    st = (o.status === 'refunded') ? '已退款' : '待退款';
+                } else {
+                    st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                }
+                
+                // 匯出名冊也加上流水號與(已退)標記
                 const seatsDisplay = (o.seats || []).map(s => {
                     const serial = ticketMapping[s];
-                    return serial ? `${s} (#${serial})` : s;
+                    const baseStr = serial ? `${s} (#${serial})` : s;
+                    return (o.refundedSeats || []).includes(s) ? `${baseStr} (已退)` : baseStr;
                 }).join(', ');
 
                 wsOrders.addRow({
@@ -2340,7 +2621,7 @@
                     total: o.total,
                     method: o.paymentMethod === 'cash' ? '現金' : (o.paymentMethod === 'transfer' ? '匯款' : '免付費'),
                     bankCode: o.bankCode || '',
-                    receiptDate: o.receiptDate || o.reportDate || '',
+                    receiptDate: o.isRefund ? (o.refundDate || '') : (o.receiptDate || o.reportDate || ''),
                     status: st,
                     note: o.note || ''
                 });
@@ -2383,22 +2664,21 @@
                     // 判斷座位類型
                     if (cameraSeats.includes(item.seat)) {
                         seatTypeStr = '攝影席';
-                        salesStatusStr = '免付費'; // 國稅局統一視為無金流
+                        salesStatusStr = '免付費'; 
                     } else if (isReserve) {
                         seatTypeStr = '保留席';
-                        salesStatusStr = '免付費'; // 國稅局統一視為無金流
+                        salesStatusStr = '免付費'; 
                     } else {
                         seatTypeStr = '一般席';
                         salesStatusStr = '未售出';
                     }
 
-                    // 判斷售出狀態 (若有劃位，依據實際金流狀態覆蓋)
+                    // 判斷售出狀態
                     if (seatInfo.status === 'sold') {
                         buyer = seatInfo.name || '';
                         oid = seatInfo.orderId || '';
                         typeStr = seatInfo.ticketType || '';
                         
-                        // 從訂單中反推單張票價
                         if(ordersData[oid]) {
                             const o = ordersData[oid];
                             priceVal = o.total / (o.seats.length || 1);
@@ -2454,14 +2734,13 @@
             workbook.creator = 'MIA Ticketing System';
             const ws = workbook.addWorksheet('當日收款名冊');
 
-            // 調整為教室專用格式的欄位名稱
             ws.columns = [
                 { header: '填寫日期', key: 'date', width: 15 },
                 { header: '付款類別', key: 'method', width: 12 },
                 { header: '繳費期別', key: 'period', width: 12 },
                 { header: '收費項目', key: 'item', width: 20 },
                 { header: '付款人', key: 'payer', width: 15 },
-                { header: '繳費明細/數量 詳細', key: 'details', width: 45 }, // 加寬以容納長字串
+                { header: '繳費明細/數量 詳細', key: 'details', width: 45 }, 
                 { header: '收入金額', key: 'income', width: 12 },
                 { header: '新/舊生/其他', key: 'note', width: 15 }
             ];
@@ -2472,25 +2751,23 @@
             const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
             allOrders.forEach(o => {
-                // 修改：排除免付費 (只匯出現金跟匯款)
                 if (o.paymentMethod === 'free') return;
 
                 let match = false;
-                // 比對收款日期
-                if (o.status === 'paid' && o.receiptDate === targetDateInput) {
-                    match = true;
-                } else if (o.paymentMethod === 'transfer' && o.reportDate === targetDateInput) {
-                    match = true;
+                if (o.isRefund) {
+                    if (o.status === 'refunded' && o.refundDate === targetDateInput) match = true;
+                } else {
+                    if (o.status === 'paid' && o.receiptDate === targetDateInput) {
+                        match = true;
+                    } else if (o.paymentMethod === 'transfer' && o.reportDate === targetDateInput) {
+                        match = true;
+                    }
                 }
 
                 if(match) {
-                    // 格式化日期為 YYYY/MM/DD
                     const formattedDate = targetDateInput.replace(/-/g, '/');
-                    
-                    // 映射付款類別
                     let category = o.paymentMethod === 'cash' ? '現金' : '匯款';
 
-                    // 處理票種簡化 (例如：早鳥優惠 NT$ 650 / 張 -> 早鳥$650)
                     let cleanTicketType = o.ticketType || "";
                     cleanTicketType = cleanTicketType
                         .replace('優惠 ', '')
@@ -2498,16 +2775,20 @@
                         .replace(' / 張', '')
                         .replace('一般原價', '原價');
 
-                    // 修改：組合繳費明細字串
-                    const detailString = `MIA 8th 成發門票 / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
+                    let detailString = '';
+                    if (o.isRefund) {
+                        detailString = `MIA 8th 成發門票(退款) / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
+                    } else {
+                        detailString = `MIA 8th 成發門票 / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
+                    }
 
                     ws.addRow({
                         date: formattedDate,
                         method: category,
                         period: '',  
-                        item: '門票', // 修改：固定帶入 "門票"
+                        item: '門票',
                         payer: o.name,
-                        details: detailString, // 修改：帶入組合後的格式
+                        details: detailString,
                         income: o.total,
                         note: ''     
                     });
