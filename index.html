@@ -1019,7 +1019,7 @@
                 
                 <div style="margin-bottom: 25px;">
                     <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">您即將刪除 <span id="del-order-name" style="color:var(--primary-blue)"></span> 的整筆訂單</h3>
-                    <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 16px;">此操作將<span style="color: #ef4444;">不留任何帳面紀錄</span>，且座位將立即釋出供他人劃位！</p>
+                    <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 16px;">此操作將<span style="color: #ef4444;">不留任何帳面紀錄</span>，且座位將立即釋出！</p>
                 </div>
 
                 <input type="hidden" id="delete-target-id">
@@ -2152,10 +2152,10 @@
             
             if (isFree) {
                 methodGroup.style.display = 'none';
-                noteEl.innerHTML = "* 此為<span style='color:#ef4444; font-weight:bold;'>免付費訂單</span>，確認後將直接釋出座位。<br>* 若全選將刪除整筆訂單，不產生退單紀錄。";
+                noteEl.innerHTML = "<span style='color:#ef4444; font-weight:bold;'>* 此為免付費訂單</span>，確認後將直接釋出座位。<br>* 若全選將刪除整筆訂單，不產生退單紀錄。";
             } else if (isPending) {
                 methodGroup.style.display = 'none';
-                noteEl.innerHTML = "* 此為<span style='color:#ef4444; font-weight:bold;'>未付款訂單</span>，確認後將<span style='color:#ef4444; font-weight:bold;'>直接扣減原單金額</span>。<br>* 若全選將刪除整筆訂單，不產生退款紀錄。";
+                noteEl.innerHTML = "<span style='color:#ef4444; font-weight:bold;'>* 此為未付款訂單</span>，確認後將<span style='color:#ef4444; font-weight:bold;'>直接扣減原單金額</span>。<br>* 若全選將刪除整筆訂單，不產生退款紀錄。";
             } else {
                 methodGroup.style.display = 'block';
                 document.getElementById('refund-method-select').value = o.paymentMethod;
