@@ -2152,10 +2152,10 @@
             
             if (isFree) {
                 methodGroup.style.display = 'none';
-                noteEl.innerHTML = "* 此為免付費票券，確認後將直接釋出座位，不產生退款金流。<br>* 將產生一筆 $0 元退單保留紀錄。";
+                noteEl.innerHTML = "* 此為<span style='color:#ef4444; font-weight:bold;'>免付費訂單</span>，確認後將直接釋出座位。<br>* 若全選將刪除整筆訂單，不產生退單紀錄。";
             } else if (isPending) {
                 methodGroup.style.display = 'none';
-                noteEl.innerHTML = "* 此為<b>未付款訂單</b>，確認後將<span style='color:#ef4444; font-weight:bold;'>直接扣減原單金額</span>。<br>* 若全選將刪除整筆訂單，不產生退款紀錄。";
+                noteEl.innerHTML = "* 此為<span style='color:#ef4444; font-weight:bold;'>未付款訂單</span>，確認後將<span style='color:#ef4444; font-weight:bold;'>直接扣減原單金額</span>。<br>* 若全選將刪除整筆訂單，不產生退款紀錄。";
             } else {
                 methodGroup.style.display = 'block';
                 document.getElementById('refund-method-select').value = o.paymentMethod;
@@ -2188,13 +2188,13 @@
             const isFree = o.paymentMethod === 'free';
             const isPending = o.status === 'pending';
 
-            if (isPending && !isFree) {
-                // 防呆：未付款訂單直接作廢扣除，不生退款單
+            // 防呆：未付款訂單 或 免付費訂單 直接作廢扣除，不生退款單
+            if (isPending || isFree) {
                 if (selectedSeats.length === activeSeats.length && (o.refundedSeats || []).length === 0) {
                     updates[`orders/${orderId}`] = null;
                 } else {
                     const newSeats = o.seats.filter(s => !selectedSeats.includes(s));
-                    const newTotal = o.total - refundAmount;
+                    const newTotal = isFree ? 0 : (o.total - refundAmount);
                     updates[`orders/${orderId}/seats`] = newSeats;
                     updates[`orders/${orderId}/total`] = newTotal;
                     
@@ -2204,15 +2204,14 @@
                 }
                 selectedSeats.forEach(s => updates[`seats/${s}`] = null);
             } else {
-                // 已付款或免付費訂單：保留歷史、產生退單
+                // 已付款訂單：保留歷史、產生退單
                 const method = document.getElementById('refund-method-select').value;
                 const newRefId = 'REF-' + Date.now();
                 
                 const existingRefunded = o.refundedSeats || [];
                 updates[`orders/${orderId}/refundedSeats`] = [...existingRefunded, ...selectedSeats];
                 
-                const refundStatus = isFree ? 'refunded' : 'pending_refund';
-                const refundDate = isFree ? new Date().toISOString().split('T')[0] : null;
+                const refundStatus = 'pending_refund';
                 
                 updates[`orders/${newRefId}`] = {
                     orderId: newRefId,
@@ -2223,11 +2222,10 @@
                     ticketType: o.ticketType,
                     seats: selectedSeats,
                     total: -refundAmount,
-                    paymentMethod: isFree ? 'free' : method,
+                    paymentMethod: method,
                     status: refundStatus,
                     createdAt: new Date().toISOString()
                 };
-                if (refundDate) updates[`orders/${newRefId}`].refundDate = refundDate;
                 
                 selectedSeats.forEach(s => updates[`seats/${s}`] = null);
             }
