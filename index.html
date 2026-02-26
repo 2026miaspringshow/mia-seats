@@ -662,7 +662,7 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">總營收</div>
+                    <div class="stat-label" id="stat-revenue-title">累計總營收</div>
                     <div class="stat-value" id="stat-revenue">$0</div>
                     <div id="stat-cash-revenue" style="font-size: 13px; color: #ef4444; font-weight: 600; margin-top: 5px;">現金收入 $0</div>
                     <div class="stat-icon-wrapper icon-revenue">
@@ -670,22 +670,22 @@
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">已售票數</div>
+                    <div class="stat-label">累計一般席已售</div>
                     <div class="stat-value" id="stat-tickets">0 <span>張</span></div>
-                    <div id="stat-remaining-info" style="font-size: 11px; color: #64748b; margin-top: 5px; font-weight: 600;">剩餘 0 張；保留席 0 張</div>
+                    <div id="stat-remaining-info" style="font-size: 11px; color: #64748b; margin-top: 5px; font-weight: 600;">剩餘：一般 0 張 ｜ 保留 0 張</div>
                     <div class="stat-icon-wrapper icon-tickets">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">訂單總數</div>
+                    <div class="stat-label">累計訂單總數</div>
                     <div class="stat-value" id="stat-orders">0 <span>筆</span></div>
                     <div class="stat-icon-wrapper icon-orders">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">待核銷筆數</div>
+                    <div class="stat-label">目前待核銷</div>
                     <div class="stat-value pending" id="stat-pending">0 <span>筆</span></div>
                     <div class="stat-icon-wrapper icon-pending">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -1702,14 +1702,8 @@
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'flex';
             
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            document.getElementById('order-date-input').value = `${yyyy}-${mm}-${dd}`;
-            document.getElementById('receipt-date-input').value = ""; 
-            
-            window.renderOrders();
+            // 直接呼叫清除所有篩選，確保一進來就是乾淨的歷史總覽
+            window.clearAllFilters();
         };
 
         window.closeOrderManager = () => {
@@ -1819,7 +1813,7 @@
             
             // 修改：套用簡短化的格式顯示
             const infoEl = document.getElementById('stat-remaining-info');
-            if (infoEl) infoEl.innerText = `剩餘 ${remainingRegular} 張；保留席 ${remainingReserve} 張`;
+            if (infoEl) infoEl.innerText = `剩餘：一般 ${remainingRegular} 張 ｜ 保留 ${remainingReserve} 張`;
 
             // 2. 進行訂單列表篩選
             let dateFilteredOrders = allOrders;
@@ -1857,36 +1851,62 @@
                 return true;
             });
 
-            // 3. 渲染列表與計算當前視圖營收
-            let totalRevenue = 0, cashRevenue = 0, ticketsInView = 0;
-            filteredArray.forEach(o => {
-                ticketsInView += (o.seats || []).length;
-                let isCountable = false;
-                if (o.paymentMethod === 'transfer') {
-                    if ((o.bankCode && o.bankCode.trim() !== "") || o.status === 'paid') {
-                        isCountable = true;
+            // 3. 計算上方看板數據 (與下方列表篩選脫鉤，改為全域/特定邏輯)
+            let displayTotalRev = 0;
+            let displayCashRev = 0;
+            let revTitle = "累計總營收";
+            
+            if (selectedReceiptDate !== "") {
+                // 【單日結算模式】
+                revTitle = "單日結算營收";
+                allOrders.forEach(o => {
+                    let isCashMatch = (o.paymentMethod === 'cash' && o.status === 'paid' && o.receiptDate === selectedReceiptDate);
+                    let isTransferMatch = (o.paymentMethod === 'transfer' && o.bankCode && o.bankCode.trim() !== "" && o.reportDate === selectedReceiptDate);
+                    
+                    if (isCashMatch) {
+                        displayTotalRev += (o.total || 0);
+                        displayCashRev += (o.total || 0);
                     }
-                } else {
-                    isCountable = true; 
-                }
-                if (isCountable) {
-                    totalRevenue += o.total || 0;
-                }
-                if (o.status === 'paid' && o.paymentMethod === 'cash') {
-                    cashRevenue += o.total || 0;
-                }
+                    if (isTransferMatch) {
+                        displayTotalRev += (o.total || 0);
+                    }
+                });
+            } else {
+                // 【日常看板模式】(看歷史總和，無論是否核銷)
+                allOrders.forEach(o => {
+                    if (o.paymentMethod !== 'free') {
+                        displayTotalRev += (o.total || 0);
+                    }
+                    if (o.paymentMethod === 'cash') {
+                        displayCashRev += (o.total || 0);
+                    }
+                });
+            }
+
+            // 計算不受干擾的歷史總計數據
+            let totalRegularTickets = 0;
+            let totalPendingCount = 0;
+            
+            allOrders.forEach(o => {
+                if (o.status === 'pending') totalPendingCount++;
+                (o.seats || []).forEach(s => {
+                    if (!reserveSeats.includes(s) && !cameraSeats.includes(s)) {
+                        totalRegularTickets++;
+                    }
+                });
             });
 
-            document.getElementById('stat-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
-            document.getElementById('stat-cash-revenue').innerText = `現金收入 $${cashRevenue.toLocaleString()}`;
+            // 更新 DOM
+            const revTitleEl = document.getElementById('stat-revenue-title');
+            if(revTitleEl) revTitleEl.innerText = revTitle;
             
-            let ordersCount = filteredArray.length, pendingCount = 0;
-            filteredArray.forEach(o => {
-                if(o.status === 'pending') pendingCount++;
-            });
-            document.getElementById('stat-tickets').innerHTML = `${ticketsInView} <span>張</span>`;
-            document.getElementById('stat-orders').innerHTML = `${ordersCount} <span>筆</span>`;
-            document.getElementById('stat-pending').innerHTML = `${pendingCount} <span>筆</span>`;
+            document.getElementById('stat-revenue').innerText = `$${displayTotalRev.toLocaleString()}`;
+            document.getElementById('stat-cash-revenue').innerText = `現金收入 $${displayCashRev.toLocaleString()}`;
+            
+            document.getElementById('stat-tickets').innerHTML = `${totalRegularTickets} <span>張</span>`;
+            document.getElementById('stat-orders').innerHTML = `${allOrders.length} <span>筆</span>`;
+            document.getElementById('stat-pending').innerHTML = `${totalPendingCount} <span>筆</span>`;
+            
             document.getElementById('results-count-number').innerText = filteredArray.length;
 
             const paginationControls = document.getElementById('pagination-controls');
@@ -1925,10 +1945,13 @@
                 let statusClass = (o.status === 'paid') ? 'status-paid' : (o.paymentMethod === 'cash' ? 'status-unpaid-red' : 'status-pending-orange');
 
                 let subDateHtml = '';
-                if (o.status === 'paid' && o.receiptDate) {
-                    subDateHtml += `<div style="font-size:10px; font-weight:bold; color:#10b981; margin-top:4px;">收款日: ${o.receiptDate}</div>`;
-                } else if (o.reportDate && o.paymentMethod === 'transfer') {
-                    subDateHtml += `<div style="font-size:10px; font-weight:bold; color:var(--primary-blue); margin-top:4px;">收款日: ${o.reportDate}</div>`;
+                // 只有「非免付費」的訂單才顯示收款日，避免公關票產生誤會
+                if (o.paymentMethod !== 'free') {
+                    if (o.status === 'paid' && o.receiptDate) {
+                        subDateHtml += `<div style="font-size:10px; font-weight:bold; color:#10b981; margin-top:4px;">收款日: ${o.receiptDate}</div>`;
+                    } else if (o.reportDate && o.paymentMethod === 'transfer') {
+                        subDateHtml += `<div style="font-size:10px; font-weight:bold; color:var(--primary-blue); margin-top:4px;">收款日: ${o.reportDate}</div>`;
+                    }
                 }
                 
                 let methodStr = '免付費';
