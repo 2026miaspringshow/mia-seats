@@ -365,9 +365,8 @@
         }
 
         .search-group { position: relative; flex: 1; min-width: 200px; display: flex; align-items: center; }
-        .search-input { padding: 0 16px 0 40px; border: 2px solid #e2e8f0; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 14px; transition: all 0.2s; height: 42px; outline: none; line-height: normal; }
+        .search-input { padding: 0 16px; border: 2px solid #e2e8f0; border-radius: 10px; width: 100%; box-sizing: border-box; font-size: 14px; transition: all 0.2s; height: 42px; outline: none; line-height: normal; }
         .search-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .search-icon { position: absolute; left: 12px; top: 50%; margin-top: -9px; transform: none; color: #94a3b8; width: 18px; height: 18px; pointer-events: none; }
 
         .results-summary {
             font-size: 13px;
@@ -726,10 +725,6 @@
                     </div>
                     <button class="btn-clear-filters" onclick="window.clearAllFilters()">清除篩選</button>
                     <div class="search-group">
-                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" cy="21" x2="16.65" y2="16.65"></line>
-                        </svg>
                         <input type="text" id="order-search-input" class="search-input" placeholder="搜尋姓名/電話/座位..." oninput="window.handleFilterChange()">
                     </div>
                 </div>
@@ -1097,6 +1092,47 @@
         for(let i=10; i<=14; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
         for(let i=18; i<=22; i++) { reserveSeats.push("G"+i); reserveSeats.push("H"+i); }
 
+        // === 新增：建立票券流水號對照表 ===
+        const ticketMapping = {};
+        const serialList = [];
+
+        function addMapping(startSerial, seatPrefix, startNum, count) {
+            for (let i = 0; i < count; i++) {
+                const serialNum = startSerial + i;
+                const serialStr = String(serialNum).padStart(3, '0');
+                const seatId = seatPrefix + String(startNum + i);
+                ticketMapping[seatId] = serialStr;
+                serialList.push({ serial: serialStr, seat: seatId });
+            }
+        }
+
+        addMapping(1, 'C', 1, 29);
+        addMapping(32, 'D', 1, 31);
+        addMapping(65, 'E', 1, 33);
+        addMapping(100, 'F', 1, 14);
+        addMapping(660, 'F', 15, 3); // 手寫補上的 F15~F17
+        addMapping(114, 'F', 18, 14);
+        addMapping(128, 'G', 1, 14);
+        addMapping(142, 'G', 18, 14); // 跳過 G15~G17
+        addMapping(156, 'H', 1, 31); // H排全印
+        
+        let currentSerial = 187;
+        const midRows = ['I', 'J', 'K', 'L', 'M', 'N', 'O'];
+        for(let r of midRows) { addMapping(currentSerial, r, 1, 31); currentSerial += 31; }
+        
+        const backRows = ['P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'];
+        for(let r of backRows) { addMapping(currentSerial, r, 1, 25); currentSerial += 25; }
+
+        // 新增：多印但需要核銷的空白票券 (包含 654~659 以及跳號的 030, 031, 063, 064, 098, 099)
+        const extraBlanks = [30, 31, 63, 64, 98, 99, 654, 655, 656, 657, 658, 659];
+        for (let num of extraBlanks) {
+            serialList.push({ serial: String(num).padStart(3, '0'), seat: '-' });
+        }
+
+        // 確保核銷表嚴格依照流水號排序
+        serialList.sort((a, b) => parseInt(a.serial) - parseInt(b.serial));
+        // ===================================
+
         onValue(ref(db, 'seats'), (snapshot) => { seatsData = snapshot.val() || {}; render(); });
         onValue(ref(db, 'orders'), (snapshot) => { 
             ordersData = snapshot.val() || {}; 
@@ -1158,8 +1194,9 @@
             window.showToast("已成功登出", "success");
         };
 
+        // 已修改：C, D, E排的左右座位數量
         const layout = [
-            { id: 'T', rows: 6, L: [6, 7, 9, 10, 11, 9], M: [13, 13, 13, 13, 13, 13], R: [6, 7, 9, 10, 11, 9], start: 'A' }, 
+            { id: 'T', rows: 6, L: [6, 7, 8, 9, 10, 9], M: [13, 13, 13, 13, 13, 13], R: [6, 7, 8, 9, 10, 9], start: 'A' }, 
             { id: 'M', rows: 10, L: [9, 9, 9, 9, 9, 9, 9, 9, 8, 5], M: [13, 13, 13, 13, 13, 13, 13, 13, 15, 15], R: [9, 9, 9, 9, 9, 9, 9, 9, 8, 5], start: 'G' }, 
             { id: 'B', rows: 9, L: 5, M: 15, R: 5, start: 'Q' }   
         ];
@@ -1627,7 +1664,7 @@
                 const copyBox = document.getElementById('copy-transfer-box');
                 
                 if (method === 'free') {
-                    statusLabel.innerText = "訂單狀態：已完成 (公關免付費)";
+                    statusLabel.innerText = "訂單狀態：已完成 (免付費)";
                     statusLabel.style.background = "#dcfce7";
                     statusLabel.style.color = "#059669";
                     copyBox.style.display = "none";
@@ -1809,7 +1846,12 @@
                 if (keyword !== "") {
                     const nameMatch = o.name.toLowerCase().includes(keyword);
                     const phoneMatch = o.phone.toLowerCase().includes(keyword);
-                    const seatMatch = (o.seats || []).some(s => s.toLowerCase().includes(keyword));
+                    const seatMatch = (o.seats || []).some(s => {
+                        const serial = ticketMapping[s] || "";
+                        // 組合：座位號碼、流水號、帶#號的流水號 一起搜尋，這樣打 017 或 #017 都搜得到！
+                        const matchStr = `${s} ${serial} #${serial}`.toLowerCase();
+                        return matchStr.includes(keyword);
+                    });
                     if (!nameMatch && !phoneMatch && !seatMatch) return false;
                 }
                 return true;
@@ -1893,11 +1935,30 @@
                 if (o.paymentMethod === 'cash') methodStr = '現金';
                 else if (o.paymentMethod === 'transfer') methodStr = '匯款';
 
+                // 新增：將座位與流水號分兩行顯示，讓畫面更清爽
+                const seatNamesStr = (o.seats || []).join(', ');
+                const serialsOnlyStr = (o.seats || [])
+                    .map(s => ticketMapping[s])
+                    .filter(Boolean) // 過濾掉沒有流水號的座位 (例如 A, B 排)
+                    .map(serial => `#${serial}`)
+                    .join(', ');
+                
+                const serialHtml = serialsOnlyStr ? `<div style="font-size:11px; color:#94a3b8; margin-top:2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${serialsOnlyStr}</div>` : '';
+                
+                // 滑鼠懸停時顯示的完整資訊
+                const seatsFullTitle = (o.seats || []).map(s => {
+                    const serial = ticketMapping[s];
+                    return serial ? `${s} (#${serial})` : s;
+                }).join(', ');
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><div style="font-weight:bold;">${timeString}</div>${subDateHtml}</td>
                     <td><div style="font-weight:bold;">${o.name}</div><div style="font-size:11px; color:#94a3b8;">${o.phone}</div></td>
-                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${(o.seats || []).join(', ')}</td>
+                    <td style="max-width: 150px;" title="${seatsFullTitle}">
+                        <div style="font-weight:bold; color:#1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${seatNamesStr}</div>
+                        ${serialHtml}
+                    </td>
                     <td>
                         <div style="font-weight:bold; color:var(--primary-blue);">NT$ ${o.total.toLocaleString()}</div>
                         <div style="font-size:11px; color:#94a3b8;">${methodStr}</div>
@@ -2240,18 +2301,104 @@
             allOrders.forEach(o => {
                 const t = new Date(o.createdAt).toLocaleString('zh-TW', { hour12: false });
                 const st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
+                
+                // 匯出名冊也加上流水號
+                const seatsDisplay = (o.seats || []).map(s => {
+                    const serial = ticketMapping[s];
+                    return serial ? `${s} (#${serial})` : s;
+                }).join(', ');
+
                 wsOrders.addRow({
                     orderId: o.orderId,
                     time: t,
                     name: o.name,
                     phone: o.phone,
-                    seats: (o.seats || []).join(', '),
+                    seats: seatsDisplay,
                     total: o.total,
                     method: o.paymentMethod === 'cash' ? '現金' : (o.paymentMethod === 'transfer' ? '匯款' : '免付費'),
                     bankCode: o.bankCode || '',
                     receiptDate: o.receiptDate || o.reportDate || '',
                     status: st,
                     note: o.note || ''
+                });
+            });
+
+            // ==========================================
+            // 工作表 3：票券核銷清冊 (給國稅局)
+            // ==========================================
+            const wsAudit = workbook.addWorksheet('票券核銷清冊');
+            wsAudit.columns = [
+                { header: '流水編號', key: 'serial', width: 12 },
+                { header: '座位號碼', key: 'seat', width: 12 },
+                { header: '售出狀態', key: 'salesStatus', width: 15 },
+                { header: '座位類型', key: 'seatType', width: 15 },
+                { header: '票種', key: 'ticketType', width: 20 },
+                { header: '金額', key: 'price', width: 12 },
+                { header: '訂單編號', key: 'orderId', width: 22 },
+                { header: '購票人', key: 'buyer', width: 15 }
+            ];
+
+            wsAudit.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            wsAudit.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+            
+            serialList.forEach(item => {
+                const seatInfo = seatsData[item.seat] || {};
+                const isReserve = reserveSeats.includes(item.seat);
+                
+                let salesStatusStr = '未售出';
+                let seatTypeStr = '一般席';
+                let typeStr = '';
+                let priceVal = '';
+                let oid = '';
+                let buyer = '';
+
+                if (item.seat === '-') {
+                    // 處理多印的廢票
+                    seatTypeStr = '無(多印)';
+                    salesStatusStr = '未售出';
+                } else {
+                    // 判斷座位類型
+                    if (cameraSeats.includes(item.seat)) {
+                        seatTypeStr = '攝影席';
+                        salesStatusStr = '免付費'; // 國稅局統一視為無金流
+                    } else if (isReserve) {
+                        seatTypeStr = '保留席';
+                        salesStatusStr = '免付費'; // 國稅局統一視為無金流
+                    } else {
+                        seatTypeStr = '一般席';
+                        salesStatusStr = '未售出';
+                    }
+
+                    // 判斷售出狀態 (若有劃位，依據實際金流狀態覆蓋)
+                    if (seatInfo.status === 'sold') {
+                        buyer = seatInfo.name || '';
+                        oid = seatInfo.orderId || '';
+                        typeStr = seatInfo.ticketType || '';
+                        
+                        // 從訂單中反推單張票價
+                        if(ordersData[oid]) {
+                            const o = ordersData[oid];
+                            priceVal = o.total / (o.seats.length || 1);
+                            if (o.paymentMethod === 'free') {
+                                salesStatusStr = '免付費';
+                            } else {
+                                salesStatusStr = '已售出';
+                            }
+                        } else {
+                            salesStatusStr = '已售出';
+                        }
+                    }
+                }
+
+                wsAudit.addRow({
+                    serial: item.serial,
+                    seat: item.seat,
+                    salesStatus: salesStatusStr,
+                    seatType: seatTypeStr,
+                    ticketType: typeStr,
+                    price: priceVal,
+                    orderId: oid,
+                    buyer: buyer
                 });
             });
 
