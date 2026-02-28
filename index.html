@@ -87,7 +87,24 @@
         #RT, #RM, #RB { align-items: flex-start; }
         #MT, #MM, #MB { align-items: center; }
         
-        .row { display: flex; gap: 4px; height: 38px; align-items: center; }
+        /* 🌟 新增：將 .row 設為 relative，並加上走道字母的樣式 */
+        .row { display: flex; gap: 4px; height: 38px; align-items: center; position: relative; }
+        
+        .row-label {
+            position: absolute;
+            font-size: 18px;
+            font-weight: 900;
+            color: #cbd5e1; /* 淺灰藍色，不干擾視覺 */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px; /* 剛好符合 column-gap 的寬度 */
+            text-align: center;
+            pointer-events: none; /* 避免點擊干擾 */
+            user-select: none;
+            font-family: "Arial", sans-serif;
+        }
+        .row-label.left { left: -60px; }
+        .row-label.right { right: -60px; }
         
         .seat { 
             width: 28px !important; 
@@ -482,6 +499,11 @@
             color: var(--primary-blue);
         }
 
+        /* 🌟 新增：歷史紀錄清單樣式 */
+        .log-item { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #475569; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+        .log-item:last-child { border-bottom: none; }
+        .log-time { font-weight: bold; color: var(--primary-blue); flex-shrink: 0; font-size: 12px; margin-top: 2px;}
+
         @media screen and (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .order-page-header { flex-direction: column; align-items: stretch; gap: 15px; }
@@ -504,6 +526,21 @@
             <line x1="12" y1="16" x2="12.01" cy="16"></line>
         </svg>
         <span id="toast-msg">上限為 5 張</span>
+    </div>
+
+    <!-- 🌟 新增：操作紀錄看板視窗 -->
+    <div class="modal-overlay" id="modal-action-log" style="z-index: 5000;">
+        <div class="modal" style="max-width: 400px; max-height: 80vh;">
+            <div class="modal-header">
+                <span>近期操作紀錄</span>
+                <span class="close-x" onclick="window.closeModal('modal-action-log')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body" id="log-list-container" style="padding: 10px 20px;">
+                <!-- 紀錄內容會動態產生在這裡 -->
+            </div>
+        </div>
     </div>
 
     <!-- 開場歡迎提示視窗 -->
@@ -592,6 +629,13 @@
             </div>
         </div>
         <div class="header-actions">
+            <!-- 🌟 新增：操作紀錄看板按鈕 (時鐘圖示) -->
+            <button class="menu-btn" id="header-log-btn" onclick="window.openActionLog()" style="display:none;" title="近期操作紀錄">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </button>
             <button class="menu-btn" id="header-back-btn" onclick="window.closeOrderManager()" style="display:none;" title="返回購票畫面">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
@@ -723,10 +767,10 @@
                     </div>
                     <div class="filter-group">
                         <span class="filter-label">狀態</span>
-                        <!-- 🌟 新增：將待退款、已退款獨立成為選項 -->
                         <select id="filter-status" class="filter-control" onchange="window.handleFilterChange()">
                             <option value="all">全部</option>
-                            <option value="pending">待入帳</option>
+                            <option value="pending-cash">待付款</option>
+                            <option value="pending-transfer">待入帳</option>
                             <option value="paid">已完成</option>
                             <option value="pending_refund">待退款</option>
                             <option value="refunded">已退款</option>
@@ -960,7 +1004,7 @@
         </div>
     </div>
 
-    <!-- 🌟 重新分開：退票作業專屬視窗 -->
+    <!-- 重新分開：退票作業專屬視窗 -->
     <div class="modal-overlay" id="modal-create-refund" style="z-index: 4000;">
         <div class="modal" style="max-width: 420px;">
             <div class="modal-header">
@@ -1028,6 +1072,30 @@
                     <button class="btn-prev-step" style="padding: 14px; flex: 1;" onclick="window.closeModal('modal-delete-order')">取消</button>
                     <!-- 加上 id 以便操作 Loading 狀態 -->
                     <button class="btn-complete" id="btn-execute-delete" style="background: #ef4444; padding: 14px; flex: 1.5; color: white;" onclick="window.executeDeleteOrder()">確定作廢</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 修正2：補回被誤刪的確認換位視窗 -->
+    <div class="modal-overlay" id="modal-swap-confirm" style="z-index: 4000;">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header">
+                <span>確認更換座位</span>
+                <span class="close-x" onclick="window.closeModal('modal-swap-confirm')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <p style="font-size:16px; color:#1e293b; font-weight:bold; text-align:center; line-height:1.8; margin:0;">
+                    確定要將<br>
+                    <span style="color:#ef4444; font-size: 20px;" id="swap-confirm-old"></span><br>
+                    更換為<br>
+                    <span style="color:var(--primary-blue); font-size: 20px;" id="swap-confirm-new"></span> 嗎？
+                </p>
+                <div style="display:flex; gap:10px; margin-top:25px;">
+                    <button class="btn-prev-step" onclick="window.closeModal('modal-swap-confirm')">取消</button>
+                    <button id="btn-execute-swap" class="btn-complete" onclick="window.executeSwap()">確認更換</button>
                 </div>
             </div>
         </div>
@@ -1128,6 +1196,9 @@
         let toastTimeout = null;
         let originalOrderState = null;
         
+        // 🌟 新增：本地操作紀錄陣列
+        let localActionLogs = [];
+
         // 分頁狀態變數
         let currentPage = 1;
         let itemsPerPage = 20;
@@ -1189,6 +1260,33 @@
             if(orderPage && orderPage.style.display === 'flex') window.renderOrders();
         });
 
+        // 🌟 新增：寫入歷史紀錄的通用函式
+        window.addActionLog = (msg) => {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            localActionLogs.unshift({ time: timeStr, msg: msg });
+            if (localActionLogs.length > 50) localActionLogs.pop(); // 最多保留 50 筆
+        };
+
+        // 🌟 新增：開啟操作紀錄看板
+        window.openActionLog = () => {
+            const container = document.getElementById('log-list-container');
+            container.innerHTML = '';
+            
+            if (localActionLogs.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px 0;">目前尚無任何操作紀錄</div>';
+            } else {
+                localActionLogs.forEach(log => {
+                    const div = document.createElement('div');
+                    div.className = 'log-item';
+                    div.innerHTML = `<div class="log-time">[${log.time}]</div> <div>${log.msg}</div>`;
+                    container.appendChild(div);
+                });
+            }
+            
+            document.getElementById('modal-action-log').style.display = 'flex';
+        };
+
         window.showToast = (msg, type = 'error') => {
             const toast = document.getElementById('custom-toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -1221,6 +1319,7 @@
                 document.getElementById('main-body').classList.add('logged-in');
                 document.getElementById('header-action-btn').innerHTML = iconUnlock;
                 document.getElementById('header-order-btn').style.display = 'flex';
+                document.getElementById('header-log-btn').style.display = 'flex'; // 顯示歷史按鈕
                 window.closeModal('modal-login');
                 render(); 
                 window.showToast("登入成功", "success");
@@ -1234,9 +1333,11 @@
         window.confirmLogout = () => {
             isAdmin = false; 
             selectedIds = []; 
+            localActionLogs = []; // 登出清除紀錄
             document.getElementById('header-action-btn').innerHTML = iconLock;
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'none';
+            document.getElementById('header-log-btn').style.display = 'none'; // 隱藏歷史按鈕
             window.closeOrderManager();
             window.closeModal('modal-logout-confirm');
             render(); 
@@ -1271,6 +1372,18 @@
             const rowDiv = document.createElement('div');
             rowDiv.className = 'row';
             
+            if (bid.startsWith('M')) {
+                const leftLabel = document.createElement('div');
+                leftLabel.className = 'row-label left';
+                leftLabel.innerText = rowName;
+                rowDiv.appendChild(leftLabel);
+
+                const rightLabel = document.createElement('div');
+                rightLabel.className = 'row-label right';
+                rightLabel.innerText = rowName;
+                rowDiv.appendChild(rightLabel);
+            }
+
             const isSwapActive = window.swapState && window.swapState.active;
 
             for(let s=start; s<=end; s++){
@@ -1389,6 +1502,9 @@
                 window.showToast("此座位已售出，請至「訂單管理」進行編輯或刪除", "error");
                 return;
             }
+
+            const isCurrentReserve = reserveSeats.includes(id);
+
             if (selectedIds.includes(id)) {
                 selectedIds = selectedIds.filter(i => i !== id);
             } else { 
@@ -1396,6 +1512,15 @@
                     window.showToast("上限為 5 張", "error"); 
                     return; 
                 }
+
+                if (selectedIds.length > 0) {
+                    const isFirstReserve = reserveSeats.includes(selectedIds[0]);
+                    if (isCurrentReserve !== isFirstReserve) {
+                        window.showToast("一般席與保留席必須分開劃位！", "error");
+                        return;
+                    }
+                }
+
                 selectedIds.push(id); 
             }
             render();
@@ -1470,7 +1595,7 @@
             const o = ordersData[window.swapState.orderId];
 
             if (window.swapState.step === 1) {
-                bText.innerHTML = `正在為 <b>${o.name}</b> 更換座位<br>第一步：請點選要退出的「原座位」 <span class="highlight-red">(已選 ${window.swapState.oldSeats.length} 個)</span>`;
+                bText.innerHTML = `正在為 <b>${o.name || '(未提供姓名)'}</b> 更換座位<br>第一步：請點選要退出的「原座位」 <span class="highlight-red">(已選 ${window.swapState.oldSeats.length} 個)</span>`;
                 if(bPrev) bPrev.style.display = 'none';
                 bNext.style.display = window.swapState.oldSeats.length > 0 ? 'block' : 'none';
                 bConfirm.style.display = 'none';
@@ -1495,6 +1620,7 @@
             const oldHtml = setLoadingState('btn-execute-swap', true);
             const { orderId, oldSeats, newSeats } = window.swapState;
             const o = ordersData[orderId];
+            const displayName = o.name || '(未提供姓名)';
             
             let updatedSeats = o.seats.filter(s => !oldSeats.includes(s));
             updatedSeats = [...updatedSeats, ...newSeats];
@@ -1527,6 +1653,7 @@
                 window.closeModal('modal-swap-confirm');
                 window.cancelSwapMode(); 
                 window.openOrderManager(); 
+                window.addActionLog(`更換座位：將 <span style="font-weight:bold; color:#1e293b;">${displayName}</span> 的 ${oldSeats.join(', ')} 換至 ${newSeats.join(', ')}`);
                 window.showToast("座位更換成功！", "success");
             }).catch(err => {
                 console.error(err);
@@ -1574,7 +1701,28 @@
             document.getElementById('p-name').value = ""; 
             document.getElementById('p-phone').value = "";
             document.getElementById('p-note').value = "";
-            document.getElementById('p-type').value = "650"; 
+            
+            const pType = document.getElementById('p-type');
+            if (selectedIds.length > 0) {
+                const isReserveSelection = reserveSeats.includes(selectedIds[0]);
+                if (isReserveSelection) {
+                    pType.innerHTML = `<option value="0">公關票價 NT$ 0 / 張</option>`;
+                    pType.value = "0";
+                    pType.disabled = true;
+                    pType.style.backgroundColor = "#f1f5f9";
+                    pType.style.cursor = "not-allowed";
+                } else {
+                    pType.innerHTML = `
+                        <option value="650">早鳥優惠 NT$ 650 / 張</option>
+                        <option value="800">一般原價 NT$ 800 / 張</option>
+                    `;
+                    pType.value = "650"; 
+                    pType.disabled = false;
+                    pType.style.backgroundColor = "white";
+                    pType.style.cursor = "pointer";
+                }
+            }
+
             document.getElementById('modal-payment').style.display = 'none';
             document.getElementById('modal-purchase').style.display = 'flex';
             document.getElementById('buy-seat-list').value = selectedIds.join(', ');
@@ -1597,8 +1745,8 @@
                 phoneInput.placeholder = "請輸入聯絡電話"; 
                 phoneInput.removeAttribute('maxlength'); 
             } else {
-                nameLabel.innerHTML = `購票姓名 ${reqStarHtml}`;
-                nameInput.placeholder = "請輸入姓名";
+                nameLabel.innerHTML = `購票姓名`; 
+                nameInput.placeholder = "請輸入姓名 (選填)"; 
                 phoneLabel.innerHTML = `聯絡電話 ${reqStarHtml}`; 
                 phoneInput.placeholder = "請輸入 09 開頭的 10 碼電話";
                 phoneInput.setAttribute('maxlength', '10');
@@ -1650,8 +1798,8 @@
                     window.showToast("請填寫貴賓稱呼 / 單位！", "error"); return;
                 }
             } else {
-                if(!name || !phone) {
-                    window.showToast("請填寫姓名與電話！", "error"); return;
+                if(!phone) { 
+                    window.showToast("請填寫聯絡電話！", "error"); return;
                 }
                 const phoneRegex = /^09\d{8}$/;
                 if (!phoneRegex.test(phone)) {
@@ -1691,6 +1839,9 @@
 
             update(ref(db), updates).then(() => { 
                 const seatsJoined = selectedIds.join('、');
+                const displayName = name || '(未提供姓名)';
+                window.addActionLog(`新增劃位：<span style="font-weight:bold; color:#1e293b;">${displayName}</span> 劃了 ${seatsJoined}`);
+                
                 selectedIds = []; 
                 window.closeModal('modal-payment'); 
                 
@@ -1729,10 +1880,17 @@
         };
 
         window.openOrderManager = () => {
+            // 🌟 修正1：切換到訂單管理時，清空已選座位與重新渲染下方懸浮列
+            selectedIds = [];
+            render();
+
             document.getElementById('main-content-area').style.display = 'none';
             document.getElementById('floating-bar').classList.remove('show');
             document.getElementById('order-page').style.display = 'flex';
             document.getElementById('header-order-btn').style.display = 'none';
+            
+            // 🌟 修正3：不隱藏歷史紀錄按鈕，讓它一直顯示在右上角
+            document.getElementById('header-log-btn').style.display = 'flex'; 
             document.getElementById('header-back-btn').style.display = 'flex';
             
             window.clearAllFilters();
@@ -1743,6 +1901,8 @@
             document.getElementById('main-content-area').style.display = 'flex';
             if (isAdmin) {
                 document.getElementById('header-order-btn').style.display = 'flex';
+                // 確保返回時歷史紀錄按鈕依然顯示
+                document.getElementById('header-log-btn').style.display = 'flex';
                 document.getElementById('header-back-btn').style.display = 'none';
             }
             updateBottomBar();
@@ -1862,7 +2022,20 @@
             }
 
             let filteredArray = dateFilteredOrders.filter(o => {
-                if (selectedStatus !== 'all' && o.status !== selectedStatus) return false;
+                if (selectedStatus !== 'all') {
+                    if (selectedStatus === 'pending-cash') {
+                        if (o.isRefund || o.status !== 'pending' || o.paymentMethod !== 'cash') return false;
+                    } else if (selectedStatus === 'pending-transfer') {
+                        if (o.isRefund || o.status !== 'pending' || o.paymentMethod !== 'transfer') return false;
+                    } else if (selectedStatus === 'paid') {
+                        if (o.isRefund || o.status !== 'paid') return false;
+                    } else if (selectedStatus === 'pending_refund') {
+                        if (!o.isRefund || o.status !== 'pending_refund') return false;
+                    } else if (selectedStatus === 'refunded') {
+                        if (!o.isRefund || o.status !== 'refunded') return false;
+                    }
+                }
+                
                 if (selectedPayment !== 'all' && o.paymentMethod !== selectedPayment) return false;
                 
                 if (keyword !== "") {
@@ -2019,7 +2192,6 @@
                     return (o.refundedSeats || []).includes(s) ? `${baseStr} (已退)` : baseStr;
                 }).join(', ');
 
-                // 🌟 操作按鈕區域
                 let actionsHtml = '';
                 if (o.isRefund) {
                     if (o.status === 'pending_refund') {
@@ -2034,20 +2206,20 @@
                     
                     const activeSeatsCount = (o.seats || []).length - (o.refundedSeats || []).length;
                     if (activeSeatsCount > 0) {
-                        // 退票按鈕 (垃圾桶)
                         actionsHtml += `<button class="action-icon-btn refund" onclick="window.openRefundModal('${o.orderId}')" title="部分退票/退費 (保留紀錄)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>`;
                     }
                     
-                    // 刪除作廢按鈕 (X 打叉)
                     actionsHtml += `<button class="action-icon-btn delete" onclick="window.openDeleteModal('${o.orderId}')" title="刪除整筆訂單 (不留紀錄)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>`;
                 }
 
                 const amountColor = o.isRefund ? '#ef4444' : 'var(--primary-blue)';
+                
+                const displayName = o.name ? o.name : '<span style="color:#cbd5e1; font-size:13px; font-weight:normal;">(未提供姓名)</span>';
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><div style="font-weight:bold;">${timeString}</div>${subDateHtml}</td>
-                    <td><div style="font-weight:bold;">${o.name}</div><div style="font-size:11px; color:#94a3b8;">${o.phone}</div></td>
+                    <td><div style="font-weight:bold;">${displayName}</div><div style="font-size:11px; color:#94a3b8;">${o.phone}</div></td>
                     <td style="max-width: 150px;" title="${seatsFullTitle}">
                         <div style="font-weight:bold; color:#1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${seatNamesStr}</div>
                         ${serialHtml}
@@ -2067,12 +2239,11 @@
             });
         };
 
-        // --- 退款核銷專屬功能 ---
         window.openVerifyRefund = (orderId) => {
             const o = ordersData[orderId];
             if(!o) return;
             document.getElementById('verify-refund-order-id').value = orderId;
-            document.getElementById('verify-refund-name').innerText = o.name;
+            document.getElementById('verify-refund-name').innerText = o.name || '(未提供姓名)';
             document.getElementById('verify-refund-total').innerText = `NT$ ${Math.abs(o.total).toLocaleString()}`;
             
             const today = new Date();
@@ -2102,6 +2273,8 @@
             
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-verify-refund'); 
+                const displayName = o.name || '(未提供姓名)';
+                window.addActionLog(`退款核銷：已將 <span style="font-weight:bold; color:#1e293b;">${displayName}</span> 的退單設為已退款`);
                 window.showToast("已成功登記退款！", "success"); 
             }).catch(err => {
                 console.error(err);
@@ -2111,13 +2284,12 @@
             });
         };
 
-        // 🌟 退票功能 (垃圾桶按鈕)
         window.openRefundModal = (orderId) => {
             const o = ordersData[orderId];
             if(!o) return;
             
             document.getElementById('refund-order-id').value = orderId;
-            document.getElementById('refund-order-name').innerText = o.name;
+            document.getElementById('refund-order-name').innerText = o.name || '此購票人';
             
             const container = document.getElementById('refund-seat-checkboxes');
             container.innerHTML = '';
@@ -2188,7 +2360,6 @@
             const isFree = o.paymentMethod === 'free';
             const isPending = o.status === 'pending';
 
-            // 防呆：未付款訂單 或 免付費訂單 直接作廢扣除，不生退款單
             if (isPending || isFree) {
                 if (selectedSeats.length === activeSeats.length && (o.refundedSeats || []).length === 0) {
                     updates[`orders/${orderId}`] = null;
@@ -2204,7 +2375,6 @@
                 }
                 selectedSeats.forEach(s => updates[`seats/${s}`] = null);
             } else {
-                // 已付款訂單：保留歷史、產生退單
                 const method = document.getElementById('refund-method-select').value;
                 const newRefId = 'REF-' + Date.now();
                 
@@ -2232,6 +2402,8 @@
             
             update(ref(db), updates).then(() => {
                 window.closeModal('modal-create-refund');
+                const displayName = o.name || '(未提供姓名)';
+                window.addActionLog(`執行退票：取消了 <span style="font-weight:bold; color:#1e293b;">${displayName}</span> 的 ${selectedSeats.join(', ')}`);
                 window.showToast("退票/作廢 處理完成，座位已釋出！", "success");
             }).catch(err => {
                 console.error(err);
@@ -2241,12 +2413,11 @@
             });
         };
 
-        // --- 刪除訂單功能 (X 按鈕) ---
         window.openDeleteModal = (orderId) => {
             const o = ordersData[orderId];
             if(!o) return;
             document.getElementById('delete-target-id').value = orderId;
-            document.getElementById('del-order-name').innerText = o.name;
+            document.getElementById('del-order-name').innerText = o.name || '此購票人';
             document.getElementById('modal-delete-order').style.display = 'flex';
         };
 
@@ -2272,6 +2443,8 @@
             
             update(ref(db), updates).then(() => {
                 window.closeModal('modal-delete-order');
+                const displayName = o.name || '(未提供姓名)';
+                window.addActionLog(`作廢訂單：刪除了 <span style="font-weight:bold; color:#ef4444;">${displayName}</span> 的整筆紀錄`);
                 window.showToast("訂單已徹底刪除！", "success");
             }).catch(err => {
                 console.error(err);
@@ -2285,7 +2458,7 @@
             const o = ordersData[orderId];
             if(!o) return;
             document.getElementById('verify-order-id').value = orderId;
-            document.getElementById('verify-name').innerText = o.name;
+            document.getElementById('verify-name').innerText = o.name || '(未提供姓名)';
             document.getElementById('verify-total').innerText = `NT$ ${o.total.toLocaleString()}`;
             const isCash = o.paymentMethod === 'cash';
             document.getElementById('verify-modal-title-text').innerText = isCash ? '現金收款確認' : '匯款入帳確認';
@@ -2325,6 +2498,8 @@
             
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-verify'); 
+                const displayName = o.name || '(未提供姓名)';
+                window.addActionLog(`收款核銷：將 <span style="font-weight:bold; color:#1e293b;">${displayName}</span> 狀態改為已完成`);
                 window.showToast("核銷成功！", "success"); 
             }).catch(err => {
                 console.error(err);
@@ -2461,6 +2636,8 @@
 
             update(ref(db), updates).then(() => { 
                 window.closeModal('modal-edit-order'); 
+                const displayName = o.name || '(未提供姓名)';
+                window.addActionLog(`編輯訂單：修改了 <span style="font-weight:bold; color:#1e293b;">${displayName}</span> 的資料`);
                 window.showToast("已儲存變更", "success"); 
             }).catch((err) => {
                 console.error(err);
@@ -2538,7 +2715,12 @@
                             const isReserve = reserveSeats.includes(id);
 
                             if (isSold) {
-                                cell.value = `${id}\n${seatInfo.name || ''}`;
+                                // 🌟 調整：一般席只顯示座位號碼；公關票/保留席才顯示姓名
+                                if (isReserve || seatInfo.paymentMethod === 'free') {
+                                    cell.value = `${id}\n${seatInfo.name || ''}`;
+                                } else {
+                                    cell.value = id;
+                                }
                                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
                                 cell.font = { color: { argb: 'FFB91C1C' }, bold: true, size: 9 };
                             } else if (isReserve) {
@@ -2737,7 +2919,7 @@
                 { header: '付款類別', key: 'method', width: 12 },
                 { header: '繳費期別', key: 'period', width: 12 },
                 { header: '收費項目', key: 'item', width: 20 },
-                { header: '付款人', key: 'payer', width: 15 },
+                { header: '付款人', key: 'payer', width: 25 }, // 🌟 稍微加寬以容納姓名+電話
                 { header: '繳費明細/數量 詳細', key: 'details', width: 45 }, 
                 { header: '收入金額', key: 'income', width: 12 },
                 { header: '新/舊生/其他', key: 'note', width: 15 }
@@ -2780,12 +2962,24 @@
                         detailString = `MIA 8th 成發門票 / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
                     }
 
+                    // 🌟 新增：組合姓名與電話
+                    let payerInfo = '';
+                    if (o.name && o.phone) {
+                        payerInfo = `${o.name} ${o.phone}`;
+                    } else if (o.phone) {
+                        payerInfo = o.phone;
+                    } else if (o.name) {
+                        payerInfo = o.name;
+                    } else {
+                        payerInfo = '未提供';
+                    }
+
                     ws.addRow({
                         date: formattedDate,
                         method: category,
                         period: '',  
                         item: '門票',
-                        payer: o.name,
+                        payer: payerInfo, // 🌟 使用組合後的資訊
                         details: detailString,
                         income: o.total,
                         note: ''     
