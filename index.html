@@ -87,19 +87,18 @@
         #RT, #RM, #RB { align-items: flex-start; }
         #MT, #MM, #MB { align-items: center; }
         
-        /* 🌟 新增：將 .row 設為 relative，並加上走道字母的樣式 */
         .row { display: flex; gap: 4px; height: 38px; align-items: center; position: relative; }
         
         .row-label {
             position: absolute;
             font-size: 18px;
             font-weight: 900;
-            color: #cbd5e1; /* 淺灰藍色，不干擾視覺 */
+            color: #cbd5e1; 
             top: 50%;
             transform: translateY(-50%);
-            width: 60px; /* 剛好符合 column-gap 的寬度 */
+            width: 60px; 
             text-align: center;
-            pointer-events: none; /* 避免點擊干擾 */
+            pointer-events: none; 
             user-select: none;
             font-family: "Arial", sans-serif;
         }
@@ -145,7 +144,6 @@
             pointer-events: none; 
         }
 
-        /* 換位模式專用 CSS */
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
         .seat.swap-selected-old,
         .seat.sold.swap-selected-old,
@@ -154,7 +152,6 @@
         .swap-selectable-old { cursor: pointer !important; }
         .disabled-seat { opacity: 0.25 !important; cursor: not-allowed !important; pointer-events: none !important; filter: grayscale(100%); }
 
-        /* 換位模式專屬質感橫幅 */
         .swap-banner {
             display: none; position: sticky; top: 0; left: 0; width: 100%; background: #1e293b; padding: 12px 20px; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
             justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-sizing: border-box; color: #f8fafc;
@@ -189,7 +186,6 @@
         .custom-toast.success { background-color: #10b981; }
         .custom-toast svg { width: 22px; height: 22px; }
 
-        /* 背景模糊效果 */
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
         .modal { background: white; width: 100%; max-width: 480px; max-height: 95vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         
@@ -499,7 +495,6 @@
             color: var(--primary-blue);
         }
 
-        /* 🌟 新增：歷史紀錄清單樣式 */
         .log-item { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; color: #475569; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
         .log-item:last-child { border-bottom: none; }
         .log-time { font-weight: bold; color: var(--primary-blue); flex-shrink: 0; font-size: 12px; margin-top: 2px;}
@@ -528,7 +523,7 @@
         <span id="toast-msg">上限為 5 張</span>
     </div>
 
-    <!-- 🌟 新增：操作紀錄看板視窗 -->
+    <!-- 操作紀錄看板視窗 -->
     <div class="modal-overlay" id="modal-action-log" style="z-index: 5000;">
         <div class="modal" style="max-width: 400px; max-height: 80vh;">
             <div class="modal-header">
@@ -539,6 +534,25 @@
             </div>
             <div class="modal-body" id="log-list-container" style="padding: 10px 20px;">
                 <!-- 紀錄內容會動態產生在這裡 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 新增：重新叫出匯款提醒的視窗 -->
+    <div class="modal-overlay" id="modal-remind-transfer" style="z-index: 4000;">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header">
+                <span>匯款提醒資訊</span>
+                <span class="close-x" onclick="window.closeModal('modal-remind-transfer')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            </div>
+            <div class="modal-body" style="padding: 25px 30px;">
+                <p style="margin-top:0; color:#475569; font-size:15px; font-weight:bold;">點擊下方按鈕，複製匯款提醒訊息：</p>
+                <div class="copy-info-box" style="display:block; margin-top: 15px;">
+                    <div id="remind-transfer-text" class="copy-info-text"></div>
+                    <button class="btn-copy-action" onclick="window.copyRemindTransferInfo()">點擊複製匯款資訊</button>
+                </div>
             </div>
         </div>
     </div>
@@ -629,7 +643,6 @@
             </div>
         </div>
         <div class="header-actions">
-            <!-- 🌟 新增：操作紀錄看板按鈕 (時鐘圖示) -->
             <button class="menu-btn" id="header-log-btn" onclick="window.openActionLog()" style="display:none;" title="近期操作紀錄">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -1077,7 +1090,7 @@
         </div>
     </div>
 
-    <!-- 🌟 修正2：補回被誤刪的確認換位視窗 -->
+    <!-- 確認換位視窗 -->
     <div class="modal-overlay" id="modal-swap-confirm" style="z-index: 4000;">
         <div class="modal" style="max-width: 420px;">
             <div class="modal-header">
@@ -1196,7 +1209,6 @@
         let toastTimeout = null;
         let originalOrderState = null;
         
-        // 🌟 新增：本地操作紀錄陣列
         let localActionLogs = [];
 
         // 分頁狀態變數
@@ -1260,15 +1272,13 @@
             if(orderPage && orderPage.style.display === 'flex') window.renderOrders();
         });
 
-        // 🌟 新增：寫入歷史紀錄的通用函式
         window.addActionLog = (msg) => {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
             localActionLogs.unshift({ time: timeStr, msg: msg });
-            if (localActionLogs.length > 50) localActionLogs.pop(); // 最多保留 50 筆
+            if (localActionLogs.length > 50) localActionLogs.pop(); 
         };
 
-        // 🌟 新增：開啟操作紀錄看板
         window.openActionLog = () => {
             const container = document.getElementById('log-list-container');
             container.innerHTML = '';
@@ -1319,7 +1329,7 @@
                 document.getElementById('main-body').classList.add('logged-in');
                 document.getElementById('header-action-btn').innerHTML = iconUnlock;
                 document.getElementById('header-order-btn').style.display = 'flex';
-                document.getElementById('header-log-btn').style.display = 'flex'; // 顯示歷史按鈕
+                document.getElementById('header-log-btn').style.display = 'flex'; 
                 window.closeModal('modal-login');
                 render(); 
                 window.showToast("登入成功", "success");
@@ -1333,11 +1343,11 @@
         window.confirmLogout = () => {
             isAdmin = false; 
             selectedIds = []; 
-            localActionLogs = []; // 登出清除紀錄
+            localActionLogs = []; 
             document.getElementById('header-action-btn').innerHTML = iconLock;
             document.getElementById('header-order-btn').style.display = 'none';
             document.getElementById('header-back-btn').style.display = 'none';
-            document.getElementById('header-log-btn').style.display = 'none'; // 隱藏歷史按鈕
+            document.getElementById('header-log-btn').style.display = 'none'; 
             window.closeOrderManager();
             window.closeModal('modal-logout-confirm');
             render(); 
@@ -1373,14 +1383,21 @@
             rowDiv.className = 'row';
             
             if (bid.startsWith('M')) {
+                // 🌟 修正：動態計算排數標籤的偏移量，讓所有字母垂直對齊
+                // 中間區最寬為 15 席，每個座位+間距約 32px。依此計算需向外補償的距離
+                const seatCount = end - start + 1;
+                const offsetPx = -60 - ((15 - seatCount) / 2) * 32;
+
                 const leftLabel = document.createElement('div');
                 leftLabel.className = 'row-label left';
                 leftLabel.innerText = rowName;
+                leftLabel.style.left = `${offsetPx}px`;
                 rowDiv.appendChild(leftLabel);
 
                 const rightLabel = document.createElement('div');
                 rightLabel.className = 'row-label right';
                 rightLabel.innerText = rowName;
+                rightLabel.style.right = `${offsetPx}px`;
                 rowDiv.appendChild(rightLabel);
             }
 
@@ -1772,6 +1789,18 @@
             window.showToast("已複製資訊！", "success");
         };
 
+        // 🌟 新增：專門用來複製重新叫出的匯款提醒文字
+        window.copyRemindTransferInfo = () => {
+            const text = document.getElementById('remind-transfer-text').innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            window.showToast("已複製匯款提醒資訊！", "success");
+        };
+
         const setLoadingState = (btnId, isLoading, originalHtml = '', loadingText = '處理中...') => {
             const btn = document.getElementById(btnId);
             if (!btn) return originalHtml;
@@ -1864,7 +1893,7 @@
                     statusLabel.style.color = "#d97706";
                     copyBox.style.display = "block";
                     
-                    const transferText = `您好~您已成功預訂MIA春季成果發表座位\n為協助您保留座位，請於今日內完成匯款，逾期將釋出座位，敬請見諒。\n📍 座位：${seatsJoined}\n📍 金額：$${total.toLocaleString()}\n—\n📌中國信託（822）2995-4080-2139\n匯款 / 轉帳完成後請回覆：\n➊ 購票姓名 \n➋ 匯款金額\n❸ 帳號後五碼`;
+                    const transferText = `您好~您已成功預訂MIA春季成果發表座位\n為協助您保留座位，請於今日內完成匯款，逾期將釋出座位，敬請見諒。\n📍 座位：${seatsJoined}\n📍 金額：$${total.toLocaleString()}\n—\n📌中國信託（822）2995-4080-2139\n匯款 / 轉帳完成後請回覆：\n➊ 購票姓名or電話 \n➋ 匯款金額\n❸ 帳號後五碼`;
                     document.getElementById('copy-transfer-text').innerText = transferText;
                 }
                 
@@ -1879,8 +1908,23 @@
             });
         };
 
+        // 🌟 新增：從後台打開特定訂單匯款提醒的函數
+        window.openRemindTransfer = (orderId) => {
+            const o = ordersData[orderId];
+            if (!o) return;
+            
+            // 計算目前還有效的座位 (排除已退票的)
+            const activeSeats = (o.seats || []).filter(s => !(o.refundedSeats || []).includes(s));
+            const seatsJoined = activeSeats.join('、');
+            const total = o.total;
+            
+            const transferText = `您好~您已成功預訂MIA春季成果發表座位\n為協助您保留座位，請於今日內完成匯款，逾期將釋出座位，敬請見諒。\n📍 座位：${seatsJoined}\n📍 金額：$${total.toLocaleString()}\n—\n📌中國信託（822）2995-4080-2139\n匯款 / 轉帳完成後請回覆：\n➊ 購票姓名or電話 \n➋ 匯款金額\n❸ 帳號後五碼`;
+            
+            document.getElementById('remind-transfer-text').innerText = transferText;
+            document.getElementById('modal-remind-transfer').style.display = 'flex';
+        };
+
         window.openOrderManager = () => {
-            // 🌟 修正1：切換到訂單管理時，清空已選座位與重新渲染下方懸浮列
             selectedIds = [];
             render();
 
@@ -1889,7 +1933,6 @@
             document.getElementById('order-page').style.display = 'flex';
             document.getElementById('header-order-btn').style.display = 'none';
             
-            // 🌟 修正3：不隱藏歷史紀錄按鈕，讓它一直顯示在右上角
             document.getElementById('header-log-btn').style.display = 'flex'; 
             document.getElementById('header-back-btn').style.display = 'flex';
             
@@ -1901,7 +1944,6 @@
             document.getElementById('main-content-area').style.display = 'flex';
             if (isAdmin) {
                 document.getElementById('header-order-btn').style.display = 'flex';
-                // 確保返回時歷史紀錄按鈕依然顯示
                 document.getElementById('header-log-btn').style.display = 'flex';
                 document.getElementById('header-back-btn').style.display = 'none';
             }
@@ -2154,6 +2196,16 @@
                     statusClass = (o.status === 'paid') ? 'status-paid' : (o.paymentMethod === 'cash' ? 'status-unpaid-red' : 'status-pending-orange');
                 }
 
+                // 🌟 新增：讓待入帳的標籤變成可點擊，並加上小複製圖示
+                let badgeHtml = `<span class="status-badge ${statusClass}">${statusLabel}</span>`;
+                if (!o.isRefund && o.status === 'pending' && o.paymentMethod === 'transfer') {
+                    badgeHtml = `
+                    <span class="status-badge ${statusClass}" style="cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onclick="window.openRemindTransfer('${o.orderId}')" title="點擊複製匯款提醒文字">
+                        ${statusLabel}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </span>`;
+                }
+
                 let subDateHtml = '';
                 if (o.isRefund) {
                     if (o.status === 'refunded' && o.refundDate) {
@@ -2228,7 +2280,7 @@
                         <div style="font-weight:bold; color:${amountColor};">NT$ ${o.total.toLocaleString()}</div>
                         <div style="font-size:11px; color:#94a3b8;">${methodStr}</div>
                     </td>
-                    <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                    <td>${badgeHtml}</td> <!-- 🌟 替換為可點擊的動態標籤 -->
                     <td>
                         <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                             ${actionsHtml}
@@ -2914,15 +2966,16 @@
             workbook.creator = 'MIA Ticketing System';
             const ws = workbook.addWorksheet('當日收款名冊');
 
+            // 🌟 修正：調整欄位順序為您的指定格式
             ws.columns = [
                 { header: '填寫日期', key: 'date', width: 15 },
                 { header: '付款類別', key: 'method', width: 12 },
                 { header: '繳費期別', key: 'period', width: 12 },
                 { header: '收費項目', key: 'item', width: 20 },
-                { header: '付款人', key: 'payer', width: 25 }, // 🌟 稍微加寬以容納姓名+電話
                 { header: '繳費明細/數量 詳細', key: 'details', width: 45 }, 
-                { header: '收入金額', key: 'income', width: 12 },
-                { header: '新/舊生/其他', key: 'note', width: 15 }
+                { header: '付款人', key: 'payer', width: 25 },
+                { header: '新/舊生/其他', key: 'note', width: 15 },
+                { header: '收入金額', key: 'income', width: 12 }
             ];
 
             ws.getRow(1).font = { bold: true };
