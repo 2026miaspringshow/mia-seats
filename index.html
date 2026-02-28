@@ -538,7 +538,7 @@
         </div>
     </div>
 
-    <!-- 🌟 新增：重新叫出匯款提醒的視窗 -->
+    <!-- 重新叫出匯款提醒的視窗 -->
     <div class="modal-overlay" id="modal-remind-transfer" style="z-index: 4000;">
         <div class="modal" style="max-width: 420px;">
             <div class="modal-header">
@@ -604,7 +604,7 @@
             </div>
             <div class="modal-body">
                 <div class="form-group" style="margin-bottom: 25px;">
-                    <input type="password" id="admin-pw-input" placeholder="請輸入管理員密碼" style="padding:16px; border:1.5px solid #ddd; border-radius:12px; width:100%; box-sizing:border-box; font-size: 16px;">
+                    <input type="password" id="admin-pw-input" placeholder="請輸入管理員密碼" style="padding:16px; border:1.5px solid #ddd; border-radius:12px; width:100%; box-sizing:border-box; font-size: 16px;" onkeydown="if(event.key === 'Enter') window.submitLogin()">
                     <div id="login-error-msg" style="color: #ef4444; font-size: 13px; margin-top: 10px; font-weight: bold; display: none; text-align: center;">密碼錯誤，請重新輸入！</div>
                 </div>
                 <div style="display:flex; gap:10px;">
@@ -627,7 +627,7 @@
             <div class="modal-body">
                 <div style="text-align: center; font-size: 16px; color: #475569; margin-bottom: 30px; font-weight: bold;">您確定要登出管理員模式嗎？</div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-confirm-final" style="background: white; color: #64748b; border: 1.5px solid #cbd5e1;" onclick="window.closeModal('modal-logout-confirm')">取消</button>
+                    <button class="btn-confirm-final" style="background: white; color: #64748b; border: 1.5 solid #cbd5e1;" onclick="window.closeModal('modal-logout-confirm')">取消</button>
                     <button class="btn-confirm-final" style="background: #ef4444;" onclick="window.confirmLogout()">確認登出</button>
                 </div>
             </div>
@@ -712,7 +712,7 @@
             <div class="order-page-header">
                 <h2 class="order-page-title">訂單管理</h2>
                 <div class="header-actions-group">
-                    <button class="btn-action-outline" onclick="window.exportToExcel()" title="匯出完整 Excel (含座位圖與訂單)">
+                    <button class="btn-action-outline" onclick="window.exportToExcel()" title="匯出完整 Excel (含離線備援連動機制)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         匯出總表 (Excel)
                     </button>
@@ -1036,7 +1036,7 @@
                 <div class="form-group">
                     <label>請勾選要退出的座位（全選即全單退票）</label>
                     <div id="refund-seat-checkboxes" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
-                        <!-- JS dynamically injects checkboxes here -->
+                        <!-- JS dynamically injectes checkboxes here -->
                     </div>
                 </div>
 
@@ -1130,7 +1130,7 @@
                     <input type="hidden" id="edit-order-id">
                     <div class="form-group">
                         <label>匯款末五碼</label>
-                        <input type="text" id="edit-order-bank" placeholder="若非匯款請留空" style="padding:14px; border:1px solid #ddd; border-radius:8px; font-size:16px;">
+                        <input type="text" id="edit-order-bank" placeholder="若非匯款請留空" style="padding:14px; border:1.5px solid #ddd; border-radius:8px; font-size:16px;">
                     </div>
                     <div class="form-group">
                         <label>備註資訊</label>
@@ -1383,8 +1383,6 @@
             rowDiv.className = 'row';
             
             if (bid.startsWith('M')) {
-                // 🌟 修正：動態計算排數標籤的偏移量，讓所有字母垂直對齊
-                // 中間區最寬為 15 席，每個座位+間距約 32px。依此計算需向外補償的距離
                 const seatCount = end - start + 1;
                 const offsetPx = -60 - ((15 - seatCount) / 2) * 32;
 
@@ -1789,7 +1787,6 @@
             window.showToast("已複製資訊！", "success");
         };
 
-        // 🌟 新增：專門用來複製重新叫出的匯款提醒文字
         window.copyRemindTransferInfo = () => {
             const text = document.getElementById('remind-transfer-text').innerText;
             const el = document.createElement('textarea');
@@ -1908,12 +1905,10 @@
             });
         };
 
-        // 🌟 新增：從後台打開特定訂單匯款提醒的函數
         window.openRemindTransfer = (orderId) => {
             const o = ordersData[orderId];
             if (!o) return;
             
-            // 計算目前還有效的座位 (排除已退票的)
             const activeSeats = (o.seats || []).filter(s => !(o.refundedSeats || []).includes(s));
             const seatsJoined = activeSeats.join('、');
             const total = o.total;
@@ -2196,7 +2191,6 @@
                     statusClass = (o.status === 'paid') ? 'status-paid' : (o.paymentMethod === 'cash' ? 'status-unpaid-red' : 'status-pending-orange');
                 }
 
-                // 🌟 新增：讓待入帳的標籤變成可點擊，並加上小複製圖示
                 let badgeHtml = `<span class="status-badge ${statusClass}">${statusLabel}</span>`;
                 if (!o.isRefund && o.status === 'pending' && o.paymentMethod === 'transfer') {
                     badgeHtml = `
@@ -2280,7 +2274,7 @@
                         <div style="font-weight:bold; color:${amountColor};">NT$ ${o.total.toLocaleString()}</div>
                         <div style="font-size:11px; color:#94a3b8;">${methodStr}</div>
                     </td>
-                    <td>${badgeHtml}</td> <!-- 🌟 替換為可點擊的動態標籤 -->
+                    <td>${badgeHtml}</td>
                     <td>
                         <div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                             ${actionsHtml}
@@ -2701,35 +2695,34 @@
 
         window.exportToExcel = async () => {
             if(!isAdmin) return;
-            window.showToast("正在產生 Excel 檔案，請稍候...", "success");
+            window.showToast("正在產生終極 Excel 總表，請稍候...", "success");
 
             const workbook = new ExcelJS.Workbook();
             workbook.creator = 'MIA Ticketing System';
+            
+            const JH_FONT = { name: '微軟正黑體' };
 
             // ==========================================
-            // 工作表 1：現場座位圖
+            // 工作表 1：現場座位圖 (綜合連動版)
             // ==========================================
             const wsMap = workbook.addWorksheet('現場座位圖', {views: [{showGridLines: false}]});
-            
             for (let i = 1; i <= 41; i++) wsMap.getColumn(i).width = 8;
 
             wsMap.mergeCells('A1:AO1');
-            wsMap.getCell('A1').value = '2026 8th MIA SPRING SHOW - 現場座位表';
-            wsMap.getCell('A1').font = { size: 20, bold: true };
+            wsMap.getCell('A1').value = '2026 8th MIA SPRING SHOW - 現場座位表 (綜合連動)';
+            wsMap.getCell('A1').font = { ...JH_FONT, size: 20, bold: true };
             wsMap.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
             wsMap.getRow(1).height = 40;
 
             wsMap.mergeCells('A2:AO2');
-            wsMap.getCell('A2').value = '舞 台';
+            wsMap.getCell('A2').value = '舞 台 (若使用最右側「緊急手動輸入區」，位子會變為紫色)';
             wsMap.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
-            wsMap.getCell('A2').font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
+            wsMap.getCell('A2').font = { ...JH_FONT, size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
             wsMap.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
             wsMap.getRow(2).height = 30;
 
-            wsMap.getRow(3).height = 20;
-
-            const L_MAX = 11, M_MAX = 15, R_MAX = 11, GAP = 2;
             let currentRow = 4;
+            let availableSeatAddresses = [];
 
             layout.forEach(sec => {
                 for(let r = 0; r < sec.rows; r++) {
@@ -2737,7 +2730,6 @@
                     const cL = Array.isArray(sec.L) ? sec.L[r] : sec.L;
                     const cM = Array.isArray(sec.M) ? sec.M[r] : sec.M;
                     const cR = Array.isArray(sec.R) ? sec.R[r] : sec.R;
-
                     let currentCol = 1;
 
                     const renderCell = (s, block) => {
@@ -2746,55 +2738,42 @@
                         const isBlocked = ((rowName === 'A' || rowName === 'B') && (block === 'L' || block === 'R'));
                         
                         cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
-                        cell.border = { 
-                            top: {style:'thin', color:{argb:'FFCBD5E1'}}, 
-                            left: {style:'thin', color:{argb:'FFCBD5E1'}}, 
-                            bottom: {style:'thin', color:{argb:'FFCBD5E1'}}, 
-                            right: {style:'thin', color:{argb:'FFCBD5E1'}} 
-                        };
+                        cell.border = { top: {style:'thin', color:{argb:'FFCBD5E1'}}, left: {style:'thin', color:{argb:'FFCBD5E1'}}, bottom: {style:'thin', color:{argb:'FFCBD5E1'}}, right: {style:'thin', color:{argb:'FFCBD5E1'}} };
 
                         if (isBlocked) {
                             cell.value = "X";
                             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
-                            cell.font = { color: { argb: 'FF94A3B8' }, bold: true };
+                            cell.font = { ...JH_FONT, color: { argb: 'FF94A3B8' }, bold: true };
                         } else if (cameraSeats.includes(id)) {
                             cell.value = `${id}\n攝影席`;
                             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
-                            cell.font = { color: { argb: 'FFFFFFFF' }, bold: true, size: 9 };
+                            cell.font = { ...JH_FONT, color: { argb: 'FFFFFFFF' }, bold: true, size: 9 };
                         } else {
                             const seatInfo = seatsData[id] || {};
                             const isSold = seatInfo.status === 'sold';
                             const isReserve = reserveSeats.includes(id);
 
                             if (isSold) {
-                                // 🌟 調整：一般席只顯示座位號碼；公關票/保留席才顯示姓名
-                                if (isReserve || seatInfo.paymentMethod === 'free') {
-                                    cell.value = `${id}\n${seatInfo.name || ''}`;
-                                } else {
-                                    cell.value = id;
-                                }
+                                cell.value = (isReserve || seatInfo.paymentMethod === 'free') ? `${id}\n${seatInfo.name || ''}` : id;
                                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
-                                cell.font = { color: { argb: 'FFB91C1C' }, bold: true, size: 9 };
-                            } else if (isReserve) {
-                                cell.value = `${id}\n保留席`;
-                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
-                                cell.font = { color: { argb: 'FFD97706' }, bold: true, size: 9 };
+                                cell.font = { ...JH_FONT, color: { argb: 'FFB91C1C' }, bold: true, size: 9 };
                             } else {
                                 cell.value = id; 
-                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
-                                cell.font = { color: { argb: 'FF1E293B' }, bold: true };
+                                cell.font = { ...JH_FONT, color: { argb: 'FF1E293B' }, bold: true };
+                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: isReserve ? { argb: 'FFFEF3C7' } : { argb: 'FFFFFFFF' } };
+                                availableSeatAddresses.push({ address: cell.address, id: id });
                             }
                         }
                     };
 
-                    currentCol += (L_MAX - cL); 
+                    currentCol += (11 - cL); 
                     for(let s = 1; s <= cL; s++) { renderCell(s, 'L'); currentCol++; }
-                    currentCol += GAP;
-                    const padMidLeft = Math.floor((M_MAX - cM) / 2);
+                    currentCol += 2;
+                    const padMidLeft = Math.floor((15 - cM) / 2);
                     currentCol += padMidLeft;
                     for(let s = cL + 1; s <= cL + cM; s++) { renderCell(s, 'M'); currentCol++; }
-                    currentCol += (M_MAX - cM - padMidLeft);
-                    currentCol += GAP;
+                    currentCol += (15 - cM - padMidLeft);
+                    currentCol += 2;
                     for(let s = cL + cM + 1; s <= cL + cM + cR; s++) { renderCell(s, 'R'); currentCol++; }
 
                     wsMap.getRow(currentRow).height = 40;
@@ -2803,10 +2782,24 @@
                 currentRow++; 
             });
 
+            availableSeatAddresses.forEach(item => {
+                wsMap.addConditionalFormatting({
+                    ref: item.address,
+                    rules: [{
+                        type: 'expression',
+                        formulae: [`SUMPRODUCT(--ISNUMBER(SEARCH(","&"${item.id}"&",", ","&SUBSTITUTE(INDIRECT("'緊急手動輸入區'!$A$2:$A$500")," ","")&",")))>0`],
+                        style: {
+                            fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFE9D5FF' } },
+                            font: { color: { argb: 'FF7E22CE' }, bold: true }
+                        }
+                    }]
+                });
+            });
+
             // ==========================================
-            // 工作表 2：訂單名冊
+            // 工作表 2：系統訂單名冊
             // ==========================================
-            const wsOrders = workbook.addWorksheet('訂單名冊');
+            const wsOrders = workbook.addWorksheet('系統訂單名冊');
             wsOrders.columns = [
                 { header: '訂單編號', key: 'orderId', width: 22 },
                 { header: '訂單時間', key: 'time', width: 20 },
@@ -2820,47 +2813,25 @@
                 { header: '狀態', key: 'status', width: 15 },
                 { header: '備註', key: 'note', width: 25 }
             ];
+            wsOrders.getRow(1).font = { ...JH_FONT, bold: true, color: { argb: 'FFFFFFFF' } };
+            wsOrders.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF475569' } };
 
-            wsOrders.getRow(1).font = { bold: true, color: { argb: 'FF475569' } };
-            wsOrders.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
-            wsOrders.getRow(1).border = { bottom: { style: 'medium', color: { argb: 'FFCBD5E1' } } };
-
-            const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            
-            allOrders.forEach(o => {
+            Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(o => {
                 const t = new Date(o.createdAt).toLocaleString('zh-TW', { hour12: false });
-                
-                let st = '';
-                if (o.isRefund) {
-                    st = (o.status === 'refunded') ? '已退款' : '待退款';
-                } else {
-                    st = (o.status === 'paid') ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳');
-                }
-                
-                // 匯出名冊也加上流水號與(已退)標記
-                const seatsDisplay = (o.seats || []).map(s => {
-                    const serial = ticketMapping[s];
-                    const baseStr = serial ? `${s} (#${serial})` : s;
-                    return (o.refundedSeats || []).includes(s) ? `${baseStr} (已退)` : baseStr;
-                }).join(', ');
-
-                wsOrders.addRow({
-                    orderId: o.orderId,
-                    time: t,
-                    name: o.name,
-                    phone: o.phone,
-                    seats: seatsDisplay,
-                    total: o.total,
+                let st = o.isRefund ? (o.status === 'refunded' ? '已退款' : '待退款') : (o.status === 'paid' ? '已完成' : (o.paymentMethod === 'cash' ? '待付款' : '待入帳'));
+                const row = wsOrders.addRow({
+                    orderId: o.orderId, time: t, name: o.name, phone: o.phone, 
+                    seats: (o.seats || []).join(', '), total: o.total,
                     method: o.paymentMethod === 'cash' ? '現金' : (o.paymentMethod === 'transfer' ? '匯款' : '免付費'),
                     bankCode: o.bankCode || '',
                     receiptDate: o.isRefund ? (o.refundDate || '') : (o.receiptDate || o.reportDate || ''),
-                    status: st,
-                    note: o.note || ''
+                    status: st, note: o.note || ''
                 });
+                row.font = JH_FONT;
             });
 
             // ==========================================
-            // 工作表 3：票券核銷清冊 (給國稅局)
+            // 工作表 3：票券核銷清冊
             // ==========================================
             const wsAudit = workbook.addWorksheet('票券核銷清冊');
             wsAudit.columns = [
@@ -2868,74 +2839,60 @@
                 { header: '座位號碼', key: 'seat', width: 12 },
                 { header: '售出狀態', key: 'salesStatus', width: 15 },
                 { header: '座位類型', key: 'seatType', width: 15 },
-                { header: '票種', key: 'ticketType', width: 20 },
                 { header: '金額', key: 'price', width: 12 },
                 { header: '訂單編號', key: 'orderId', width: 22 },
                 { header: '購票人', key: 'buyer', width: 15 }
             ];
-
-            wsAudit.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            wsAudit.getRow(1).font = { ...JH_FONT, bold: true, color: { argb: 'FFFFFFFF' } };
             wsAudit.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
-            
             serialList.forEach(item => {
                 const seatInfo = seatsData[item.seat] || {};
                 const isReserve = reserveSeats.includes(item.seat);
-                
-                let salesStatusStr = '未售出';
-                let seatTypeStr = '一般席';
-                let typeStr = '';
-                let priceVal = '';
-                let oid = '';
-                let buyer = '';
-
-                if (item.seat === '-') {
-                    // 處理多印的廢票
-                    seatTypeStr = '無(多印)';
-                    salesStatusStr = '未售出';
-                } else {
-                    // 判斷座位類型
-                    if (cameraSeats.includes(item.seat)) {
-                        seatTypeStr = '攝影席';
-                        salesStatusStr = '免付費'; 
-                    } else if (isReserve) {
-                        seatTypeStr = '保留席';
-                        salesStatusStr = '免付費'; 
-                    } else {
-                        seatTypeStr = '一般席';
-                        salesStatusStr = '未售出';
-                    }
-
-                    // 判斷售出狀態
-                    if (seatInfo.status === 'sold') {
-                        buyer = seatInfo.name || '';
-                        oid = seatInfo.orderId || '';
-                        typeStr = seatInfo.ticketType || '';
-                        
-                        if(ordersData[oid]) {
-                            const o = ordersData[oid];
-                            priceVal = o.total / (o.seats.length || 1);
-                            if (o.paymentMethod === 'free') {
-                                salesStatusStr = '免付費';
-                            } else {
-                                salesStatusStr = '已售出';
-                            }
-                        } else {
-                            salesStatusStr = '已售出';
-                        }
-                    }
+                let stStr = '未售出';
+                let price = '';
+                if (item.seat !== '-' && seatInfo.status === 'sold') {
+                    stStr = seatInfo.paymentMethod === 'free' ? '免付費' : '已售出';
+                    const o = ordersData[seatInfo.orderId];
+                    if (o) price = o.total / (o.seats.length || 1);
                 }
-
-                wsAudit.addRow({
-                    serial: item.serial,
-                    seat: item.seat,
-                    salesStatus: salesStatusStr,
-                    seatType: seatTypeStr,
-                    ticketType: typeStr,
-                    price: priceVal,
-                    orderId: oid,
-                    buyer: buyer
+                const row = wsAudit.addRow({
+                    serial: item.serial, seat: item.seat, salesStatus: stStr,
+                    seatType: isReserve ? '保留席' : '一般席', price: price,
+                    orderId: seatInfo.orderId || '', buyer: seatInfo.name || ''
                 });
+                row.font = JH_FONT;
             });
+
+            // ==========================================
+            // 工作表 4：緊急手動輸入區 (極簡版)
+            // ==========================================
+            const wsManual = workbook.addWorksheet('緊急手動輸入區');
+            wsManual.columns = [
+                { header: '座位號碼 (如 C1,C2)', key: 'seats', width: 35 },
+                { header: '票價類型', key: 'type', width: 25 },
+                { header: '總計金額 (自動加總)', key: 'total', width: 20 },
+                { header: '購票姓名', key: 'name', width: 15 },
+                { header: '聯絡電話', key: 'phone', width: 20 },
+                { header: '付款方式', key: 'method', width: 20 },
+                { header: '後五碼', key: 'bank', width: 15 },
+                { header: '狀態核銷', key: 'status', width: 15 },
+                { header: '付款日期', key: 'payDate', width: 20 },
+                { header: '備註', key: 'note', width: 30 }
+            ];
+            wsManual.getRow(1).font = { ...JH_FONT, bold: true, color: { argb: 'FFFFFFFF' } };
+            wsManual.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF6366F1' } };
+
+            for (let i = 2; i <= 500; i++) {
+                wsManual.getCell(`B${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: ['"早鳥 $650,一般 $800,公關票 $0"'] };
+                wsManual.getCell(`F${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: ['"現金,匯款,免付費"'] };
+                wsManual.getCell(`H${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: ['"待入帳,已入帳,免付費"'] };
+                
+                wsManual.getCell(`E${i}`).numFmt = '@';
+                wsManual.getCell(`C${i}`).value = { formula: `IF(A${i}="","", (LEN(A${i})-LEN(SUBSTITUTE(A${i},",",""))+1) * IF(ISNUMBER(SEARCH("650",B${i})),650, IF(ISNUMBER(SEARCH("800",B${i})),800, 0)))` };
+                wsManual.getCell(`C${i}`).numFmt = '"NT$"#,##0';
+                
+                wsManual.getRow(i).font = JH_FONT;
+            }
 
             try {
                 const buffer = await workbook.xlsx.writeBuffer();
@@ -2954,19 +2911,14 @@
         window.exportDailyReceipts = async () => {
             if(!isAdmin) return;
             const targetDateInput = document.getElementById('receipt-date-input').value;
-            
-            if(!targetDateInput) {
-                window.showToast("請先在上方選擇「收款日期」", "error");
-                return;
-            }
-
+            if(!targetDateInput) { window.showToast("請先在上方選擇「收款日期」", "error"); return; }
             window.showToast("正在產生當日收款名冊...", "success");
             
             const workbook = new ExcelJS.Workbook();
             workbook.creator = 'MIA Ticketing System';
             const ws = workbook.addWorksheet('當日收款名冊');
+            const JH_FONT = { name: '微軟正黑體' };
 
-            // 🌟 修正：調整欄位順序為您的指定格式
             ws.columns = [
                 { header: '填寫日期', key: 'date', width: 15 },
                 { header: '付款類別', key: 'method', width: 12 },
@@ -2978,65 +2930,30 @@
                 { header: '收入金額', key: 'income', width: 12 }
             ];
 
-            ws.getRow(1).font = { bold: true };
+            ws.getRow(1).font = { ...JH_FONT, bold: true };
             ws.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
 
             const allOrders = Object.values(ordersData).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
             allOrders.forEach(o => {
                 if (o.paymentMethod === 'free') return;
-
                 let match = false;
                 if (o.isRefund) {
                     if (o.status === 'refunded' && o.refundDate === targetDateInput) match = true;
                 } else {
-                    if (o.status === 'paid' && o.receiptDate === targetDateInput) {
-                        match = true;
-                    } else if (o.paymentMethod === 'transfer' && o.reportDate === targetDateInput) {
-                        match = true;
-                    }
+                    if (o.status === 'paid' && o.receiptDate === targetDateInput) match = true;
+                    else if (o.paymentMethod === 'transfer' && o.reportDate === targetDateInput) match = true;
                 }
-
                 if(match) {
                     const formattedDate = targetDateInput.replace(/-/g, '/');
                     let category = o.paymentMethod === 'cash' ? '現金' : '匯款';
-
-                    let cleanTicketType = o.ticketType || "";
-                    cleanTicketType = cleanTicketType
-                        .replace('優惠 ', '')
-                        .replace(' NT$ ', '$')
-                        .replace(' / 張', '')
-                        .replace('一般原價', '原價');
-
-                    let detailString = '';
-                    if (o.isRefund) {
-                        detailString = `MIA 8th 成發門票(退款) / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
-                    } else {
-                        detailString = `MIA 8th 成發門票 / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
-                    }
-
-                    // 🌟 新增：組合姓名與電話
-                    let payerInfo = '';
-                    if (o.name && o.phone) {
-                        payerInfo = `${o.name} ${o.phone}`;
-                    } else if (o.phone) {
-                        payerInfo = o.phone;
-                    } else if (o.name) {
-                        payerInfo = o.name;
-                    } else {
-                        payerInfo = '未提供';
-                    }
-
-                    ws.addRow({
-                        date: formattedDate,
-                        method: category,
-                        period: '',  
-                        item: '門票',
-                        payer: payerInfo, // 🌟 使用組合後的資訊
-                        details: detailString,
-                        income: o.total,
-                        note: ''     
+                    let cleanTicketType = (o.ticketType || "").replace('優惠 ', '').replace(' NT$ ', '$').replace(' / 張', '').replace('一般原價', '原價');
+                    let detailString = o.isRefund ? `MIA 8th 成發門票(退款) / ${cleanTicketType} / ${(o.seats || []).join('、')}` : `MIA 8th 成發門票 / ${cleanTicketType} / ${(o.seats || []).join('、')}`;
+                    let payerInfo = (o.name && o.phone) ? `${o.name} ${o.phone}` : (o.phone || o.name || '未提供');
+                    const row = ws.addRow({
+                        date: formattedDate, method: category, period: '', item: '門票',
+                        details: detailString, payer: payerInfo, note: '', income: o.total
                     });
+                    row.font = JH_FONT;
                 }
             });
 
